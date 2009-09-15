@@ -371,8 +371,8 @@ CREATE PROCEDURE `securich`.`reconciliation`(command varchar(50))
 
             FLUSH PRIVILEGES;
             
-            SET @un=(SELECT SUBSTRING_INDEX(USER(),'@',1))
-            SET @hn=(SELECT SUBSTRING_INDEX(USER(),'@',-1))
+            SET @un=(SELECT SUBSTRING_INDEX(USER(),'@',1));
+            SET @hn=(SELECT SUBSTRING_INDEX(USER(),'@',-1));
             INSERT INTO aud_grant_revoke (USERNAME,HOSTNAME,COMMAND,TIMESTAMP) VALUES (@un,@hn,@g,NOW());
 
 

@@ -37,6 +37,15 @@ ENGINE = MyISAM
 DEFAULT CHARACTER SET = latin1
 COLLATE = latin1_swedish_ci;
 
+CREATE  TABLE IF NOT EXISTS `securich`.`sec_config` (
+  `ID` INT UNSIGNED NULL AUTO_INCREMENT ,
+  `PROPERTY` VARCHAR(255) NULL ,
+  `VALUE` INT NULL ,
+  PRIMARY KEY (`ID`) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = latin1
+COLLATE = latin1_swedish_ci;
+
 ALTER TABLE `securich`.`sec_databases` CHANGE COLUMN `DATABASENAME` `DATABASENAME` VARCHAR(64) NOT NULL  ;
 
 ALTER TABLE `securich`.`sec_hosts` CHANGE COLUMN `HOSTNAME` `HOSTNAME` VARCHAR(64) NOT NULL  ;
@@ -77,6 +86,8 @@ INSERT  INTO `securich`.`sec_help`(`ID`,`STOREDPROCEDURE`,`DESCRIPTION`) VALUES 
 INSERT  INTO `securich`.`sec_help`(`ID`,`STOREDPROCEDURE`,`DESCRIPTION`) VALUES (22,'update_databases_tables_storedprocedures_list','update_databases_tables_storedprocedures_list();\r\n-- Updates the tables and databases tables (sec_tables, sec_databases, sec_storecprocedures and their relationship table sec_db_tb and sec_db_sp) with the full list of tables / databases / storedprocedures.');
 INSERT  INTO `securich`.`sec_help`(`ID`,`STOREDPROCEDURE`,`DESCRIPTION`) VALUES (23,'grant_privileges_reverse_reconciliation','grant_privileges_reverse_reconciliation(\'username\',\'hostname\',\'databasename\',\'tablename\',\'tabletype\',\'rolename\',\'emailaddress\'); (version 0.2.0)\r\nUsed in conjunction with `reverse_reconciliation` to reconcile MySQL grants with Securich tables.');
 INSERT  INTO `securich`.`sec_help`(`ID`,`STOREDPROCEDURE`,`DESCRIPTION`) VALUES (24,'reverse_reconciliation','reverse_reconciliation(); (version 0.2.0)\r\nUsed in conjunction with `grant_privileges_reverse_reconciliation` to reconcile MySQL grants with Securich tables.');
+
+INSERT INTO `sec_config` (`PROPERTY`,`VALUE`) values ('reverse_reconciliation_in_progress',1);
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;

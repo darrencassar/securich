@@ -366,6 +366,17 @@ CREATE  TABLE IF NOT EXISTS `securich`.`aud_roles` (
   PRIMARY KEY (`ID`) )
 ENGINE = MyISAM;
 
+-- -----------------------------------------------------
+-- Table `securich`.`sec_config`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `securich`.`sec_config` ;
+
+CREATE  TABLE IF NOT EXISTS `securich`.`sec_config` (
+  `ID` INT UNSIGNED NULL AUTO_INCREMENT ,
+  `PROPERTY` VARCHAR(255) NULL ,
+  `VALUE` INT NULL ,
+  PRIMARY KEY (`ID`) )
+ENGINE = InnoDB;
 
 
 SET SQL_MODE=@OLD_SQL_MODE;

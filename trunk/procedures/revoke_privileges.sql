@@ -422,7 +422,7 @@ CREATE PROCEDURE `securich`.`revoke_privileges`( usernamein varchar(16), hostnam
               SET @VAR=@VAR+1;
 
           END WHILE;
-       ELSE IF terminateconnections = 'Y' or terminateconnections='y' THEN
+       ELSEIF terminateconnections = 'Y' or terminateconnections='y' THEN
           
           SELECT "Current version of MySQL doesn't allow terminating connections, please upgrade to 5.1.7 or later (latest GA version is suggested)" as Warning;          
           SELECT "Privileges were revoked despite the above warning." as Note;

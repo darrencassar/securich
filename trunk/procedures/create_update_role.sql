@@ -53,8 +53,8 @@ BEGIN
           PR_ID=PRIV_ID
           );
        
-       SET @un=(SELECT SUBSTRING_INDEX(USER(),'@',1))
-       SET @hn=(SELECT SUBSTRING_INDEX(USER(),'@',-1))
+       SET @un=(SELECT SUBSTRING_INDEX(USER(),'@',1));
+       SET @hn=(SELECT SUBSTRING_INDEX(USER(),'@',-1));
        
 
        /* If user needs to add a privilege to a role, check that the role doesn't contain the particular privileg and if it does then issue a warning, otherwise just add it */
@@ -63,7 +63,9 @@ BEGIN
 
           insert into sec_ro_pr (RO_ID,PR_ID) values (ROLE_ID,PRIV_ID);
           set @g= CONCAT("add " , privilegenamein , " to " , rolenamein );
-          call reconciliation('sync');
+          IF (select value from sec_config where PROPERTY = reverse_reconciliation_in_progress) = 0 THEN
+             call reconciliation('sync'); 
+          END IF;
           INSERT INTO aud_roles (USERNAME,HOSTNAME,COMMAND,TIMESTAMP) VALUES (@un,@hn,@g,NOW());
 
        ELSEIF way = 'add' AND roleprivilegeexists > 0 THEN
@@ -76,7 +78,9 @@ BEGIN
 
           delete from sec_ro_pr where RO_ID=ROLE_ID and PR_ID=PRIV_ID;
           set @g= CONCAT("remove " , privilegenamein , " from " , rolenamein );          
-          call reconciliation('sync'); 
+          IF (select value from sec_config where PROPERTY = reverse_reconciliation_in_progress) = 0 THEN
+             call reconciliation('sync'); 
+          END IF;
           INSERT INTO aud_roles (USERNAME,HOSTNAME,COMMAND,TIMESTAMP) VALUES (@un,@hn,@g,NOW());
  
        ELSEIF way = 'remove' AND roleprivilegeexists = 0 THEN

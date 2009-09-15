@@ -438,6 +438,8 @@ CREATE  DEFINER=`root`@`localhost` PROCEDURE `securich`.`grant_privileges_revers
          END IF;
 
       END IF;
+      
+      CALL reconciliation('sync');
 
       FLUSH PRIVILEGES;
 
