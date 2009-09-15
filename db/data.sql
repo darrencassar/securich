@@ -7,6 +7,9 @@ flush privileges;
 
 USE securich;
 
+INSERT INTO `sec_config` (`PROPERTY`,`VALUE`) values
+('reverse_reconciliation_in_progress',1);
+
 INSERT INTO `sec_databases` (`ID`,`DATABASENAME`) VALUES
 (1,'');
 

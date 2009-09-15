@@ -48,6 +48,7 @@ CREATE PROCEDURE `securich`.`reverse_reconciliation`()
          END IF;
       END;*/
 
+         update sec_config set VALUE = 1 where PROPERTY = reverse_reconciliation_in_progress;
 
          FLUSH PRIVILEGES;
 

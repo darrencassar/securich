@@ -891,8 +891,8 @@ CREATE  DEFINER=`root`@`localhost` PROCEDURE `securich`.`grant_privileges`( user
 
                END IF;
                
-               SET @un=(SELECT SUBSTRING_INDEX(USER(),'@',1))
-               SET @hn=(SELECT SUBSTRING_INDEX(USER(),'@',-1))
+               SET @un=(SELECT SUBSTRING_INDEX(USER(),'@',1));
+               SET @hn=(SELECT SUBSTRING_INDEX(USER(),'@',-1));
                INSERT INTO aud_grant_revoke (USERNAME,HOSTNAME,COMMAND,TIMESTAMP) VALUES (@un,@hn,@g,NOW());
                
                       /* output the password to be sent to the user */
