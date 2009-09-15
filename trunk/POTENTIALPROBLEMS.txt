@@ -1,0 +1,16 @@
+Potential Problems:
+
+1.
+mysql> call CREATE_USER('user','localhost','db','','all','dba','name@domain.com');
+ERROR 1436 (HY000): Thread stack overrun:  5008 bytes used of a 131072 byte stack, and 128000 bytes needed.  Use 'mysqld -O thread_stack=#' to specify a bigger stack.
+
+Solution:
+Increase thread_stack
+
+
+2.
+mysql> call GRANT_PRIVILEGES('user','localhost','securich','GRANT_PRIVILEGES','storedprocedure','sp','name@domain.com');
+ERROR 1456 (HY000): Recursive limit 0 (as set by the max_sp_recursion_depth variable) was exceeded for routine GRANT_PRIVILEGES
+
+Solution:
+Increase max_sp_recursion_depth

@@ -1,0 +1,20 @@
+List of features:
+
+1. Secure permitting only root to change the password of a user or the user himself.
+2. Password history stores 5 passwords including the timestamp when the last password change occurred and the first time the user was created
+3. Password has a minimum complexity requirement and user needs to supply his old password in order to authenticate to replace it with a new one
+4. There is a minimum recycle time for a password, that is it can be changed up to 10 times in 1 day but these cycles don't affect the password history. IE a password is only included in the history if the password had been in use for more than 1 day.
+5. Global, Database, Table and Procedure level privileges
+6. Updatable roles, that is when a role is updated, users using that role can be updated using `call RECONCILIATION('sync');`
+7. Clone a new user from one you know is the same (everything is the same apart from the username, host, emailaddress and password).
+8. Updating a role propagates to the privileges any user having that role has i.e. it is dynamic.
+9. `mysql` database is considered a "sacred" database by securich and therefore the latter (securich) doesn't list the former (mysql) anywhere in it's tables avoiding granting rights on it
+10. Can automatically reconcile from mysql to securich.
+
+Limitations:
+
+1. Doesn't cater for functions
+2. Doesn't cater for columns
+3. Can't be used to grant the grant option or limitations with the number of queries / connections per period of time.
+4. Password needs to have letter, one number and one special character and any other eight characters but the "one letter, one number and one special character need to be consecutive. They can be in any permutation but need to be consecutive ie aa1$ works out well as 1$a1 but you can't have a11$ or 1$$a."
+5. If a stored procedure is deleted / dropped, then the rights attached to it are lost as well so `call reconciliation('sync');` should be executed right after a stored procedure is recreated.
