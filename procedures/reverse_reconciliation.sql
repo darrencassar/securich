@@ -38,7 +38,7 @@ CREATE PROCEDURE `securich`.`reverse_reconciliation`()
       DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
 
 
-/*Exception handler*/
+/*Exception handler
       DECLARE EXIT HANDLER FOR SQLEXCEPTION
       BEGIN
          ROLLBACK;
@@ -46,7 +46,7 @@ CREATE PROCEDURE `securich`.`reverse_reconciliation`()
          IF (SELECT COUNT(*) FROM sec_users) > 0 THEN
             SELECT 'Error occurred - terminating - reverse reconciliation failed';
          END IF;
-      END;
+      END;*/
 
 
          FLUSH PRIVILEGES;
@@ -148,7 +148,7 @@ CREATE PROCEDURE `securich`.`reverse_reconciliation`()
                LEAVE cur_role_loop;
             END IF;
             
-            SET @a= CONCAT('set @b=(SELECT COUNT(*) FROM sec_roles WHERE ROLE="' , privilegerole ,'")');
+            SET @a= CONCAT('set @b=(SELECT COUNT(*) FROM sec_roles WHERE ROLE="' , privilegerole , '")');
 
             PREPARE tempcom FROM @a;
             EXECUTE tempcom;
