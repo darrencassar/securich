@@ -87,7 +87,7 @@ INSERT  INTO `securich`.`sec_help`(`ID`,`STOREDPROCEDURE`,`DESCRIPTION`) VALUES 
 INSERT  INTO `securich`.`sec_help`(`ID`,`STOREDPROCEDURE`,`DESCRIPTION`) VALUES (23,'grant_privileges_reverse_reconciliation','grant_privileges_reverse_reconciliation(\'username\',\'hostname\',\'databasename\',\'tablename\',\'tabletype\',\'rolename\',\'emailaddress\'); (version 0.2.0)\r\nUsed in conjunction with `reverse_reconciliation` to reconcile MySQL grants with Securich tables.');
 INSERT  INTO `securich`.`sec_help`(`ID`,`STOREDPROCEDURE`,`DESCRIPTION`) VALUES (24,'reverse_reconciliation','reverse_reconciliation(); (version 0.2.0)\r\nUsed in conjunction with `grant_privileges_reverse_reconciliation` to reconcile MySQL grants with Securich tables.');
 
-INSERT INTO `sec_config` (`PROPERTY`,`VALUE`) values ('reverse_reconciliation_in_progress',1);
+INSERT INTO `sec_config` (`PROPERTY`,`VALUE`) values ('reverse_reconciliation_in_progress',0);
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
