@@ -381,8 +381,11 @@ terminate () {
 
           if [ "$IM" == 1 ]
           then
-            
-            rm /tmp/securich_reconciliation.sql
+
+            if [ -f /tmp/securich_reconciliation.sql ]
+            then
+               rm /tmp/securich_reconciliation.sql
+            fi
             
             mysql -u root --password=$PASS -h $HOST -P $PORT securich --execute="call reverse_reconciliation()"
             if [ $? != 0 ]; then
@@ -393,7 +396,7 @@ terminate () {
             fi
             
             mysql -u root --password=$PASS -h $HOST -P $PORT securich < /tmp/securich_reconciliation.sql
-            mv /tmp/securich_reconciliation.sql logs/
+            mv /tmp/securich_reconciliation.sql $BASEDIR/logs/
           fi
 
 ## If connection is handled through socket file, do the same as above but using socket
@@ -453,7 +456,10 @@ terminate () {
           if [ "$IM" == 1 ]
           then
             
-            rm /tmp/securich_reconciliation.sql
+            if [ -f /tmp/securich_reconciliation.sql ]
+            then
+               rm /tmp/securich_reconciliation.sql
+            fi
             
             mysql -u root --password=$PASS --socket=$SOCK securich --execute="call reverse_reconciliation()"
             if [ $? != 0 ]; then
@@ -464,7 +470,7 @@ terminate () {
             fi
             
             mysql -u root --password=$PASS --socket=$SOCK securich < /tmp/securich_reconciliation.sql
-            mv /tmp/securich_reconciliation.sql logs/
+            mv /tmp/securich_reconciliation.sql $BASEDIR/logs/
           fi
           
      else
