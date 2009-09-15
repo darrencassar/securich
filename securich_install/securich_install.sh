@@ -110,6 +110,7 @@ terminate () {
   CVN=`grep -c $VN version`
   if [ $CVN == 0 ]
    then
+    echo ""
     echo -n "Wrong value, please re-enter version number (defualt $LV i.e. latest version): "
      read -e VN
       if [ "$VN" == "" ]
@@ -121,6 +122,7 @@ terminate () {
 
 ## Choose if installation should get the file from the net or just install it from a  local file.
 
+ echo ""
  echo "Which kind of installation would you like to do?"
  echo "1. Install from file on disk "
  echo "2. Download and install (recommended) "
@@ -226,6 +228,7 @@ terminate () {
 
 ## Choose from fresh installation or upgrade
 
+ echo ""
  echo "Do you wish to:"
  echo "1. Do a fresh install "
  echo "2. Upgrade from a previous version "
@@ -251,6 +254,7 @@ terminate () {
  then
     ## Import current MySQL grants
     
+    echo ""
     echo "Would you like to import current MySQL grants to Securich:"
     echo "1. Import"
     echo "2. No start from scratch (This will clear out any non reserved usernames (not 'root','msandbox' etc) grants so please be sure of your answer)"
@@ -275,6 +279,7 @@ terminate () {
         
 ## Enter password (masked for security)
 
+ echo ""
  echo -n "Enter mysql root Password (default ''): "
 
  stty_orig=`stty -g`
@@ -286,13 +291,14 @@ terminate () {
 
 ## Choose from TCP/IP or Socket file
 
+ echo ""
  echo "Would you like to connect using:"
  echo "1. TCP/IP"
  echo "2. Socket file"
  echo -n "Enter choice (default 1): "
  read -e CH                                                           ## CH = Connection Handler
 
- if [ "$FOU" == "" ]
+ if [ "$CH" == "" ]
    then
    CH=1
  fi
@@ -385,7 +391,6 @@ terminate () {
                exit 1
              }
             fi
-            done
             
             mysql -u root --password=$PASS -h $HOST -P $PORT securich < /tmp/securich_reconciliation.sql
             mv /tmp/securich_reconciliation.sql logs/
@@ -395,6 +400,7 @@ terminate () {
 
      elif [ "$CH" == "2" ]
       then
+       echo ""
        echo -n "Enter mysql socket (default '/tmp/mysql.sock'): "
        read -e SOCK
         if [ "$SOCK" == "" ]
@@ -456,7 +462,6 @@ terminate () {
                exit 1
              }
             fi
-            done
             
             mysql -u root --password=$PASS --socket=$SOCK securich < /tmp/securich_reconciliation.sql
             mv /tmp/securich_reconciliation.sql logs/
@@ -483,12 +488,14 @@ terminate () {
 
    if [ "$CH" == "" ] || [ "$CH" == "1"  ]
     then
+       echo ""
        echo -n "Enter mysql Hostname/IP (default '127.0.0.1'): "
        read -e HOST
          if [ "$HOST" == "" ]
           then
            HOST=127.0.0.1
          fi
+       echo ""
        echo -n "Enter mysql Port (default '3306'): "
        read -e PORT
         if [ "$PORT" == "" ]
