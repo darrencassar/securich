@@ -388,6 +388,7 @@ terminate () {
             fi
             
             mysql -u root --password=$PASS -h $HOST -P $PORT securich --execute="call reverse_reconciliation()"
+            cat /tmp/securich_reconciliation.sql
             if [ $? != 0 ]; then
              {
                echo "Problem populating Securich with MySQL grants"
