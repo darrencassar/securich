@@ -188,6 +188,9 @@ CREATE  DEFINER=`root`@`localhost` PROCEDURE `securich`.`grant_privileges`( user
       DECLARE EXIT HANDLER FOR SQLEXCEPTION
       BEGIN
          ROLLBACK;
+         call reconciliation('sync');
+         FLUSH PRIVILEGES;
+
          SELECT 'Error occurred - terminating - USER CREATION AND / OR PRIVILEGES GRANT FAILED';
       END;
 
