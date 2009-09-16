@@ -1,7 +1,0 @@
-#summary Welcome to Securich.
-
-= Introduction =
-
-Jake http://code.google.com/p/securich/logo?logo_id=1253104604 would like to welcome you to use securich and give feedback. You will be able to find lots of information on this website but if you require any help, please feel free to drop a note on:
-
-{{{ select reverse('moc.hciruces@ofni'); }}}
