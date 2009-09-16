@@ -21,3 +21,7 @@ It's easy to know which install script is the latest - it'd have the version of 
 *********************************************************************
 **** Make sure you have mysql, wget, gunzip and tar in your PATH ****
 *********************************************************************
+
+= Uninstalling =
+
+In the unlikely event that you'd like to get rid of Securich, it's basically as easy as a "drop securich;" on the MySQL instance it is installed on.
