@@ -1,4 +1,4 @@
 #summary Table of Contents.
 
   * [Target]
-  * [Install]
+  * [Installation]
