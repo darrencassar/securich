@@ -1,4 +1,5 @@
 #summary Welcome to Securich.
+#labels Featured
 #sidebar TableOfContents
 
 = Introduction =
