@@ -6,7 +6,7 @@ Securich only requires little resources and a few applications like _mysql_, _wg
 
 = Install Script =
 
-The recommended way to go about when installing the package is to download the installer script `_wget http://www.securich.com/downloads/securich_install.tar_` which you simply have to untar and run. The script will ask a few questions tipo:
+The recommended way to go about when installing the package is to download the installer script ` wget http://www.securich.com/downloads/securich_install.tar ` which you simply have to untar and run. The script will ask a few questions tipo:
 1. Which version you want to install
 2. Would you prefer to download the latest copy or use a readily available .tar.gz file
 3. Would you like to upgrade securich or just run a fresh install
