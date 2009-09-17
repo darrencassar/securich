@@ -4,8 +4,8 @@
 
 Securich only requires little resources and a few applications like _mysql_, _wget_, _tar_, _gzip_. It is pretty straight forward and offers quite a few options like installing it on remote machines, upgrading, error handling, etc
 
-= Install Script =
-
+= Installing Securich =
+== Using the install script ==
 The recommended way to go about when installing the package is to download the installer script {{{wget http://www.securich.com/downloads/securich_install.tar}}} which you simply have to untar and run. The script will ask a few questions tipo:
   # Which version you want to install
   # Would you prefer to download the latest copy or use a readily available .tar.gz file
@@ -15,6 +15,14 @@ The recommended way to go about when installing the package is to download the i
 Always make sure you are running the latest install script.
 It's easy to know which install script is the latest - it'd have the version of the latest securich as a prefix, meaning, for securich.0.2.0, the install script would be securich_install.0.2.0.1 where the last number is the installer version.
 
+=== Requirements ===
+
+*********************************************************************
+**** Make sure you have mysql, wget, gunzip and tar in your PATH ****
+*********************************************************************
+
+  ----
+== Manual installation == 
 If you'd like to install the latest version (in development / testing):
 {{{
 > svn checkout http://securich.googlecode.com/svn/trunk/ securich-read-only  
@@ -33,12 +41,7 @@ If at this point you'd like to import any MySQL accounts in the Securich db issu
 {{{
 > mysql -u root securich < --execute="call reverse_reconciliation()"
 }}}
-= Requirements = 
-
-*********************************************************************
-**** Make sure you have mysql, wget, gunzip and tar in your PATH ****
-*********************************************************************
 
 = Uninstalling =
 
-In the unlikely event that you'd like to get rid of Securich, it's basically as easy as a "drop securich;" on the MySQL instance it is installed on.
+Uninstalling securich is as simple as a few key strokes -- it's basically as easy as a `drop securich;` on the MySQL instance it is installed on.
