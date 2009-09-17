@@ -1,4 +1,4 @@
-#summary Installing Securich is a _wget_ away.
+#summary Installing Securich is a wget away.
 
 = Introduction =
 
@@ -15,6 +15,22 @@ etc
 
 Always make sure you are running the latest install script.
 It's easy to know which install script is the latest - it'd have the version of the latest securich as a prefix, meaning, for securich.0.2.0, the install script would be securich_install.0.2.0.1 where the last number is the installer version.
+
+If you'd like to install the latest version (in development / testing):
+> svn checkout http://securich.googlecode.com/svn/trunk/ securich-read-only  
+> cd securich
+> mysql -u root --execute="drop database if exists securich"
+> mysql -u root securich < db/securich.sql
+> mysql -u root securich < procedures/update_databases_tables_storedprocedures_list.sql
+> mysql -u root securich < db/data.sql
+
+> for proc in `ls procedures/`
+> do
+> mysql -u root securich < procedures/$proc
+> done 
+
+If at this point you'd like to import any MySQL accounts in the Securich db issue:
+> mysql -u root securich < --execute="call reverse_reconciliation()"
 
 = Requirements = 
 
