@@ -6,17 +6,17 @@ Securich only requires little resources and a few applications like _mysql_, _wg
 
 = Install Script =
 
-The recommended way to go about when installing the package is to download the installer script ` wget http://www.securich.com/downloads/securich_install.tar ` which you simply have to untar and run. The script will ask a few questions tipo:
-1. Which version you want to install
-2. Would you prefer to download the latest copy or use a readily available .tar.gz file
-3. Would you like to upgrade securich or just run a fresh install
-4. Would you like to loose any current privileges already present on MySQL or migrate them to securich
-etc
+The recommended way to go about when installing the package is to download the installer script {{{wget http://www.securich.com/downloads/securich_install.tar}}} which you simply have to untar and run. The script will ask a few questions tipo:
+  # Which version you want to install
+  # Would you prefer to download the latest copy or use a readily available .tar.gz file
+  # Would you like to upgrade securich or just run a fresh install
+  # Would you like to loose any current privileges already present on MySQL or migrate them to securich, etc
 
 Always make sure you are running the latest install script.
 It's easy to know which install script is the latest - it'd have the version of the latest securich as a prefix, meaning, for securich.0.2.0, the install script would be securich_install.0.2.0.1 where the last number is the installer version.
 
 If you'd like to install the latest version (in development / testing):
+{{{
 > svn checkout http://securich.googlecode.com/svn/trunk/ securich-read-only  
 > cd securich
 > mysql -u root --execute="drop database if exists securich"
@@ -28,10 +28,11 @@ If you'd like to install the latest version (in development / testing):
 > do
 > mysql -u root securich < procedures/$proc
 > done 
-
+}}}
 If at this point you'd like to import any MySQL accounts in the Securich db issue:
+{{{
 > mysql -u root securich < --execute="call reverse_reconciliation()"
-
+}}}
 = Requirements = 
 
 *********************************************************************
