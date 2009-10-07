@@ -82,6 +82,36 @@ terminate () {
  echo ""
  trap terminate SIGINT SIGTERM
 
+## Checking if mysql binary is available
+ 
+ MYSQLBIN=`which mysql 2> /dev/null`
+ if [ "$MYSQLBIN" = "" -o ! -x "$MYSQLBIN" ]
+ then
+   echo "It seems this installed can't find MYSQL binary."
+   echo "Please make sure it is in your system by running 'mysql --version'"
+   exit 1
+ fi
+ 
+## Checking if gunzip is available
+ 
+ GUNZIPBIN=`which gunzip 2> /dev/null`
+ if [ "$GUNZIPBIN" = "" -o ! -x "$GUNZIPBIN" ]
+ then
+   echo "It seems this installed can't find GUNZIP binary."
+   echo "Please make sure it is in your system by running 'gunzip --version'"
+   exit 1
+ fi
+ 
+## Checking if tar is available
+ 
+ TARBIN=`which tar 2> /dev/null`
+ if [ "$TARBIN" = "" -o ! -x "$TARBIN" ]
+ then
+   echo "It seems this installed can't find TAR binary."
+   echo "Please make sure it is in your system by running 'tar --version'"
+   exit 1
+ fi
+
 ## Version control - suggested
 
  LV=`tail -1 version`                                                  ## LV = Latest Version
