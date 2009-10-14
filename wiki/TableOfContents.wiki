@@ -3,3 +3,4 @@
   * [Welcome]
   * [Target]
   * [Installation]
+  * [Documentation]
