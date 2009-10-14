@@ -40,7 +40,7 @@ CREATE PROCEDURE `securich`.`password_check`()
       /* list of privileges a particular user entity (username@hostname) will be granted on a particular combination of database and tables */
 
       DECLARE cur_pass CURSOR FOR
-	       SELECT mu.USER AS USERNAME,mu.HOST AS HOSTNAME,mu.PASSWORD AS "MySQL PW" ,sec.PW0 AS "SECURICH PW"
+	     SELECT mu.USER AS USERNAME,mu.HOST AS HOSTNAME,mu.PASSWORD AS "MySQL PW" ,sec.PW0 AS "SECURICH PW"
          FROM mysql.user mu JOIN (
            SELECT uhid.USERNAME, uhid.HOSTNAME, pr.PW0 
            FROM sec_us_ho_profile pr JOIN (
