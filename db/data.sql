@@ -20,15 +20,15 @@ INSERT INTO `sec_storedprocedures` (`ID`,`STOREDPROCEDURENAME`) VALUES
 (1,'');
 
 INSERT  INTO `sec_privileges`(`ID`,`PRIVILEGE`,`TYPE`) VALUES
-(1,'SELECT',0),
-(2,'INSERT',0),
-(3,'UPDATE',0),
+(1,'SELECT',-1),
+(2,'INSERT',-1),
+(3,'UPDATE',-1),
 (4,'DELETE',0),
 (5,'ALTER',0),
 (6,'CREATE',0),
 (7,'DROP',0),
 (8,'INDEX',0),
-(9,'REFERENCES',0),
+(9,'REFERENCES',-1),
 (10,'CREATE TEMPORARY TABLES',2),
 (11,'LOCK TABLES',2),
 (12,'TRIGGER',2),
@@ -83,8 +83,7 @@ INSERT  INTO `securich`.`sec_help`(`ID`,`STOREDPROCEDURE`,`DESCRIPTION`) VALUES 
 INSERT  INTO `securich`.`sec_help`(`ID`,`STOREDPROCEDURE`,`DESCRIPTION`) VALUES (17,'remove_reserved_username','remove_reserved_username(\'usernamein\'); (version 0.1.4)\r\n-- Does the opposite of add_reserved_username, removes a username from the reserved list');
 INSERT  INTO `securich`.`sec_help`(`ID`,`STOREDPROCEDURE`,`DESCRIPTION`) VALUES (18,'rename_user','rename_user(\'oldusername\',\'newusername\',\'newemailaddress\');\r\n-- Renames an old user to the new username leaving all privileges intact and changing only the password and the email address.');
 INSERT  INTO `securich`.`sec_help`(`ID`,`STOREDPROCEDURE`,`DESCRIPTION`) VALUES (19,'revoke_privileges','revoke_privileges(\'username\',\'hostname\',\'databasename\',\'tablename\',\'tabletype\',\'rolename\',\'terminateconnections\');\r\n-- Revokes a privilege for a particular combination of username / hostname / databasename / tablename / role. The terminateconnectionsy is there to kill all threads for a particular user if set to Y which is revoked. Should you not want to cut off the user, just substitute it with n and the user won\'t be able to connect next time round but current connections remain intact. - tabletype should either be table (for a table) and storedprocedure (for a stored proc).');
-INSERT  INTO `securich`.`sec_help`(`ID`,`STOREDPROCEDURE`,`DESCRIPTION`) VALUES (20,'set_password','set_password(\'username\',\'hostname\',\'oldpassword\',\'newpassword\'); (version 0.1.1) (version 0.1.4 added \'oldpassword\')\r\n-- Changes password for any user (if current user is root), otherwise changes own password if current user is not root. can change the password up to 11 times in 1 day and stores the last 5 passwords which were not changed for at least 24hrs. Does not permit the new password to be the same as any of the old passwords. Resets update count if more than 24hrs passed from last first update of the day. Password must be longer than X (configurable in sec_config) characters, contain at least one number, one letter and one special character (minimum complexity requirement). In order for a user to change one\'s old password, the user needs to supply the old password apart from the new one as well.');
-INSERT  INTO `securich`.`sec_help`(`ID`,`STOREDPROCEDURE`,`DESCRIPTION`) VALUES (21,'unblock_user ','unblock_user ( \'usernamein\',\'hostnamein\',\'dbnamein\' )\r\n-- Unblocks any user specified if it had blocked privileges / roles');
+`INSERT  INTO `securich`.`sec_help`(`ID`,`STOREDPROCEDURE`,`DESCRIPTION`) VALUES (21,'unblock_user ','unblock_user ( \'usernamein\',\'hostnamein\',\'dbnamein\' )\r\n-- Unblocks any user specified if it had blocked privileges / roles');
 INSERT  INTO `securich`.`sec_help`(`ID`,`STOREDPROCEDURE`,`DESCRIPTION`) VALUES (22,'update_databases_tables_storedprocedures_list','update_databases_tables_storedprocedures_list();\r\n-- Updates the tables and databases tables (sec_tables, sec_databases, sec_storecprocedures and their relationship table sec_db_tb and sec_db_sp) with the full list of tables / databases / storedprocedures.');
 INSERT  INTO `securich`.`sec_help`(`ID`,`STOREDPROCEDURE`,`DESCRIPTION`) VALUES (23,'grant_privileges_reverse_reconciliation','grant_privileges_reverse_reconciliation(\'username\',\'hostname\',\'databasename\',\'tablename\',\'tabletype\',\'rolename\',\'emailaddress\'); (version 0.2.0)\r\nUsed in conjunction with `reverse_reconciliation` to reconcile MySQL grants with Securich tables.');
 INSERT  INTO `securich`.`sec_help`(`ID`,`STOREDPROCEDURE`,`DESCRIPTION`) VALUES (24,'reverse_reconciliation','reverse_reconciliation(); (version 0.2.0)\r\nUsed in conjunction with `grant_privileges_reverse_reconciliation` to reconcile MySQL grants with Securich tables.');
