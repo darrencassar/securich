@@ -547,7 +547,7 @@ CREATE  DEFINER=`root`@`localhost` PROCEDURE `securich`.`grant_privileges`( user
 
                          /* depending on the type of priv, a different kind of grant command is built */
 
-                     IF @t=0 THEN
+                     IF @t<1 THEN
                         SET @g = CONCAT('grant ', PRIV_OBO_GRANT , ' on ' , dbnamein , '.' , tbname , ' to "' , usernamein , '"@"' , hostnamein , '"');
 
                      ELSEIF @t<3 THEN
@@ -648,7 +648,7 @@ CREATE  DEFINER=`root`@`localhost` PROCEDURE `securich`.`grant_privileges`( user
 
                             /* depending on the type of priv, a different kind of grant command is built */
 
-                              IF @t=0 THEN
+                              IF @t<1 THEN
 
                                  SET @g = CONCAT('grant ', PRIV_OBO_GRANT , ' on ' , dbnamein , '.' , tbname , ' to "' , usernamein , '"@"' , hostnamein , '"');
 
@@ -754,7 +754,7 @@ CREATE  DEFINER=`root`@`localhost` PROCEDURE `securich`.`grant_privileges`( user
 
                       /* depending on the type of priv, a different kind of grant command is built */
 
-                        IF @t=0 THEN
+                        IF @t<1 THEN
 
                            SET @g = CONCAT('grant ', PRIV_OBO_GRANT , ' on ' , dbnamein , '.' , tbname , ' to "' , usernamein , '"@"' , hostnamein , '"');
 

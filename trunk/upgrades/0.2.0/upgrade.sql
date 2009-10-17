@@ -52,6 +52,9 @@ ALTER TABLE `securich`.`sec_hosts` CHANGE COLUMN `HOSTNAME` `HOSTNAME` VARCHAR(6
 
 ALTER TABLE `securich`.`sec_users` CHANGE COLUMN `USERNAME` `USERNAME` VARCHAR(16) NOT NULL  , CHANGE COLUMN `EMAIL_ADDRESS` `EMAIL_ADDRESS` VARCHAR(64) NULL DEFAULT ''  ;
 
+
+#renaming a few stored procedures
+
 DROP PROCEDURE IF EXISTS check_roles;                #renamed to show_roles
 DROP PROCEDURE IF EXISTS check_role_privileges;      #renamed to show_privileges_in_roles
 DROP PROCEDURE IF EXISTS check_user_privileges;      #renamed to show_user_privileges
@@ -59,6 +62,9 @@ DROP PROCEDURE IF EXISTS check_privilege_users;      #renamed to show_users_with
 DROP PROCEDURE IF EXISTS check_user_list;            #renamed to show_user_list
 DROP PROCEDURE IF EXISTS check_user_entries;         #renamed to show_user_entries
 DROP PROCEDURE IF EXISTS check_full_user_entries;    #renamed to show_full_user_entries
+
+
+#updating the help documentation
 
 truncate `securich`.`sec_help`;
 
@@ -87,9 +93,17 @@ INSERT  INTO `securich`.`sec_help`(`ID`,`STOREDPROCEDURE`,`DESCRIPTION`) VALUES 
 INSERT  INTO `securich`.`sec_help`(`ID`,`STOREDPROCEDURE`,`DESCRIPTION`) VALUES (23,'grant_privileges_reverse_reconciliation','grant_privileges_reverse_reconciliation(\'username\',\'hostname\',\'databasename\',\'tablename\',\'tabletype\',\'rolename\',\'emailaddress\'); (version 0.2.0)\r\nUsed in conjunction with `reverse_reconciliation` to reconcile MySQL grants with Securich tables.');
 INSERT  INTO `securich`.`sec_help`(`ID`,`STOREDPROCEDURE`,`DESCRIPTION`) VALUES (24,'reverse_reconciliation','reverse_reconciliation(); (version 0.2.0)\r\nUsed in conjunction with `grant_privileges_reverse_reconciliation` to reconcile MySQL grants with Securich tables.');
 
+#added two new variables
+
 INSERT INTO `sec_config` (`PROPERTY`,`VALUE`) values ('reverse_reconciliation_in_progress',0);
 INSERT INTO `sec_config` (`PROPERTY`,`VALUE`) values ('password_length',10);
 
+#added column level privileges so there is a new type of privilege 
+
+update sec_privileges set TYPE='-1' where PRIVILEGE='SELECT';
+update sec_privileges set TYPE='-1' where PRIVILEGE='INSERT';
+update sec_privileges set TYPE='-1' where PRIVILEGE='UPDATE';
+update sec_privileges set TYPE='-1' where PRIVILEGE='REFERENCES';
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
