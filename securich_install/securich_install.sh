@@ -63,23 +63,26 @@ terminate () {
 
 }
 
-## Catering for traps ... hindering a messed up securich
- echo "                                                             "
- echo "                                                 __          "
- echo "                                      __        /\ \         "
- echo "   ____     __    ___   __  __  _ __ /\_\    ___\ \ \___     "
- echo "  /',__\  /'__ \ /'___\/\ \/\ \/\ '__\/\ \  /'___\ \  _  \   "
- echo " /\__,  \/\  __//\ \__/\ \ \_\ \ \ \/ \ \ \/\ \__/\ \ \ \ \  "
- echo " \/\____/\ \____\ \____/\ \____/\ \_\  \ \_\ \____/\ \_\ \_\ "
- echo "  \/___/  \/____/\/____/ \/___/  \/_/   \/_/\/____/ \/_/\/_/ "
- echo "                                                             "
- echo " brought to you by Darren Cassar "
- echo " http://www.mysqlpreacher.com "
- echo ""
- echo ""
- echo "Anytime you need to cancel installation just press ( Ctrl + C )"
- echo ""
- echo ""
+if [ $1 != "silent" ]
+then
+  ## Catering for traps ... hindering a messed up securich
+  echo "                                                             "
+  echo "                                                 __          "
+  echo "                                      __        /\ \         "
+  echo "   ____     __    ___   __  __  _ __ /\_\    ___\ \ \___     "
+  echo "  /',__\  /'__ \ /'___\/\ \/\ \/\ '__\/\ \  /'___\ \  _  \   "
+  echo " /\__,  \/\  __//\ \__/\ \ \_\ \ \ \/ \ \ \/\ \__/\ \ \ \ \  "
+  echo " \/\____/\ \____\ \____/\ \____/\ \_\  \ \_\ \____/\ \_\ \_\ "
+  echo "  \/___/  \/____/\/____/ \/___/  \/_/   \/_/\/____/ \/_/\/_/ "
+  echo "                                                             "
+  echo " brought to you by Darren Cassar "
+  echo " http://www.mysqlpreacher.com "
+  echo ""
+  echo ""
+  echo "Anytime you need to cancel installation just press ( Ctrl + C )"
+  echo ""
+  echo ""
+fi
  trap terminate SIGINT SIGTERM
 
 ## Checking if mysql binary is available
