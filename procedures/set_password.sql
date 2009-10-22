@@ -42,14 +42,14 @@ CREATE PROCEDURE `securich`.`set_password`( usernamein varchar(50), hostnamein v
     DECLARE UPDATECOUNT INT;
     DECLARE LASTUPDATE INT;
     DECLARE CORRECTUSER INT;
-    DECLARE ROOTUSER INT;
+    DECLARE ROOTUSER VARCHAR(16);
 
 
     SET CORRECTUSER= (select CONCAT(usernamein,'@',hostnamein)=user());
-    SET PASSWORDLENGTH= (select VALUE from sec_config where PROPERTY='password_length);
-    SET ROOTUSER= (select 'root'=(substring_index(user(),'@',1)));
+    SET PASSWORDLENGTH= (select VALUE from sec_config where PROPERTY='password_length');
+    SET ROOTUSER= (select (substring_index(user(),'@',1)));
 
-     IF CORRECTUSER = 1 OR ROOTUSER = 1 THEN
+     IF CORRECTUSER = 1 OR ROOTUSER = 'root' THEN
 
         SET USHOID= (
            select ID
