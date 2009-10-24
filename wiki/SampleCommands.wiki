@@ -8,27 +8,31 @@ Here is a list of commands available for use with securich (0.1.2). As from 0.1.
 
 Securich Tutorial (for securich version 0.1.2)
 
-Steps:
-1. Download it,
-2. Install it,
-3. Create a role named "role1" having privileges "select insert update"
-4. Check roles,
-5. Check role privileges,
-6. Create a first user john@machine.domain.com (granting privileges on a whole database employees apart from one table),
-7. Create a second user paul@10.0.0.2 (granting privileges on all tables in world having word Country in them),
-8. Create a third user peter@localhost (granting privileges on the database test),
-9. Check user privileges for (paul),
-10. Update role created above and see changes (add delete to role 1),
-11. Update password (for paul) and see changes,
-12. Clone user paul to judas,
-13. Check user privileges
-14. Check user,
-15. Rename user judas to james,
-16. Revoke privileges from third user disconnecting any existing connections from that user (useful if a security breach is suspected or if you are a security paranoid thus wanting to make sure the person you are blocking out won't have any more access as from that point onwards).
+==Tutorial==
 
+  # Download it,
+  # Install it,
+  # Create a role named "role1" having privileges "select insert update"
+  # Check roles,
+  # Check role privileges,
+  # Create a first user john@machine.domain.com (granting privileges on a whole database employees apart from one table),
+  # Create a second user paul@10.0.0.2 (granting privileges on all tables in world having word Country in them),
+  # Create a third user peter@localhost (granting privileges on the database test),
+  # Check user privileges for (paul),
+  # Update role created above and see changes (add delete to role 1),
+  # Update password (for paul) and see changes,
+  # Clone user paul to judas,
+  # Check user privileges
+  # Check user,
+  # Rename user judas to james,
+  # Revoke privileges from third user disconnecting any existing connections from that user (useful if a security breach is suspected or if you are a security paranoid thus wanting to make sure the person you are blocking out won't have any more access as from that point onwards).
 
-1. Go to www.securich.com downloads page and download the install script
-2. Untar the install script and run it using ./securich_install.sh and it'll install everything automatically
+---
+
+===Steps===
+
+  # Go to www.securich.com downloads page or code,gogle.com/p/securich and download the install script
+  # Untar the install script and run it using ./securich_install.sh and it'll install everything automatically
 {{{
       dcassar@ubuntu:~/Desktop$ ./securich_install.sh
       Enter version number: 0.1.1
@@ -55,39 +59,41 @@ Steps:
       Installation complete
 }}}
 
-3. Log into mysql `mysql -u root -p -h 127.0.0.1 -P 3306` (typical example .... -h and -P don't need to be specified if mysql is running localhost default port)
+  # Log into mysql `mysql -u root -p -h 127.0.0.1 -P 3306` (typical example .... -h and -P don't need to be specified if mysql is running localhost default port)
    use securich;
    call create_update_role('role1','select');
    call create_update_role('role1','insert');
    call create_update_role('role1','update');
-4. call check_roles();
-5. call check_role_privileges('role1');
-6. call grant_privileges('john' , 'machine.domain.com' , 'employees' , '' , 'alltables' , 'role1' , 'john@domain.com');
+  # call check_roles();
+  # call check_role_privileges('role1');
+  # call grant_privileges('john' , 'machine.domain.com' , 'employees' , '' , 'alltables' , 'role1' , 'john@domain.com');
    call revoke_privileges('john' , 'machine.domain.com' , 'employees' , 'salaries' , 'table' , 'role1' , 'N');
-7. call grant_privileges('paul' , '10.0.0.2' , 'world' , '^Country' , 'regexp' , 'role1' , 'paul@domain.com');
-8. call grant_privileges('peter' , 'localhost' , 'test' , '' , 'all' , 'role1' , 'peter@domain.com');
-9. call check_full_user_entries('paul');
-10. call create_update_role('role1','delete');
+  # call grant_privileges('paul' , '10.0.0.2' , 'world' , '^Country' , 'regexp' , 'role1' , 'paul@domain.com');
+  # call grant_privileges('peter' , 'localhost' , 'test' , '' , 'all' , 'role1' , 'peter@domain.com');
+  # call check_full_user_entries('paul');
+  # call create_update_role('role1','delete');
     call check_full_user_entries('paul');
-11. call set_password('paul' , '10.0.0.2' , 'password123');
-12. call clone_user('paul' , '10.0.0.2' , 'judas' , '10.0.0.2' , 'judas@domain.com');
-13. call check_full_user_entries('judas');
-14. call check_user_privileges('judas' , '10.0.0.2' , 'world' , 'role1');
-15. call rename_user('judas' , 'james' , 'james@domain.com');
-16. call create_update_role('role2','execute');
-17. call grant_privileges('peter' , 'localhost' , 'securich' , 'my_privileges' , 'storedprocedure' , 'role2' , 'peter@domain.com');
+  # call set_password('paul' , '10.0.0.2' , 'password123');
+  # call clone_user('paul' , '10.0.0.2' , 'judas' , '10.0.0.2' , 'judas@domain.com');
+  # call check_full_user_entries('judas');
+  # call check_user_privileges('judas' , '10.0.0.2' , 'world' , 'role1');
+  # call rename_user('judas' , 'james' , 'james@domain.com');
+  # call create_update_role('role2','execute');
+  # call grant_privileges('peter' , 'localhost' , 'securich' , 'my_privileges' , 'storedprocedure' , 'role2' , 'peter@domain.com');
 
-18. Connect to mysql using thirduser peter in another session:
+  # Connect to mysql using thirduser peter in another session:
     show databases;
     use securich;
     show tables;
     call my_privileges('test');
     show processlist;
 
-19. call revoke_privileges('peter' , 'localhost' , 'test' , '' , '' , 'role1' , 'Y');
+  # call revoke_privileges('peter' , 'localhost' , 'test' , '' , '' , 'role1' , 'Y');
 
-20. As user peter again from 2nd open instance run:
+  # As user peter again from 2nd open instance run:
     show processlist;
+
+===Log===
 
 {{{
 dcassar@ubuntu:~/Desktop$ ./securich_install.sh
