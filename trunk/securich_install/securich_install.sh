@@ -127,6 +127,7 @@ fi
    mkdir logs
  fi
 
+ echo ""
  echo -n "Enter version number (defualt $LV i.e. latest version): "
  read -e VN                                                            ## VN = Version Number
     if [ "$VN" == "" ]
@@ -609,19 +610,25 @@ fi
       then
        echo -n "Enter mysql socket (default '/tmp/mysql.sock'): "
        read -e SOCK
-        if [ "$SOCK" == "" ]
-         then
-          SOCK=/tmp/mysql.sock
-        fi
+       if [ "$SOCK" == "" ]
+        then
+         SOCK=/tmp/mysql.sock
+       fi
+       
+       while [ ! -e $SOCK ]
+       do
+        echo -n "Socket file does not exist, please re-enter location: "
+        read -e SOCK
+       done
 
 ## CURV = CURrent Version
 
           CURV=`mysql -u root --password=$PASS --socket=$SOCK securich --execute="select VERSION from sec_version order by ID desc limit 1" | tail -1`
-            if [ $? != 0 ]; then
-             {
-               CURV=0.1.1
-             }
-            fi
+          if [ $? != 0 ]; then
+           {
+             CURV=0.1.1
+           }
+          fi
 
 ## If version requested is older than current version then upgrade is not possible
 
