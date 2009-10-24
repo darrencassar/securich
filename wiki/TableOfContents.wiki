@@ -4,4 +4,4 @@
   * [Target]
   * [Installation]
   * [Documentation]
-  * [Sample Commands]
+  * [Sample-Commands]
