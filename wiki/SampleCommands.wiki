@@ -58,7 +58,6 @@ Securich Tutorial (for securich version 0.1.2)
       Enter mysql Port (default 3306): 3306
       Installation complete
 }}}
-
   # Log into mysql `mysql -u root -p -h 127.0.0.1 -P 3306` (typical example .... -h and -P don't need to be specified if mysql is running localhost default port)
    use securich;
    call create_update_role('role1','select');
@@ -80,16 +79,13 @@ Securich Tutorial (for securich version 0.1.2)
   # call rename_user('judas' , 'james' , 'james@domain.com');
   # call create_update_role('role2','execute');
   # call grant_privileges('peter' , 'localhost' , 'securich' , 'my_privileges' , 'storedprocedure' , 'role2' , 'peter@domain.com');
-
   # Connect to mysql using thirduser peter in another session:
     show databases;
     use securich;
     show tables;
     call my_privileges('test');
     show processlist;
-
   # call revoke_privileges('peter' , 'localhost' , 'test' , '' , '' , 'role1' , 'Y');
-
   # As user peter again from 2nd open instance run:
     show processlist;
 
