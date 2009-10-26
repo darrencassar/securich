@@ -6,8 +6,12 @@ IP=127.0.0.1
 PORT=3306
 # script to send simple email
 # email subject
-SUBJECT="testing"
+#SUBJECT="testing"
 # Email text/message
-EMAILMESSAGE="email/email.body"
+#EMAILMESSAGE="email/email.body"
+#RECIPIENT="dba@company.com"
+#HOST=`hostname`
 
-mysql -u root -h $IP -P $PORT -D securich  -e "call password_check()" > email.list
+mysql -u root -h $IP -P $PORT -D securich  -e "call password_check()"
+
+#mailx -s "$HOST : $PORT - Illegal password changes" $RECIPIENT
