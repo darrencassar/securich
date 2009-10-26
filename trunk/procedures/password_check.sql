@@ -65,7 +65,6 @@ CREATE PROCEDURE `securich`.`password_check`()
          SELECT 'Error occurred - terminating - Securich to MySQL password reconciliation failed';
       END;
       
-      
       OPEN cur_pass;
 
       cur_pass_loop:WHILE(done=0) DO
@@ -82,10 +81,10 @@ CREATE PROCEDURE `securich`.`password_check`()
          update mysq.user set Password=pws where User=un and Host=hn;
          insert into aud_password (USERNAME,HOSTNAME,MPASS,SPASS,TIMESTAMP) values (un,hn,pwm,pws,now());
          
-          /* loop untill there is no more privileges to grant */
-
       END WHILE cur_pass_loop;
       CLOSE cur_pass;
+
+      FLUSH PRIVILEGES;
                      
 END$$
 
