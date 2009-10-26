@@ -63,6 +63,13 @@ terminate () {
 
 }
 
+ARGUMENT=$1
+
+if [ -z "$1" ]
+  then
+    ARGUMENT=notsilent
+fi
+
 if [ $1 != "silent" ]
 then
   ## Catering for traps ... hindering a messed up securich
