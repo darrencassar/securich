@@ -31,6 +31,7 @@ SecuRich Changelog:
 2009-10-: version 0.2.0
 
    * Added reconciliation from mysql to securich during installation
+   * Added mysql version check for connection kill using processlist view in information_schema available as from 5.1.7
    * Added auditing of users changing password via MySQLs own `set_password`
    * Added auditing of role creation and updates
    * Added auditing of grants / revokes
