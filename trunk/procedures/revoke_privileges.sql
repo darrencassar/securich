@@ -394,7 +394,9 @@ CREATE PROCEDURE `securich`.`revoke_privileges`( usernamein varchar(16), hostnam
     SET mymidversion = (SELECT SUBSTRING_INDEX(SUBSTRING_INDEX(VERSION(), '.', 2),'.',-1));
     SET mysmallversion = (SELECT SUBSTRING_INDEX(VERSION(), '.', -1));
            
-       IF terminateconnections = 'Y' or terminateconnections='y' and ( mybigversion > '4' AND mymidversion > 0 AND mysmallversion > 35  ) or ( mybigversion > '4' AND mymidversion > 1 ) THEN
+       /* If mysql version is 5.1.7 or above then processlist view is available on information_schema */
+
+       IF terminateconnections = 'Y' or terminateconnections='y' and ( mybigversion > '4' AND mymidversion > 0 AND mysmallversion > 6  ) or ( mybigversion > '4' AND mymidversion > 1 ) THEN
 
           SET @CNT = (
              select count(*)
