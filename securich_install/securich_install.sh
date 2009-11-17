@@ -90,7 +90,6 @@ then
   echo ""
   echo ""
 fi
- trap terminate SIGINT SIGTERM
 
 ## Checking if mysql binary is available
  
