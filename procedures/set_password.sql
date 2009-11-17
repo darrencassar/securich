@@ -71,13 +71,13 @@ CREATE PROCEDURE `securich`.`set_password`( usernamein varchar(50), hostnamein v
            from sec_us_ho_profile
            where US_HO_ID = USHOID );
 
-        IF (select PASSWORD(oldpasswordin)) <> PASSW0 and ROOTUSER <> 1 THEN
+        IF (select PASSWORD(oldpasswordin)) <> PASSW0 and ROOTUSER <> 'root' THEN
 
            select "Invalid original password, please check your own password and try again!";
 
            select sleep(5); /* If the password is not guessed this sleep takes place. It is there to hinder a brute force attack!*/
 
-        ELSEIF ((select newpasswordin REGEXP "[[[:alpha:]+][[:digit:]+][[:punct:]+]|[[:alpha:]+][[:punct:]+][[:digit:]+]|[[:punct:]+][[:alpha:]+][[:digit:]+]|[[:punct:]+][[:digit:]+][[:alpha:]+]|[[:digit:]+][[:alpha:]+][[:punct:]+]|[[:digit:]+][[:punct:]+][[:alpha:]+]]") = 0 OR (select length(newpasswordin)) < PASSWORDLENGTH ) and ROOTUSER <> 1 /*newpasswordin = ''*/ THEN
+        ELSEIF ((select newpasswordin REGEXP "[[[:alpha:]+][[:digit:]+][[:punct:]+]|[[:alpha:]+][[:punct:]+][[:digit:]+]|[[:punct:]+][[:alpha:]+][[:digit:]+]|[[:punct:]+][[:digit:]+][[:alpha:]+]|[[:digit:]+][[:alpha:]+][[:punct:]+]|[[:digit:]+][[:punct:]+][[:alpha:]+]]") = 0  OR (select length(newpasswordin)) < PASSWORDLENGTH ) and ROOTUSER <> 'root' /*newpasswordin = ''*/ THEN
 
            select CONCAT("Invalid password - Password must be at least " , PASSWORDLENGTH , " characters long and include at least a number, a character and one of the following   !\"$%^&*()-_=+[]{}\'@;:#~,.<>/\?|");
 
