@@ -27,7 +27,7 @@ DROP PROCEDURE IF EXISTS rename_user;
 DELIMITER $$
 
 
-CREATE PROCEDURE `securich`.`rename_user`( usernamein varchar(16), newusernamein varchar(16), newemailaddressin varchar(50))
+CREATE PROCEDURE `securich`.`rename_user`( usernamein varchar(16), newusernamein varchar(16), newemailaddressin varchar(50), oldpassword varchar(50))
   BEGIN
 
       DECLARE userexists int;
@@ -57,7 +57,7 @@ CREATE PROCEDURE `securich`.`rename_user`( usernamein varchar(16), newusernamein
       BEGIN
          ROLLBACK;
          SELECT 'Error occurred - terminating - USER CREATION AND / OR PRIVILEGES GRANT FAILED';
-      END;
+      END; 
 
       FLUSH PRIVILEGES;
                       /* Security feature does not permit an empty user / root user being granted through this package! */
@@ -107,8 +107,10 @@ CREATE PROCEDURE `securich`.`rename_user`( usernamein varchar(16), newusernamein
 
                LEAVE cur_host_loop;
             END IF;
+            
+            call reconciliation('sync');
 
-            call set_password(newusernamein,hostname,randompassword,randompassword);
+            call set_password(newusernamein,hostname,oldpassword,randompassword);
 
             END WHILE cur_host_loop;
             CLOSE cur_host;
@@ -117,8 +119,6 @@ CREATE PROCEDURE `securich`.`rename_user`( usernamein varchar(16), newusernamein
 
             PREPARE randompasswordcom FROM @randomp;
             EXECUTE randompasswordcom;
-
-            call reconciliation('sync');
 
          END IF;
 

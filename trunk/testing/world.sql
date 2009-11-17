@@ -16,6 +16,9 @@
 --
 -- Table structure for table `City`
 --
+DROP SCHEMA IF EXISTS world;
+CREATE SCHEMA world;
+USE world;
 
 DROP TABLE IF EXISTS `City`;
 CREATE TABLE `City` (

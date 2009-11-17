@@ -70,7 +70,7 @@ if [ -z "$1" ]
     ARGUMENT=notsilent
 fi
 
-if [ $1 != "silent" ]
+if [ "$ARGUMENT" != "silent" ]
 then
   ## Catering for traps ... hindering a messed up securich
   echo "                                                             "
@@ -438,6 +438,9 @@ fi
             
             mysql -u root --password=$PASS -h $HOST -P $PORT securich < /tmp/securich_reconciliation.sql
             mv /tmp/securich_reconciliation.sql $BASEDIR/logs/
+          else
+            mysql -u root --password=$PASS -h $HOST -P $PORT securich --execute="call reconciliation('sync')"
+            mysql -u root --password=$PASS -h $HOST -P $PORT securich --execute="delete from mysql.user where User != 'root' and User != 'msandbox' and User != ''"
           fi
 
 ## If connection is handled through socket file, do the same as above but using socket
@@ -512,6 +515,9 @@ fi
             
             mysql -u root --password=$PASS --socket=$SOCK securich < /tmp/securich_reconciliation.sql
             mv /tmp/securich_reconciliation.sql $BASEDIR/logs/
+          else
+            mysql -u root --password=$PASS -h $HOST -P $PORT securich --execute="call reconciliation('sync')"
+            mysql -u root --password=$PASS -h $HOST -P $PORT securich --execute="delete from mysql.user where User != 'root' and User != 'msandbox' and User != ''"
           fi
           
      else

@@ -38,9 +38,9 @@ CREATE PROCEDURE `securich`.`my_privileges`( dbnamein varchar(64))
       set hn=(select (substring_index(user(),'@',-1)));
 
       IF dbnamein = '*' THEN
-         call check_full_user_entries(un);
+         call show_full_user_entries(un);
       ELSE
-         call check_user_privileges(un,hn,dbnamein,'all');
+         call show_user_privileges(un,hn,dbnamein,'all');
       END IF;
 
 END$$

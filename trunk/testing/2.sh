@@ -7,17 +7,10 @@
 USER=root
 PASSWORD=msandbox
 HOST=127.0.0.1
-PORT=5137
+PORT=3308
 DB=securich
-LOGERR=securich_test.err
-LOGFILE=securich_test.log
-
-#=============================================================================
-# TestParamters
-#=============================================================================
-
-DBUSER=terri104
-DBHOST=127.0.0.1
+LOGERR=`pwd`/logs/securich_test.err
+LOGFILE=`pwd`/logs/securich_test.log
 
 #=============================================================================
 # Logging - Redirect IO to LOGERR and LOGFILE
@@ -46,6 +39,15 @@ cat /dev/null > $LOGFILE
 
 
 #=============================================================================
+# DBCreation - World,Employees and Sakila dbs are imported for testing
+#=============================================================================
+
+mysql -u $USER --password=$PASSWORD -h $HOST -P $PORT < testing/world.sql
+mysql -u $USER --password=$PASSWORD -h $HOST -P $PORT < testing/employees.sql
+mysql -u $USER --password=$PASSWORD -h $HOST -P $PORT < testing/sakila.sql
+
+
+#=============================================================================
 # Execution - Commands executed and logged for analysis
 #=============================================================================
 
@@ -53,42 +55,52 @@ cat /dev/null > $LOGFILE
 #========
 
 echo ""
-echo -e `date` - "\033[1mINFO - TEST CREATE USER\033[0m"
+echo -e `date` - "INFO - Test1 - TEST CREATE USER"
 echo ""
-echo -e `date` - "\033[1mINFO - Starting grant privileges\033[0m"
+echo -e `date` - "INFO - Test1 - Starting grant privileges"
 echo ""
 
-mysql -u $USER --password=$PASSWORD -h $HOST -P $PORT $DB --execute="call grant_privileges('$DBUSER','$DBHOST','securich','sec_users','singletable','update','user@company.com')"
+mysql -u $USER --password=$PASSWORD -h $HOST -P $PORT $DB --execute="CALL create_update_role('add','role1','select');"
 if [ $? != 0 ]; then
 {
-    echo -e "\033[1mERROR - grant_privileges\033[0m"
+    echo -e "ERROR - Test1 - create_update_role"
 } fi
 
-TESTUSER=`cat securich_test.log | tr -s "-" | sed 's/ //g' | cut -d "-" -f 2 | tail -1`
-TESTPASS=`cat securich_test.log | tr -s "-" | sed 's/ //g' | cut -d "-" -f 6 | tail -1`
+echo "" 
+echo ""
+echo -e `date` - "INFO - Test1 - Updating role - role1, adding privilege select"
+
+mysql -u $USER --password=$PASSWORD -h $HOST -P $PORT $DB --execute="call grant_privileges('trilla','localhost','securich','sec_users','singletable','role1','user@company.com')"
+if [ $? != 0 ]; then
+{
+    echo -e "ERROR - Test1 - grant_privileges"
+} fi
+
+TESTUSER=`cat $LOGFILE | grep 'Password for user' | tr -s "-" | sed 's/ //g' | cut -d "-" -f 2 | tail -1`
+TESTPASS=`cat $LOGFILE | grep 'Password for user' | tr -s "-" | sed 's/ //g' | cut -d "-" -f 6 | tail -1`
 
 echo "" 
 echo ""
 echo "TESTUSER=$TESTUSER - TESTPASS=$TESTPASS"
 echo ""
-echo -e `date` - "\033[1mINFO - Testing new user access\033[0m"
+echo -e `date` - "INFO - Test1 - Testing new user access"
 echo ""
 
 mysql -u $TESTUSER --password=$TESTPASS -h $HOST -P $PORT --execute="show databases"
 if [ $? != 0 ]; then
 {
-    echo -e "\033[1mERROR - show databases\033[0m"
+    echo -e "ERROR - show databases"
 } fi
 
 echo "" 
 echo ""
-echo -e `date` - "\033[1mINFO - Testing select now()\033[0m"
+echo -e `date` - "INFO - Testing select now()"
 echo ""
 
 mysql -u $TESTUSER --password=$TESTPASS -h $HOST -P $PORT --execute="select now()"
 if [ $? != 0 ]; then
 {
-    echo -e "\033[1mERROR - select now()\033[0m"
+    echo -e "ERROR - select now()"
 } fi
 
 echo ""
@@ -98,56 +110,53 @@ echo ""
 # Test2 
 #============
 
-echo -e `date` - "\033[1mINFO - TEST CREATE ROLE\033[0m"
-
-echo -e `date` - "\033[1mINFO - Starting creating role1\033[0m"
-mysql -u $USER --password=$PASSWORD -h $HOST -P $PORT $DB --execute="CALL create_update_role('add','role1','select');"
-if [ $? != 0 ]; then
-{
-    echo -e "\033[1mERROR - role create with priv select\033[0m"
-} fi
+echo -e `date` - "INFO - Test2 - TEST CREATE ROLE"
 
 mysql -u $USER --password=$PASSWORD -h $HOST -P $PORT $DB --execute="CALL create_update_role('add','role1','insert');"
 if [ $? != 0 ]; then
 {
-    echo -e "\033[1mERROR - role create with priv insert\033[0m"
+    echo -e "ERROR - Test2 - role create with priv insert"
 } fi
+
+echo "" 
+echo ""
+echo -e `date` - "INFO - Test2 - Role creating with insert privilege"
 
 mysql -u $USER --password=$PASSWORD -h $HOST -P $PORT $DB --execute="CALL create_update_role('add','role1','update');"
 if [ $? != 0 ]; then
 {
-    echo -e "\033[1mERROR - role create with priv update\033[0m"
+    echo -e "ERROR - Test2 - role create with priv update"
 } fi
 
 echo "" 
 echo ""
-echo -e `date` - "\033[1mINFO - Showing roles available\033[0m"
+echo -e `date` - "INFO - Test2 - Showing roles available"
 
 mysql -u $USER --password=$PASSWORD -h $HOST -P $PORT $DB --execute="CALL show_roles();"
 if [ $? != 0 ]; then
 {
-    echo -e "\033[1mERROR - show_roles\033[0m"
+    echo -e "ERROR - Test2 - show_roles"
 } fi
  
 echo "" 
 echo ""
-echo -e `date` - "\033[1mINFO - Showing roles\033[0m"
+echo -e `date` - "INFO - Test2 - Showing roles"
 
 mysql -u $USER --password=$PASSWORD -h $HOST -P $PORT $DB --execute="CALL show_privileges_in_roles('role1');"
 if [ $? != 0 ]; then
 {
-    echo -e "\033[1mERROR - show_privileges_in_roles\033[0m"
+    echo -e "ERROR - Test2 - show_privileges_in_roles"
 } fi
 
 echo "" 
 echo ""
-echo -e `date` - "\033[1mINFO - Showing privileges belonging to role role1\033[0m"
+echo -e `date` - "INFO - Test2 - Showing privileges belonging to role role1"
 
 
 mysql -u $TESTUSER --password=$TESTPASS -h $HOST -P $PORT --execute="select now()"
 if [ $? != 0 ]; then
 {
-    echo -e "\033[1mERROR - select now()\033[0m"
+    echo -e "ERROR - Test2 - select now()"
 } fi
 
 echo ""
@@ -157,156 +166,143 @@ echo ""
 # Test3
 #============
 
-mysql -u $USER --password=$PASSWORD -h $HOST -P $PORT < employees.db
-mysql -u $USER --password=$PASSWORD -h $HOST -P $PORT < word.db
+echo -e `date` - "INFO - Test3 - TEST CREATE / DELETE USER"
 
-echo -e `date` - "\033[1mINFO - TEST CREATE / DELETE USER\033[0m"
+echo -e `date` - "INFO - Test3 - Starting creating John@domain.com"
 
-echo -e `date` - "\033[1mINFO - Starting creating John@domain.com\033[0m"
 
-mysql -u $USER --password=$PASSWORD -h $HOST -P $PORT $DB --execute="call grant_privileges('john' , 'domain.com' , 'employees' , '' , 'alltables' , 'role1' , 'john@domain.com');"
+mysql -u $USER --password=$PASSWORD -h $HOST -P $PORT $DB --execute="call grant_privileges('john' , '127.0.0.1' , 'employees' , '' , 'alltables' , 'role1' , 'john@domain.com')"
 if [ $? != 0 ]; then
 {
-    echo -e "\033[1mERROR - grant_privileges\033[0m"
+    echo -e "ERROR - Test3 - grant_privileges"
 } fi
 
-TESTUSER=`cat securich_test.log | tr -s "-" | sed 's/ //g' | cut -d "-" -f 2 | tail -1`
-TESTPASS=`cat securich_test.log | tr -s "-" | sed 's/ //g' | cut -d "-" -f 6 | tail -1`
+TESTUSER=`cat $LOGFILE | grep 'Password for user' | tr -s "-" | sed 's/ //g' | cut -d "-" -f 2 | tail -1`
+TESTPASS=`cat $LOGFILE | grep 'Password for user' | tr -s "-" | sed 's/ //g' | cut -d "-" -f 6 | tail -1`
 
 echo "" 
 echo "TESTUSER=$TESTUSER - TESTPASS=$TESTPASS"
 echo ""
-echo -e `date` - "\033[1mINFO - Testing new user access\033[0m"
+echo -e `date` - "INFO - Test3 - Testing new user access"
 echo ""
 
 
-mysql -u $USER --password=$PASSWORD -h $HOST -P $PORT $DB --execute="call revoke_privileges('john' , 'domain.com' , 'employees' , 'salaries' , 'table' , 'role1' , 'N');"
+mysql -u $USER --password=$PASSWORD -h $HOST -P $PORT $DB --execute="call revoke_privileges('john' , '127.0.0.1' , 'employees' , 'salaries' , 'table' , 'role1' , 'N')"
 if [ $? != 0 ]; then
 {
-    echo -e "\033[1mERROR - revoke_privileges\033[0m"
+    echo -e "ERROR - Test3 - revoke_privileges"
 } fi
 
 echo "" 
 echo ""
-echo -e `date` - "\033[1mINFO - Testing revoke privileges on user\033[0m"
+echo -e `date` - "INFO - Test3 - Testing revoke privileges on user"
 echo ""
 
-mysql -u $USER --password=$PASSWORD -h $HOST -P $PORT $DB --execute="call grant_privileges('paul' , '10.0.0.2' , 'world' , '^Country' , 'regexp' , 'role1' , 'paul@domain.com');"
+mysql -u $USER --password=$PASSWORD -h $HOST -P $PORT $DB --execute="call grant_privileges('tom' , '10.0.0.2' , 'world' , '^Country' , 'regexp' , 'role1' , 'tom@domain.com')"
 if [ $? != 0 ]; then
 {
-    echo -e "\033[1mERROR - grant_privileges\033[0m"
+    echo -e "ERROR - Test3 - grant_privileges"
 } fi
 
-TESTUSER=`cat securich_test.log | tr -s "-" | sed 's/ //g' | cut -d "-" -f 2 | tail -1`
-TESTPASS=`cat securich_test.log | tr -s "-" | sed 's/ //g' | cut -d "-" -f 6 | tail -1`
-
-echo "" 
-echo "TESTUSER=$TESTUSER - TESTPASS=$TESTPASS"
-echo ""
-echo -e `date` - "\033[1mINFO - Testing new user access\033[0m"
-echo ""
-
-mysql -u $USER --password=$PASSWORD -h $HOST -P $PORT $DB --execute="call grant_privileges('peter' , 'localhost' , 'world' , '' , 'all' , 'role1' , 'peter@domain.com');"
-if [ $? != 0 ]; then
-{
-    echo -e "\033[1mERROR - grant_privileges\033[0m"
-} fi
-
-TESTUSER=`cat securich_test.log | tr -s "-" | sed 's/ //g' | cut -d "-" -f 2 | tail -1`
-TESTPASS=`cat securich_test.log | tr -s "-" | sed 's/ //g' | cut -d "-" -f 6 | tail -1`
+TESTUSER=`cat $LOGFILE | grep 'Password for user' | tr -s "-" | sed 's/ //g' | cut -d "-" -f 2 | tail -1`
+TESTPASS=`cat $LOGFILE | grep 'Password for user' | tr -s "-" | sed 's/ //g' | cut -d "-" -f 6 | tail -1`
 
 echo "" 
 echo "TESTUSER=$TESTUSER - TESTPASS=$TESTPASS"
 echo ""
-echo -e `date` - "\033[1mINFO - Testing new user access\033[0m"
+echo -e `date` - "INFO - Test3 - Testing new user access"
 echo ""
 
-mysql -u $USER --password=$PASSWORD -h $HOST -P $PORT $DB --execute="CALL show_full_user_entries('paul');"
+mysql -u $USER --password=$PASSWORD -h $HOST -P $PORT $DB --execute="CALL show_full_user_entries('tom');"
 if [ $? != 0 ]; then
 {
-    echo -e "\033[1mERROR - show_full_user_entries\033[0m"
+    echo -e "ERROR - Test3 - show_full_user_entries"
 } fi
 
 echo "" 
 echo ""
-echo -e `date` - "\033[1mINFO - Showing full user entries\033[0m"
+echo -e `date` - "INFO - Test3 - Showing full user entries"
 
 mysql -u $USER --password=$PASSWORD -h $HOST -P $PORT $DB --execute="CALL create_update_role('add','role1','delete');"
 if [ $? != 0 ]; then
 {
-    echo -e "\033[1mERROR - create_update_role\033[0m"
+    echo -e "ERROR - Test3 - create_update_role"
 } fi
 
 echo "" 
 echo ""
-echo -e `date` - "\033[1mINFO - Updating role - role1, adding privilege DELETE\033[0m"
+echo -e `date` - "INFO - Test3 - Updating role - role1, adding privilege DELETE"
 
-mysql -u $USER --password=$PASSWORD -h $HOST -P $PORT $DB --execute="CALL show_full_user_entries('paul');"
+mysql -u $USER --password=$PASSWORD -h $HOST -P $PORT $DB --execute="CALL show_full_user_entries('tom');"
 if [ $? != 0 ]; then
 {
-    echo -e "\033[1mERROR - show_full_user_entries\033[0m"
+    echo -e "ERROR - Test3 - show_full_user_entries"
 } fi
 
 echo "" 
 echo ""
-echo -e `date` - "\033[1mINFO - Showing full user entries\033[0m"
+echo -e `date` - "INFO - Test3 - Showing full user entries"
 
-mysql -u $USER --password=$PASSWORD -h $HOST -P $PORT $DB --execute="CALL clone_user('paul' , '10.0.0.2' , 'judas' , '10.0.0.2' , 'judas@domain.com');"
+mysql -u $USER --password=$PASSWORD -h $HOST -P $PORT $DB --execute="CALL clone_user('tom' , '10.0.0.2' , 'judas' , '10.0.0.2' , 'judas@domain.com');"
 if [ $? != 0 ]; then
 {
-    echo -e "\033[1mERROR - clone_user\033[0m"
+    echo -e "ERROR - Test3 - clone_user"
 } fi
 
+TESTUSER=`cat $LOGFILE | grep 'Password for user' | tr -s "-" | sed 's/ //g' | cut -d "-" -f 2 | tail -1`
+TESTPASS=`cat $LOGFILE | grep 'Password for user' | tr -s "-" | sed 's/ //g' | cut -d "-" -f 6 | tail -1`
+
 echo "" 
+echo "TESTUSER=$TESTUSER - TESTPASS=$TESTPASS"
 echo ""
-echo -e `date` - "\033[1mINFO - Cloning user PAUL to user JUDAS\033[0m"
+echo -e `date` - "INFO - Test3 - Cloning user TOM to user JUDAS"
 
 mysql -u $USER --password=$PASSWORD -h $HOST -P $PORT $DB --execute="CALL show_full_user_entries('judas');"
 if [ $? != 0 ]; then
 {
-    echo -e "\033[1mERROR - show_full_user_entries\033[0m"
+    echo -e "ERROR - Test3 - show_full_user_entries"
 } fi
 
 echo "" 
 echo ""
-echo -e `date` - "\033[1mINFO - Showing full user entries\033[0m"
+echo -e `date` - "INFO - Test3 - Showing full user entries"
 
 mysql -u $USER --password=$PASSWORD -h $HOST -P $PORT $DB --execute="CALL show_user_privileges('judas' , '10.0.0.2' , 'world' , 'role1');"
 if [ $? != 0 ]; then
 {
-    echo -e "\033[1mERROR - show_full_user_privileges\033[0m"
+    echo -e "ERROR - Test3 - show_full_user_privileges"
 } fi
 
 echo "" 
 echo ""
-echo -e `date` - "\033[1mINFO - Showing full user privileges\033[0m"
+echo -e `date` - "INFO - Test3 - Showing full user privileges for JUDAS"
 
-mysql -u $USER --password=$PASSWORD -h $HOST -P $PORT $DB --execute="CALL rename_user('judas' , 'james' , 'james@domain.com');"
+#mysql -u $USER --password=$PASSWORD -h $HOST -P $PORT $DB --execute="CALL rename_user('judas' , 'james' , 'james@domain.com', '$TESTPASS');"
+#if [ $? != 0 ]; then
+#{
+#    echo -e "ERROR - Test3 - rename_user"
+#} fi
+#
+#echo "" 
+#echo ""
+#echo -e `date` - "INFO - Test3 - Renaming User"
+
+mysql -u $USER --password=$PASSWORD -h $HOST -P $PORT $DB --execute="CALL create_update_role('add','role2','execute');"
 if [ $? != 0 ]; then
 {
-    echo -e "\033[1mERROR - show_full_user_privileges\033[0m"
+    echo -e "ERROR - Test3 - create_update_role"
 } fi
-
-echo "" 
+ 
 echo ""
-echo -e `date` - "\033[1mINFO - Showing full user privileges\033[0m"
+echo ""
+echo -e `date` - "INFO - Test3 - Create Update Role"
 
-mysql -u $USER --password=$PASSWORD -h $HOST -P $PORT $DB --execute="CALL create_update_role('role2','execute');"
+
+
+mysql -u $USER --password=$PASSWORD -h $HOST -P $PORT --execute="select now()"
 if [ $? != 0 ]; then
 {
-    echo -e "\033[1mERROR - show_full_user_privileges\033[0m"
-} fi
-
-echo "" 
-echo ""
-echo -e `date` - "\033[1mINFO - Showing full user privileges\033[0m"
-
-
-
-mysql -u $TESTUSER --password=$TESTPASS -h $HOST -P $PORT --execute="select now()"
-if [ $? != 0 ]; then
-{
-    echo -e "\033[1mERROR - select now()\033[0m"
+    echo -e "ERROR - Test3 - select now()"
 } fi
 
 echo ""
@@ -317,24 +313,35 @@ echo ""
 # Test4
 #============
 
-mysql -u $USER --password=$PASSWORD -h $HOST -P $PORT < employees.db
-mysql -u $USER --password=$PASSWORD -h $HOST -P $PORT < word.db
+echo -e `date` - "INFO - Test4 - TEST CREATE / DELETE USER"
 
-echo -e `date` - "\033[1mINFO - TEST CREATE / DELETE USER\033[0m"
+echo -e `date` - "INFO - Test4 - Starting creating John@domain.com"
 
-echo -e `date` - "\033[1mINFO - Starting creating John@domain.com\033[0m"
-
-mysql -u $USER --password=$PASSWORD -h $HOST -P $PORT $DB --execute="call grant_privileges('peter' , 'localhost' , 'securich' , 'my_privileges' , 'storedprocedure' , 'role2' , 'peter@domain.com');"
+mysql -u $USER --password=$PASSWORD -h $HOST -P $PORT $DB --execute="call grant_privileges('peter' , 'localhost' , 'world' , '' , 'all' , 'role1' , 'peter@domain.com')"
 if [ $? != 0 ]; then
 {
-    echo -e "\033[1mERROR - grant_privileges\033[0m"
+    echo -e "ERROR - Test3 - grant_privileges"
 } fi
 
+TESTUSER=`cat $LOGFILE | grep 'Password for user' | tr -s "-" | sed 's/ //g' | cut -d "-" -f 2 | tail -1`
+TESTPASS=`cat $LOGFILE | grep 'Password for user' | tr -s "-" | sed 's/ //g' | cut -d "-" -f 6 | tail -1`
 
 echo "" 
 echo "TESTUSER=$TESTUSER - TESTPASS=$TESTPASS"
 echo ""
-echo -e `date` - "\033[1mINFO - Testing new user access\033[0m"
+echo -e `date` - "INFO - Test3 - Testing new user access"
+echo ""
+
+mysql -u $USER --password=$PASSWORD -h $HOST -P $PORT $DB --execute="call grant_privileges('peter' , 'localhost' , 'securich' , 'my_privileges' , 'storedprocedure' , 'role2' , 'peter@domain.com');"
+if [ $? != 0 ]; then
+{
+    echo -e "ERROR - Test4 - grant_privileges"
+} fi
+
+echo "" 
+echo "TESTUSER=$TESTUSER - TESTPASS=$TESTPASS"
+echo ""
+echo -e `date` - "INFO - Test4 - Testing new user access"
 echo ""
 
 
@@ -342,68 +349,68 @@ echo ""
 mysql -u peter --password=$TESTPASS -h 127.0.0.1 -P $PORT --execute="show databases"
 if [ $? != 0 ]; then
 {
-    echo -e "\033[1mERROR - Peter can not show databases\033[0m"
+    echo -e "ERROR - Test4 - Peter can not show databases"
 } fi
 
 
 echo ""
-echo -e `date` - "\033[1mINFO - Peter show databases\033[0m"
+echo -e `date` - "INFO - Test4 - Peter show databases"
 echo ""
 
 
 mysql -u peter --password=$TESTPASS -h 127.0.0.1 -P $PORT securich --execute="show tables"
 if [ $? != 0 ]; then
 {
-    echo -e "\033[1mERROR - Peter can not show tables\033[0m"
+    echo -e "ERROR - Test4 - Peter can not show tables"
 } fi
 
 
 echo ""
-echo -e `date` - "\033[1mINFO - Peter show tables\033[0m"
+echo -e `date` - "INFO - Test4 - Peter show tables"
 echo ""
 
 
-mysql -u peter --password=$TESTPASS -h 127.0.0.1 -P $PORT securich --execute="call my_privileges('test');"
+mysql -u peter --password=$TESTPASS -h 127.0.0.1 -P $PORT securich --execute="call my_privileges('world');"
 if [ $? != 0 ]; then
 {
-    echo -e "\033[1mERROR - Peter can't check his own privileges\033[0m"
+    echo -e "ERROR - Test4 - Peter can't check his own privileges"
 } fi
 
 
 echo ""
-echo -e `date` - "\033[1mINFO - Peter can check his own privileges\033[0m"
+echo -e `date` - "INFO - Test4 - Peter can check his own privileges"
 echo ""
 
 
 
-mysql -u $USER --password=$PASSWORD -h $HOST -P $PORT $DB --execute="call revoke_privileges('peter' , 'localhost' , 'test' , '' , '' , 'role1' , 'Y');"
+mysql -u $USER --password=$PASSWORD -h $HOST -P $PORT $DB --execute="call revoke_privileges('peter' , 'localhost' , 'world' , '' , '' , 'role1' , 'Y');"
 if [ $? != 0 ]; then
 {
-    echo -e "\033[1mERROR - revoke_privileges\033[0m"
+    echo -e "ERROR - Test4 - revoke_privileges"
 } fi
 
 echo "" 
 echo ""
-echo -e `date` - "\033[1mINFO - Testing revoke privileges on user\033[0m"
+echo -e `date` - "INFO - Test4 - Testing revoke privileges on user"
 echo ""
 
 
 mysql -u peter --password=$TESTPASS -h 127.0.0.1 -P $PORT test --execute="show databases"
 if [ $? != 0 ]; then
 {
-    echo -e "\033[1mERROR - Peter can't show databases after revoke\033[0m"
+    echo -e "ERROR - Test4 - Peter can't show databases after revoke"
 } fi
 
 
 echo ""
-echo -e `date` - "\033[1mINFO - Peter show databases after revoke\033[0m"
+echo -e `date` - "INFO - Test4 - Peter show databases after revoke"
 echo ""
 
 
-mysql -u $TESTUSER --password=$TESTPASS -h $HOST -P $PORT --execute="select now()"
+mysql -u $USER --password=$PASSWORD -h $HOST -P $PORT --execute="select now()"
 if [ $? != 0 ]; then
 {
-    echo -e "\033[1mERROR - select now()\033[0m"
+    echo -e "ERROR - Test4 - select now()"
 } fi
 
 echo ""
