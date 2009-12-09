@@ -378,6 +378,14 @@ CREATE  TABLE IF NOT EXISTS `securich`.`sec_config` (
   PRIMARY KEY (`ID`) )
 ENGINE = InnoDB;
 
+-- -----------------------------------------------------
+-- Table `securich`.`sec_dictionary`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `securich`.`sec_dictionary` ;
+
+CREATE  TABLE IF NOT EXISTS `securich`.`sec_dictionary` (
+  `PASSWD` VARCHAR(255) )
+ENGINE = MyISAM;
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;

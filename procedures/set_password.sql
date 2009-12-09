@@ -6,6 +6,7 @@
 ##   Information about TS is found at www.tradingscreen.com                          ##
 ##                                                                                   ##
 ##   This program was written by Darren Cassar 2009.                                 ##
+##   Password checks code inspired by Mark Leith                                     ##
 ##   Feedback and improvements are welcome at:                                       ##
 ##   info [at] securich.com / info [at] mysqlpreacher.com                            ##
 ##                                                                                   ##
@@ -43,6 +44,8 @@ CREATE PROCEDURE `securich`.`set_password`( usernamein varchar(50), hostnamein v
     DECLARE LASTUPDATE INT;
     DECLARE CORRECTUSER INT;
     DECLARE ROOTUSER VARCHAR(16);
+    DECLARE message VARCHAR(256);
+    DECLARE countdict INT;
 
 
     SET CORRECTUSER= (select CONCAT(usernamein,'@',hostnamein)=user());
@@ -77,16 +80,62 @@ CREATE PROCEDURE `securich`.`set_password`( usernamein varchar(50), hostnamein v
 
            select sleep(5); /* If the password is not guessed this sleep takes place. It is there to hinder a brute force attack!*/
 
-        ELSEIF ((select newpasswordin REGEXP "[[[:alpha:]+][[:digit:]+][[:punct:]+]|[[:alpha:]+][[:punct:]+][[:digit:]+]|[[:punct:]+][[:alpha:]+][[:digit:]+]|[[:punct:]+][[:digit:]+][[:alpha:]+]|[[:digit:]+][[:alpha:]+][[:punct:]+]|[[:digit:]+][[:punct:]+][[:alpha:]+]]") = 0  OR (select length(newpasswordin)) < PASSWORDLENGTH ) and ROOTUSER <> 'root' /*newpasswordin = ''*/ THEN
-
-           select CONCAT("Invalid password - Password must be at least " , PASSWORDLENGTH , " characters long and include at least a number, a character and one of the following   !\"$%^&*()-_=+[]{}\'@;:#~,.<>/\?|");
-
+        ELSEIF ROOTUSER <> 'root' THEN
+                
+        -- check the password length  
+        IF (select length(newpasswordin)) < PASSWORDLENGTH ) and ((select VALUE from sec_config where PROPERTY='password_length_check') = 1) THEN
+           SET message = CONCAT("Password should be at least " , PASSWORDLENGTH , " characters long");
+        END IF;
+        
+        -- check whether the password is too simple by comparing it against
+        -- a table that holds a dictionary of simple words (admin.dict)
+        SELECT countdict(*) INTO countdict FROM admin.dict WHERE WORD = newpasswordin;
+        
+        IF (countdict > 0) and ((select VALUE from sec_config where PROPERTY='password_dictionary_check') = 1) THEN
+          SET message = CONCAT_WS(',',message,' Password too simple');
+        END IF;
+        
+        -- check for a lower case character  
+        IF (newpasswordin NOT RLIKE '[[:lower:]]') and ((select VALUE from sec_config where PROPERTY='password_lowercase_check') = 1) THEN
+           SET message = CONCAT_WS(',',message,
+                                 ' Password should contain lower case character');
+        END IF;
+        
+        -- check for an upper case character  
+        IF (newpasswordin NOT RLIKE '[[:upper:]]') and ((select VALUE from sec_config where PROPERTY='password_uppercase_check') = 1) THEN
+           SET message = CONCAT_WS(',',message,
+                                  ' Password should contain upper case character');
+        END IF;
+        
+        -- check for a digit  
+        IF (newpasswordin NOT RLIKE '[[:digit:]]') and ((select VALUE from sec_config where PROPERTY='password_number_check') = 1) THEN
+           SET message = CONCAT_WS(',',message,
+                                  ' Password should contain a digit');
+        END IF;
+        
+        -- check for punctuation  
+        IF (newpasswordin NOT RLIKE '[[:punct:]]') and ((select VALUE from sec_config where PROPERTY='password_special_character_check') = 1) THEN
+           SET message = CONCAT_WS(',',message,
+                                   ' Password should contain punctuation');
+        END IF;
+        
+        -- lastly check whether username and password are the same 
+        -- if it is, admonish!
+        IF (usernamein = newpasswordin) and ((select VALUE from sec_config where PROPERTY='password_username_check') = 1) THEN
+           SET message = 'Username and password are the same!';
+        END IF;
+        
+        -- if message is still NULL then password is OK
+        IF message IS NOT NULL THEN
+           select message;
+        END IF;                              
+                   
         ELSE
-
+        
            SET LASTUPDATE = (select ID from sec_us_ho_profile where US_HO_ID=USHOID and UPDATE_TIMESTAMP > ADDDATE(NOW(), INTERVAL -24 HOUR));
-
+        
            IF LASTUPDATE IS NULL THEN
-
+        
               update sec_us_ho_profile
               set UPDATE_COUNT = '0'
               where US_HO_ID=USHOID;

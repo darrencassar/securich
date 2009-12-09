@@ -28,13 +28,15 @@ SecuRich Changelog:
    * Added Restore user@hostname on a particular database
    * Removed 'show warnings' from sql installation
 
-2009-10-: version 0.2.0
+2009-11-21: version 0.2.0
 
    * Added reconciliation from mysql to securich during installation
    * Added mysql version check for connection kill using processlist view in information_schema available as from 5.1.7
    * Added auditing of users changing password via MySQLs own `set_password`
    * Added auditing of role creation and updates
    * Added auditing of grants / revokes
+   * Password length is now configurable thorough sec_config
+   * Enhanced install script to include reverse reconciliation and do other checks
    * Stored proc check_roles was renamed to show_roles
    * Stored proc check_role_privileges was renamed to show_privileges_in_roles
    * Stored proc check_user_privileges was renamed to show_user_privileges

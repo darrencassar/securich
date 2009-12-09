@@ -13,6 +13,7 @@ INSTALLATION
 WEB
 
    http://www.securich.com
+   http://code.google.com/p/securich/
 
 
 DOCUMENTATION
@@ -139,6 +140,9 @@ storedprocedure     -   procedure name       -   single procedurure   -   pr1   
 
 23) update_databases_tables_storedprocedures_list();
 -- Updates the tables and databases tables (sec_tables, sec_databases, sec_storecprocedures and their relationship table sec_db_tb and sec_db_sp) with the full list of tables / databases / storedprocedures.
+
+24) password_check();
+-- This is password_check, a script used to check for password discrepancies between securich and mysql.
 
 Note that the `mysql` database is purposely not included in the `sec_databases` table as it is a VERY SENSITIVE database and no one should have direct privileges to that database apart from root and other sensitive accounts (preferibly kept to a minimum)
 
