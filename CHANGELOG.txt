@@ -49,3 +49,4 @@ SecuRich Changelog:
 
    * Added password dictionary check
    * Password complexity is now fully configurable thorough sec_config
+   * 

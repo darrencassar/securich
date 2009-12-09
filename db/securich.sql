@@ -384,7 +384,7 @@ ENGINE = InnoDB;
 DROP TABLE IF EXISTS `securich`.`sec_dictionary` ;
 
 CREATE  TABLE IF NOT EXISTS `securich`.`sec_dictionary` (
-  `PASSWD` VARCHAR(255) )
+  `WORD` VARCHAR(255) )
 ENGINE = MyISAM;
 
 SET SQL_MODE=@OLD_SQL_MODE;

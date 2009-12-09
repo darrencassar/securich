@@ -123,20 +123,67 @@
 			<dict>
 				<key>AliasData</key>
 				<data>
-				AAAAAAFUAAIAAAJPUwAAAAAAAAAAAAAAAAAAAAAAAAAA
-				AAAAAADGuKcDSCsAAAAgbrENQ0hBTkdFTE9HLnR4dAAA
-				AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-				AAAAAAAAAAAAAAAAAAAAACBvyscLTGJURVhUAAAAAP//
-				//8AAAkgAAAAAAAAAAAAAAAAAAAACHNlY3VyaWNoABAA
-				CAAAxriY8wAAABEACAAAxwtMYgAAAAEADAAgbrEAGqNR
-				ABqjTgACAChPUzpteXNxbDpzZWN1cmljaDpzZWN1cmlj
-				aDpDSEFOR0VMT0cudHh0AA4AHAANAEMASABBAE4ARwBF
-				AEwATwBHAC4AdAB4AHQADwAGAAIATwBTABIAJW15c3Fs
-				L3NlY3VyaWNoL3NlY3VyaWNoL0NIQU5HRUxPRy50eHQA
-				ABMAAS8A//8AAA==
+				AAAAAAF8AAIAAAJPUwAAAAAAAAAAAAAAAAAAAAAAAAAA
+				AAAAAADGuKcDSCsAAAAgb04Qc2V0X3Bhc3N3b3JkLnNx
+				bAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+				AAAAAAAAAAAAAAAAAAAAACBvoccLTGNURVhUAAAAAP//
+				//8AAAkgAAAAAAAAAAAAAAAAAAAACnByb2NlZHVyZXMA
+				EAAIAADGuJjzAAAAEQAIAADHC0xjAAAAAQAQACBvTgAg
+				brEAGqNRABqjTgACADZPUzpteXNxbDpzZWN1cmljaDpz
+				ZWN1cmljaDpwcm9jZWR1cmVzOnNldF9wYXNzd29yZC5z
+				cWwADgAiABAAcwBlAHQAXwBwAGEAcwBzAHcAbwByAGQA
+				LgBzAHEAbAAPAAYAAgBPAFMAEgAzbXlzcWwvc2VjdXJp
+				Y2gvc2VjdXJpY2gvcHJvY2VkdXJlcy9zZXRfcGFzc3dv
+				cmQuc3FsAAATAAEvAP//AAA=
 				</data>
 				<key>FileURL</key>
-				<string>file://localhost/mysql/securich/securich/CHANGELOG.txt</string>
+				<string>file://localhost/mysql/securich/securich/procedures/set_password.sql</string>
+				<key>TypeID</key>
+				<string>_CFileLocator</string>
+				<key>Version</key>
+				<integer>1</integer>
+			</dict>
+			<dict>
+				<key>AliasData</key>
+				<data>
+				AAAAAAF4AAIAAAJPUwAAAAAAAAAAAAAAAAAAAAAAAAAA
+				AAAAAADGuKcDSCsAAABH1BgUc2V0X3Bhc3N3b3JkX3Rt
+				cC5zcWwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+				AAAAAAAAAAAAAAAAAAAAAEouC8dFOh5URVhUAAAAAP//
+				//8AAAkgAAAAAAAAAAAAAAAAAAAABi5UcmFzaAAQAAgA
+				AMa4mPMAAAARAAgAAMdFOh4AAAABAAwAR9QYAAxtywAA
+				ev4AAgAxT1M6VXNlcnM6ZGFycmVuY2Fzc2FyOi5UcmFz
+				aDpzZXRfcGFzc3dvcmRfdG1wLnNxbAAADgAqABQAcwBl
+				AHQAXwBwAGEAcwBzAHcAbwByAGQAXwB0AG0AcAAuAHMA
+				cQBsAA8ABgACAE8AUwASAC5Vc2Vycy9kYXJyZW5jYXNz
+				YXIvLlRyYXNoL3NldF9wYXNzd29yZF90bXAuc3FsABMA
+				AS8AABUAAgAT//8AAA==
+				</data>
+				<key>FileURL</key>
+				<string>file://localhost/Users/darrencassar/.Trash/set_password_tmp.sql</string>
+				<key>TypeID</key>
+				<string>_CFileLocator</string>
+				<key>Version</key>
+				<integer>1</integer>
+			</dict>
+			<dict>
+				<key>AliasData</key>
+				<data>
+				AAAAAAFwAAIAAAJPUwAAAAAAAAAAAAAAAAAAAAAAAAAA
+				AAAAAADGuKcDSCsAAABKPxsLdXBncmFkZS5zcWwAAAAA
+				AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+				AAAAAAAAAAAAAAAAAAAAAEo/HcdFRahURVhUAAAAAP//
+				//8AAAkgAAAAAAAAAAAAAAAAAAAABTAuMi4xAAAQAAgA
+				AMa4mPMAAAARAAgAAMdFRagAAAABABQASj8bACBvAQAg
+				brEAGqNRABqjTgACADVPUzpteXNxbDpzZWN1cmljaDpz
+				ZWN1cmljaDp1cGdyYWRlczowLjIuMTp1cGdyYWRlLnNx
+				bAAADgAYAAsAdQBwAGcAcgBhAGQAZQAuAHMAcQBsAA8A
+				BgACAE8AUwASADJteXNxbC9zZWN1cmljaC9zZWN1cmlj
+				aC91cGdyYWRlcy8wLjIuMS91cGdyYWRlLnNxbAATAAEv
+				AP//AAA=
+				</data>
+				<key>FileURL</key>
+				<string>file://localhost/mysql/securich/securich/upgrades/0.2.1/upgrade.sql</string>
 				<key>TypeID</key>
 				<string>_CFileLocator</string>
 				<key>Version</key>
@@ -166,6 +213,51 @@
 			<dict>
 				<key>AliasData</key>
 				<data>
+				AAAAAAGMAAIAAAJPUwAAAAAAAAAAAAAAAAAAAAAAAAAA
+				AAAAAADGuKcDSCsAAAAgb04UZ3JhbnRfcHJpdmlsZWdl
+				cy5zcWwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+				AAAAAAAAAAAAAAAAAAAAACBvnMcLTGMAAAAAAAAAAP//
+				//8AAAkgAAAAAAAAAAAAAAAAAAAACnByb2NlZHVyZXMA
+				EAAIAADGuJjzAAAAEQAIAADHC0xjAAAAAQAQACBvTgAg
+				brEAGqNRABqjTgACADpPUzpteXNxbDpzZWN1cmljaDpz
+				ZWN1cmljaDpwcm9jZWR1cmVzOmdyYW50X3ByaXZpbGVn
+				ZXMuc3FsAA4AKgAUAGcAcgBhAG4AdABfAHAAcgBpAHYA
+				aQBsAGUAZwBlAHMALgBzAHEAbAAPAAYAAgBPAFMAEgA3
+				bXlzcWwvc2VjdXJpY2gvc2VjdXJpY2gvcHJvY2VkdXJl
+				cy9ncmFudF9wcml2aWxlZ2VzLnNxbAAAEwABLwD//wAA
+				</data>
+				<key>FileURL</key>
+				<string>file://localhost/mysql/securich/securich/procedures/grant_privileges.sql</string>
+				<key>TypeID</key>
+				<string>_CFileLocator</string>
+				<key>Version</key>
+				<integer>1</integer>
+			</dict>
+			<dict>
+				<key>AliasData</key>
+				<data>
+				AAAAAAFUAAIAAAJPUwAAAAAAAAAAAAAAAAAAAAAAAAAA
+				AAAAAADGuKcDSCsAAAAgbrENQ0hBTkdFTE9HLnR4dAAA
+				AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+				AAAAAAAAAAAAAAAAAAAAACBvyscLTGJURVhUAAAAAP//
+				//8AAAkgAAAAAAAAAAAAAAAAAAAACHNlY3VyaWNoABAA
+				CAAAxriY8wAAABEACAAAxwtMYgAAAAEADAAgbrEAGqNR
+				ABqjTgACAChPUzpteXNxbDpzZWN1cmljaDpzZWN1cmlj
+				aDpDSEFOR0VMT0cudHh0AA4AHAANAEMASABBAE4ARwBF
+				AEwATwBHAC4AdAB4AHQADwAGAAIATwBTABIAJW15c3Fs
+				L3NlY3VyaWNoL3NlY3VyaWNoL0NIQU5HRUxPRy50eHQA
+				ABMAAS8A//8AAA==
+				</data>
+				<key>FileURL</key>
+				<string>file://localhost/mysql/securich/securich/CHANGELOG.txt</string>
+				<key>TypeID</key>
+				<string>_CFileLocator</string>
+				<key>Version</key>
+				<integer>1</integer>
+			</dict>
+			<dict>
+				<key>AliasData</key>
+				<data>
 				AAAAAAFUAAIAAAJPUwAAAAAAAAAAAAAAAAAAAAAAAAAA
 				AAAAAADGuKcDSCsAAAAgbswMc2VjdXJpY2guc3FsAAAA
 				AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
@@ -180,29 +272,6 @@
 				</data>
 				<key>FileURL</key>
 				<string>file://localhost/mysql/securich/securich/db/securich.sql</string>
-				<key>TypeID</key>
-				<string>_CFileLocator</string>
-				<key>Version</key>
-				<integer>1</integer>
-			</dict>
-			<dict>
-				<key>AliasData</key>
-				<data>
-				AAAAAAFwAAIAAAJPUwAAAAAAAAAAAAAAAAAAAAAAAAAA
-				AAAAAADGuKcDSCsAAABKPxsLdXBncmFkZS5zcWwAAAAA
-				AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-				AAAAAAAAAAAAAAAAAAAAAEo/HcdFRahURVhUAAAAAP//
-				//8AAAkgAAAAAAAAAAAAAAAAAAAABTAuMi4xAAAQAAgA
-				AMa4mPMAAAARAAgAAMdFRagAAAABABQASj8bACBvAQAg
-				brEAGqNRABqjTgACADVPUzpteXNxbDpzZWN1cmljaDpz
-				ZWN1cmljaDp1cGdyYWRlczowLjIuMTp1cGdyYWRlLnNx
-				bAAADgAYAAsAdQBwAGcAcgBhAGQAZQAuAHMAcQBsAA8A
-				BgACAE8AUwASADJteXNxbC9zZWN1cmljaC9zZWN1cmlj
-				aC91cGdyYWRlcy8wLjIuMS91cGdyYWRlLnNxbAATAAEv
-				AP//AAA=
-				</data>
-				<key>FileURL</key>
-				<string>file://localhost/mysql/securich/securich/upgrades/0.2.1/upgrade.sql</string>
 				<key>TypeID</key>
 				<string>_CFileLocator</string>
 				<key>Version</key>
@@ -256,29 +325,6 @@
 			<dict>
 				<key>AliasData</key>
 				<data>
-				AAAAAAF8AAIAAAJPUwAAAAAAAAAAAAAAAAAAAAAAAAAA
-				AAAAAADGuKcDSCsAAAAgb04Qc2V0X3Bhc3N3b3JkLnNx
-				bAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-				AAAAAAAAAAAAAAAAAAAAACBvoccLTGNURVhUAAAAAP//
-				//8AAAkgAAAAAAAAAAAAAAAAAAAACnByb2NlZHVyZXMA
-				EAAIAADGuJjzAAAAEQAIAADHC0xjAAAAAQAQACBvTgAg
-				brEAGqNRABqjTgACADZPUzpteXNxbDpzZWN1cmljaDpz
-				ZWN1cmljaDpwcm9jZWR1cmVzOnNldF9wYXNzd29yZC5z
-				cWwADgAiABAAcwBlAHQAXwBwAGEAcwBzAHcAbwByAGQA
-				LgBzAHEAbAAPAAYAAgBPAFMAEgAzbXlzcWwvc2VjdXJp
-				Y2gvc2VjdXJpY2gvcHJvY2VkdXJlcy9zZXRfcGFzc3dv
-				cmQuc3FsAAATAAEvAP//AAA=
-				</data>
-				<key>FileURL</key>
-				<string>file://localhost/mysql/securich/securich/procedures/set_password.sql</string>
-				<key>TypeID</key>
-				<string>_CFileLocator</string>
-				<key>Version</key>
-				<integer>1</integer>
-			</dict>
-			<dict>
-				<key>AliasData</key>
-				<data>
 				AAAAAAF4AAIAAAJPUwAAAAAAAAAAAAAAAAAAAAAAAAAA
 				AAAAAADGuKcDSCsAAAAgb04PcmVuYW1lX3VzZXIuc3Fs
 				AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
@@ -294,29 +340,6 @@
 				</data>
 				<key>FileURL</key>
 				<string>file://localhost/mysql/securich/securich/procedures/rename_user.sql</string>
-				<key>TypeID</key>
-				<string>_CFileLocator</string>
-				<key>Version</key>
-				<integer>1</integer>
-			</dict>
-			<dict>
-				<key>AliasData</key>
-				<data>
-				AAAAAAF4AAIAAAJPUwAAAAAAAAAAAAAAAAAAAAAAAAAA
-				AAAAAADGuKcDSCsAAABH1BgUc2V0X3Bhc3N3b3JkX3Rt
-				cC5zcWwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-				AAAAAAAAAAAAAAAAAAAAAEouC8dFOh5URVhUAAAAAP//
-				//8AAAkgAAAAAAAAAAAAAAAAAAAABi5UcmFzaAAQAAgA
-				AMa4mPMAAAARAAgAAMdFOh4AAAABAAwAR9QYAAxtywAA
-				ev4AAgAxT1M6VXNlcnM6ZGFycmVuY2Fzc2FyOi5UcmFz
-				aDpzZXRfcGFzc3dvcmRfdG1wLnNxbAAADgAqABQAcwBl
-				AHQAXwBwAGEAcwBzAHcAbwByAGQAXwB0AG0AcAAuAHMA
-				cQBsAA8ABgACAE8AUwASAC5Vc2Vycy9kYXJyZW5jYXNz
-				YXIvLlRyYXNoL3NldF9wYXNzd29yZF90bXAuc3FsABMA
-				AS8AABUAAgAT//8AAA==
-				</data>
-				<key>FileURL</key>
-				<string>file://localhost/Users/darrencassar/.Trash/set_password_tmp.sql</string>
 				<key>TypeID</key>
 				<string>_CFileLocator</string>
 				<key>Version</key>
