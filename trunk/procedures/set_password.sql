@@ -30,7 +30,7 @@ DROP PROCEDURE IF EXISTS set_password;
 
 DELIMITER $$
 
-CREATE PROCEDURE `securich`.`set_password`( usernamein varchar(50), hostnamein varchar(50), oldpasswordin varchar(50), newpasswordin varchar(50))
+CREATE PROCEDURE `securich`.`set_password`( usernamein VARCHAR(50), hostnamein VARCHAR(50), oldpasswordin VARCHAR(50), newpasswordin VARCHAR(50))
   BEGIN
 
     DECLARE PASSW0 CHAR(41);
@@ -46,104 +46,108 @@ CREATE PROCEDURE `securich`.`set_password`( usernamein varchar(50), hostnamein v
     DECLARE ROOTUSER VARCHAR(16);
     DECLARE message VARCHAR(256);
     DECLARE countdict INT;
-
-
-    SET CORRECTUSER= (select CONCAT(usernamein,'@',hostnamein)=user());
-    SET PASSWORDLENGTH= (select VALUE from sec_config where PROPERTY='password_length');
-    SET ROOTUSER= (select (substring_index(user(),'@',1)));
+    
+    IF hostnamein='localhost' or hostnamein='127.0.0.1' then
+        SET CORRECTUSER= ((SELECT CONCAT(usernamein,'@127.0.0.1')=USER()) or (SELECT CONCAT(usernamein,'@localhost')=USER()));
+    ELSE
+        SET CORRECTUSER= (SELECT CONCAT(usernamein,'@',hostnamein)=USER());
+    END IF;
+    
+    SET PASSWORDLENGTH= (SELECT VALUE FROM sec_config WHERE PROPERTY='password_length');
+    SET ROOTUSER= (SELECT (SUBSTRING_INDEX(USER(),'@',1)));
 
      IF CORRECTUSER = 1 OR ROOTUSER = 'root' THEN
 
         SET USHOID= (
-           select ID
-           from sec_us_ho usho
-           where usho.US_ID= (
-              select ID
-              from sec_users
-              where USERNAME=usernamein
+           SELECT ID
+           FROM sec_us_ho usho
+           WHERE usho.US_ID= (
+              SELECT ID
+              FROM sec_users
+              WHERE USERNAME=usernamein
               )
-           and usho.HO_ID = (
-              select ID
-              from sec_hosts
-              where HOSTNAME=hostnamein
+           AND usho.HO_ID = (
+              SELECT ID
+              FROM sec_hosts
+              WHERE HOSTNAME=hostnamein
               )
            );
 
         SET PASSW0 = (
-           select pw0
-           from sec_us_ho_profile
-           where US_HO_ID = USHOID );
+           SELECT pw0
+           FROM sec_us_ho_profile
+           WHERE US_HO_ID = USHOID );
 
-        IF (select PASSWORD(oldpasswordin)) <> PASSW0 and ROOTUSER <> 'root' THEN
+        IF (SELECT PASSWORD(oldpasswordin)) <> PASSW0 AND ROOTUSER <> 'root' THEN
 
-           select "Invalid original password, please check your own password and try again!";
+           SET message = "Invalid original password, please check your own password and try again!";
 
-           select sleep(5); /* If the password is not guessed this sleep takes place. It is there to hinder a brute force attack!*/
+           SELECT SLEEP(5); /* If the password is not guessed this sleep takes place. It is there to hinder a brute force attack!*/
 
         ELSEIF ROOTUSER <> 'root' THEN
                 
-        -- check the password length  
-        IF (select length(newpasswordin)) < PASSWORDLENGTH ) and ((select VALUE from sec_config where PROPERTY='password_length_check') = 1) THEN
-           SET message = CONCAT("Password should be at least " , PASSWORDLENGTH , " characters long");
-        END IF;
-        
-        -- check whether the password is too simple by comparing it against
-        -- a table that holds a dictionary of simple words (admin.dict)
-        SELECT countdict(*) INTO countdict FROM admin.dict WHERE WORD = newpasswordin;
-        
-        IF (countdict > 0) and ((select VALUE from sec_config where PROPERTY='password_dictionary_check') = 1) THEN
-          SET message = CONCAT_WS(',',message,' Password too simple');
-        END IF;
-        
-        -- check for a lower case character  
-        IF (newpasswordin NOT RLIKE '[[:lower:]]') and ((select VALUE from sec_config where PROPERTY='password_lowercase_check') = 1) THEN
-           SET message = CONCAT_WS(',',message,
-                                 ' Password should contain lower case character');
-        END IF;
-        
-        -- check for an upper case character  
-        IF (newpasswordin NOT RLIKE '[[:upper:]]') and ((select VALUE from sec_config where PROPERTY='password_uppercase_check') = 1) THEN
-           SET message = CONCAT_WS(',',message,
-                                  ' Password should contain upper case character');
-        END IF;
-        
-        -- check for a digit  
-        IF (newpasswordin NOT RLIKE '[[:digit:]]') and ((select VALUE from sec_config where PROPERTY='password_number_check') = 1) THEN
-           SET message = CONCAT_WS(',',message,
-                                  ' Password should contain a digit');
-        END IF;
-        
-        -- check for punctuation  
-        IF (newpasswordin NOT RLIKE '[[:punct:]]') and ((select VALUE from sec_config where PROPERTY='password_special_character_check') = 1) THEN
-           SET message = CONCAT_WS(',',message,
-                                   ' Password should contain punctuation');
-        END IF;
-        
-        -- lastly check whether username and password are the same 
-        -- if it is, admonish!
-        IF (usernamein = newpasswordin) and ((select VALUE from sec_config where PROPERTY='password_username_check') = 1) THEN
-           SET message = 'Username and password are the same!';
+           -- check the password length  
+           IF ((SELECT LENGTH(newpasswordin)) < PASSWORDLENGTH) AND ((SELECT VALUE FROM sec_config WHERE PROPERTY='password_length_check') = 1) THEN
+              SET message = CONCAT("Password should be at least " , PASSWORDLENGTH , " characters long");
+           END IF;
+           
+           -- check whether the password is too simple by comparing it against
+           -- a table that holds a dictionary of simple words (admin.dict)
+           SELECT COUNT(*) INTO countdict FROM sec_dictionary WHERE WORD = newpasswordin;
+           
+           IF (countdict > 0) AND ((SELECT VALUE FROM sec_config WHERE PROPERTY='password_dictionary_check') = 1) THEN
+             SET message = CONCAT_WS(',',message,' Password too simple');
+           END IF;
+           
+           -- check for a lower case character  
+           IF (newpasswordin NOT RLIKE '[[:lower:]]') AND ((SELECT VALUE FROM sec_config WHERE PROPERTY='password_lowercase_check') = 1) THEN
+              SET message = CONCAT_WS(',',message,
+                                    ' Password should contain lower case character');
+           END IF;
+           
+           -- check for an upper case character  
+           IF (newpasswordin NOT RLIKE '[[:upper:]]') AND ((SELECT VALUE FROM sec_config WHERE PROPERTY='password_uppercase_check') = 1) THEN
+              SET message = CONCAT_WS(',',message,
+                                     ' Password should contain upper case character');
+           END IF;
+           
+           -- check for a digit  
+           IF (newpasswordin NOT RLIKE '[[:digit:]]') AND ((SELECT VALUE FROM sec_config WHERE PROPERTY='password_number_check') = 1) THEN
+              SET message = CONCAT_WS(',',message,
+                                     ' Password should contain a digit');
+           END IF;
+           
+           -- check for punctuation  
+           IF (newpasswordin NOT RLIKE '[[:punct:]]') AND ((SELECT VALUE FROM sec_config WHERE PROPERTY='password_special_character_check') = 1) THEN
+              SET message = CONCAT_WS(',',message,
+                                      ' Password should contain punctuation');
+           END IF;
+           
+           -- lastly check whether username and password are the same 
+           -- if it is, admonish!
+           IF (usernamein = newpasswordin) AND ((SELECT VALUE FROM sec_config WHERE PROPERTY='password_username_check') = 1) THEN
+              SET message = 'Username and password are the same!';
+           END IF;
+           
         END IF;
         
         -- if message is still NULL then password is OK
         IF message IS NOT NULL THEN
-           select message;
-        END IF;                              
-                   
+           SELECT message;      
         ELSE
         
-           SET LASTUPDATE = (select ID from sec_us_ho_profile where US_HO_ID=USHOID and UPDATE_TIMESTAMP > ADDDATE(NOW(), INTERVAL -24 HOUR));
+           SET LASTUPDATE = (SELECT ID FROM sec_us_ho_profile WHERE US_HO_ID=USHOID AND UPDATE_TIMESTAMP > ADDDATE(NOW(), INTERVAL -24 HOUR));
         
            IF LASTUPDATE IS NULL THEN
         
-              update sec_us_ho_profile
-              set UPDATE_COUNT = '0'
-              where US_HO_ID=USHOID;
+              UPDATE sec_us_ho_profile
+              SET UPDATE_COUNT = '0'
+              WHERE US_HO_ID=USHOID;
 
            END IF;
 
 
-           SET UPDATECOUNT = (select UPDATE_COUNT from sec_us_ho_profile where US_HO_ID=USHOID and UPDATE_TIMESTAMP > ADDDATE(NOW(), INTERVAL -24 HOUR));
+           SET UPDATECOUNT = (SELECT UPDATE_COUNT FROM sec_us_ho_profile WHERE US_HO_ID=USHOID AND UPDATE_TIMESTAMP > ADDDATE(NOW(), INTERVAL -24 HOUR));
 
            IF UPDATECOUNT < 1 OR UPDATECOUNT IS NULL THEN
 
@@ -153,39 +157,39 @@ CREATE PROCEDURE `securich`.`set_password`( usernamein varchar(50), hostnamein v
               EXECUTE setpassword;
 
               SET PASSW1 = (
-                 select pw1
-                 from sec_us_ho_profile
-                 where US_HO_ID = USHOID );
+                 SELECT pw1
+                 FROM sec_us_ho_profile
+                 WHERE US_HO_ID = USHOID );
 
               SET PASSW2 = (
-                 select pw2
-                 from sec_us_ho_profile
-                 where US_HO_ID = USHOID );
+                 SELECT pw2
+                 FROM sec_us_ho_profile
+                 WHERE US_HO_ID = USHOID );
 
               SET PASSW3 = (
-                 select pw3
-                 from sec_us_ho_profile
-                 where US_HO_ID = USHOID );
+                 SELECT pw3
+                 FROM sec_us_ho_profile
+                 WHERE US_HO_ID = USHOID );
 
               SET PASSW4 = (
-                 select pw4
-                 from sec_us_ho_profile
-                 where US_HO_ID = USHOID );
+                 SELECT pw4
+                 FROM sec_us_ho_profile
+                 WHERE US_HO_ID = USHOID );
 
 
-              update sec_us_ho_profile
-              set PW4 = PASSW3,
+              UPDATE sec_us_ho_profile
+              SET PW4 = PASSW3,
                   PW3 = PASSW2,
                   PW2 = PASSW1,
                   PW1 = PASSW0,
                   PW0 = PASSWORD(newpasswordin),
-                  UPDATE_TIMESTAMP=now(),
+                  UPDATE_TIMESTAMP=NOW(),
                   UPDATE_COUNT = UPDATE_COUNT + 1
-              where US_HO_ID=USHOID;
+              WHERE US_HO_ID=USHOID;
 
            ELSEIF UPDATECOUNT > 10 THEN
 
-              select "PASSWORD CHANGE FOR THIS USER HAS EXCEEDED LIMIT - Try in 24hrs";
+              SELECT "PASSWORD CHANGE FOR THIS USER HAS EXCEEDED LIMIT - Try in 24hrs";
 
            ELSE
 
@@ -194,17 +198,17 @@ CREATE PROCEDURE `securich`.`set_password`( usernamein varchar(50), hostnamein v
               PREPARE setpassword FROM @sp;
               EXECUTE setpassword;
 
-              update sec_us_ho_profile
-              set PW0 = PASSWORD(newpasswordin),
+              UPDATE sec_us_ho_profile
+              SET PW0 = PASSWORD(newpasswordin),
                   UPDATE_COUNT = UPDATE_COUNT + 1
-              where US_HO_ID=USHOID;
+              WHERE US_HO_ID=USHOID;
            END IF;
 
         END IF;
 
      ELSE
 
-        select "YOU DO NOT HAVE PERMISSION TO CHANGE THE PASSWORD FOR THE USER SPECIFIED!";
+        SELECT "YOU DO NOT HAVE PERMISSION TO CHANGE THE PASSWORD FOR THE USER SPECIFIED!";
 
      END IF;
 
