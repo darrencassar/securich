@@ -2,7 +2,7 @@
 
 = Introduction =
 
-Here is a list of commands available for use with securich (0.1.2). As from 0.1.4 there is a `help` stored procedure which you can use by issuing a `call sec_help();`. 
+Here is a list of commands available for use with securich (0.1.2). As from 0.1.4 there is a `help` stored procedure which you can use by issuing a `call help();`. 
 
 = Details =
 
