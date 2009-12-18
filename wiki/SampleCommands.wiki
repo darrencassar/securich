@@ -47,11 +47,11 @@ Securich Tutorial (for securich version 0.1.2)
       Connecting to www.securich.com|64.202.163.10|:80... connected.
       HTTP request sent, awaiting response... 200 OK
       Length: 29217 (29K) [application/x-tar]
-      Saving to: `securich.0.1.1.tar.gz'
+      Saving to: `securich.0.1.1.tar.gz`
 
       100%[=====================================================================================================>] 29,217      64.7K/s   in 0.4s
 
-      2009-06-19 16:27:59	(64.7 KB/s) - `securich.0.1.1.tar.gz' saved [29217/29217]
+      2009-06-19 16:27:59	(64.7 KB/s) - `securich.0.1.1.tar.gz` saved [29217/29217]
 
       Enter mysql root Password (default ):
       Enter mysql Hostname/IP (default 127.0.0.1): localhost
