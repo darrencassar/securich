@@ -1,0 +1,6 @@
+#mailing list using google groups.
+
+= FOUND AT =
+
+*[http://groups.google.com/group/securich SecurichMailingList]*<br>
+*[securich@googlegroups.com SecurichEmail]*
