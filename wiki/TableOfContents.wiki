@@ -5,3 +5,4 @@
   * [Installation]
   * [Documentation]
   * [SampleCommands]
+  * [MailingList]
