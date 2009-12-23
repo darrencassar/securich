@@ -169,20 +169,20 @@ fi
  echo -n "Enter choice (default 2): "
  read -e TOI                                                                  ## TOI = Type of Installation
  
+ if [ "$TOI" == "" ]
+  then
+    TOI=2
+ fi
+ 
  while [ "$TOI" -lt "1" ] && [ "$TOI" -gt "2" ]
  do
     echo -n "Wrong value, please re-enter choice (defualt 2 i.e. Download and install): "
      read -e TOI
       if [ "$TOI" == "" ]
        then
-        TOI=1
+        TOI=2
       fi
  done
-    
- if [ "$TOI" == "" ]
-  then
-    TOI=2
- fi
 
  if [ "$TOI" == "2" ]
   then
