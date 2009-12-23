@@ -48,5 +48,9 @@ SecuRich Changelog:
 2009-12-31: version 0.2.1
 
    * Added password dictionary check
-   * Password complexity is now fully configurable thorough sec_config
-   * 
+   * Added uppercase and lowercase configurable check
+   * Added digit in password configurable check
+   * Added more verbose to wrong passwords
+   
+   
+   
