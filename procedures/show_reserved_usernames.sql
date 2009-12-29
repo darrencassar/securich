@@ -2,9 +2,6 @@
 ##                                                                                   ##
 ##   This is show_reserved_username, a script used to list reserved usernames        ##
 ##                                                                                   ##
-##   This program was originally sponsored by TradingScreen Inc                      ##
-##   Information about TS is found at www.tradingscreen.com                          ##
-##                                                                                   ##
 ##   This program was written by Darren Cassar 2009.                                 ##
 ##   Feedback and improvements are welcome at:                                       ##
 ##   info [at] securich.com / info [at] mysqlpreacher.com                            ##
@@ -32,7 +29,7 @@ DELIMITER $$
 CREATE PROCEDURE `securich`.`show_reserved_usernames`()
   BEGIN
 
-     SELECT USERNAME FROM securich.sec_reserved_usernames as 'reserved usernames';
+     select USERNAME as 'reserved usernames' from securich.sec_reserved_usernames;
 
   END$$
 

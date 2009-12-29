@@ -1,0 +1,179 @@
+INFO
+CREATING DATABASE STRUCTURE
+INFO
+storage engine: InnoDB
+
+Tue Dec 29 16:34:57 GMT 2009 - INFO - Test1 - TEST CREATE USER
+
+Tue Dec 29 16:34:57 GMT 2009 - INFO - Test1 - Starting grant privileges
+
+
+
+Tue Dec 29 16:34:57 GMT 2009 - INFO - Test1 - Updating role - role1, adding privilege select
+USER_PASSWORD
+Password for user -- trilla -- contactable at -- user@company.com -- is -- caf2c59dc8ce61d10358 --
+
+
+TESTUSER=trilla - TESTPASS=caf2c59dc8ce61d10358
+
+Tue Dec 29 16:34:57 GMT 2009 - INFO - Test1 - Testing new user access
+
+Database
+information_schema
+securich
+
+
+Tue Dec 29 16:34:57 GMT 2009 - INFO - Testing select now()
+
+now()
+2009-12-29 16:34:57
+
+
+
+Tue Dec 29 16:34:57 GMT 2009 - INFO - Test2 - TEST CREATE ROLE
+
+
+Tue Dec 29 16:34:57 GMT 2009 - INFO - Test2 - Role creating with insert privilege
+
+
+Tue Dec 29 16:34:57 GMT 2009 - INFO - Test2 - Showing roles available
+ID	ROLE
+1	read
+2	write
+3	role1
+
+
+Tue Dec 29 16:34:57 GMT 2009 - INFO - Test2 - Showing roles
+PRIVILEGE
+INSERT
+SELECT
+UPDATE
+
+
+Tue Dec 29 16:34:57 GMT 2009 - INFO - Test2 - Showing privileges belonging to role role1
+now()
+2009-12-29 16:34:57
+
+
+
+Tue Dec 29 16:34:57 GMT 2009 - INFO - Test3 - TEST CREATE / DELETE USER
+Tue Dec 29 16:34:57 GMT 2009 - INFO - Test3 - Starting creating John@domain.com
+USER_PASSWORD
+Password for user -- john -- contactable at -- john@domain.com -- is -- 62b4924dcb4c743 --
+
+TESTUSER=john - TESTPASS=62b4924dcb4c743
+
+Tue Dec 29 16:34:57 GMT 2009 - INFO - Test3 - Testing new user access
+
+
+
+Tue Dec 29 16:34:57 GMT 2009 - INFO - Test3 - Testing revoke privileges on user
+
+USER_PASSWORD
+Password for user -- tom -- contactable at -- tom@domain.com -- is -- b2d3e39e4eb0e27 --
+
+TESTUSER=tom - TESTPASS=b2d3e39e4eb0e27
+
+Tue Dec 29 16:34:57 GMT 2009 - INFO - Test3 - Testing new user access
+
+USERNAME	HOSTNAME	DATABASENAME	TABLENAME	ROLE	PRIVILEGE	STATE
+tom	10.0.0.2	world	country	role1	INSERT	A
+tom	10.0.0.2	world	country	role1	SELECT	A
+tom	10.0.0.2	world	country	role1	UPDATE	A
+tom	10.0.0.2	world	CountryLanguage	role1	INSERT	A
+tom	10.0.0.2	world	CountryLanguage	role1	SELECT	A
+tom	10.0.0.2	world	CountryLanguage	role1	UPDATE	A
+
+
+Tue Dec 29 16:34:57 GMT 2009 - INFO - Test3 - Showing full user entries
+
+
+Tue Dec 29 16:34:57 GMT 2009 - INFO - Test3 - Updating role - role1, adding privilege DELETE
+USERNAME	HOSTNAME	DATABASENAME	TABLENAME	ROLE	PRIVILEGE	STATE
+tom	10.0.0.2	world	country	role1	DELETE	A
+tom	10.0.0.2	world	country	role1	INSERT	A
+tom	10.0.0.2	world	country	role1	SELECT	A
+tom	10.0.0.2	world	country	role1	UPDATE	A
+tom	10.0.0.2	world	CountryLanguage	role1	DELETE	A
+tom	10.0.0.2	world	CountryLanguage	role1	INSERT	A
+tom	10.0.0.2	world	CountryLanguage	role1	SELECT	A
+tom	10.0.0.2	world	CountryLanguage	role1	UPDATE	A
+
+
+Tue Dec 29 16:34:58 GMT 2009 - INFO - Test3 - Showing full user entries
+USER_PASSWORD
+Password for user -- judas -- contactable at -- judas@domain.com -- is -- 438df63a94d108 --
+
+TESTUSER=judas - TESTPASS=438df63a94d108
+
+Tue Dec 29 16:34:58 GMT 2009 - INFO - Test3 - Cloning user TOM to user JUDAS
+USERNAME	HOSTNAME	DATABASENAME	TABLENAME	ROLE	PRIVILEGE	STATE
+judas	10.0.0.2	world	country	role1	DELETE	A
+judas	10.0.0.2	world	country	role1	INSERT	A
+judas	10.0.0.2	world	country	role1	SELECT	A
+judas	10.0.0.2	world	country	role1	UPDATE	A
+judas	10.0.0.2	world	CountryLanguage	role1	DELETE	A
+judas	10.0.0.2	world	CountryLanguage	role1	INSERT	A
+judas	10.0.0.2	world	CountryLanguage	role1	SELECT	A
+judas	10.0.0.2	world	CountryLanguage	role1	UPDATE	A
+
+
+Tue Dec 29 16:34:58 GMT 2009 - INFO - Test3 - Showing full user entries
+PRIVILEGE
+DELETE
+INSERT
+SELECT
+UPDATE
+
+
+Tue Dec 29 16:34:58 GMT 2009 - INFO - Test3 - Showing full user privileges for JUDAS
+
+
+Tue Dec 29 16:34:58 GMT 2009 - INFO - Test3 - Create Update Role
+now()
+2009-12-29 16:34:58
+
+
+
+Tue Dec 29 16:34:58 GMT 2009 - INFO - Test4 - TEST CREATE / DELETE USER
+Tue Dec 29 16:34:58 GMT 2009 - INFO - Test4 - Starting creating John@domain.com
+USER_PASSWORD
+Password for user -- peter -- contactable at -- peter@domain.com -- is -- fd0347c2392e632 --
+
+TESTUSER=peter - TESTPASS=fd0347c2392e632
+
+Tue Dec 29 16:34:58 GMT 2009 - INFO - Test3 - Testing new user access
+
+
+TESTUSER=peter - TESTPASS=fd0347c2392e632
+
+Tue Dec 29 16:34:58 GMT 2009 - INFO - Test4 - Testing new user access
+
+Database
+information_schema
+securich
+world
+
+Tue Dec 29 16:34:58 GMT 2009 - INFO - Test4 - Peter show databases
+
+
+Tue Dec 29 16:34:58 GMT 2009 - INFO - Test4 - Peter show tables
+
+PRIVILEGE
+DELETE
+INSERT
+SELECT
+UPDATE
+
+Tue Dec 29 16:34:58 GMT 2009 - INFO - Test4 - Peter can check his own privileges
+
+
+
+Tue Dec 29 16:34:58 GMT 2009 - INFO - Test4 - Testing revoke privileges on user
+
+
+Tue Dec 29 16:34:58 GMT 2009 - INFO - Test4 - Peter show databases after revoke
+
+
+
+
