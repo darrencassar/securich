@@ -100,12 +100,13 @@ emailaddress  - 50
 Failure to abide to the limitations will cause truncation of any of the above parameters.
 
 table type / tablename can be:
-tabletype           -   tablename            -   description
-all                 -                        -   all database         -   db.*                         -   used generally like `grant privilege on db.* to 'user'@'hostname';`
-alltables           -                        -   all tables           -   db.tb1 db.tb2 db.tb3 etc     -   for all tables separately (used when there is a need to grant on all and revoke on a few tables)
-singletable         -   tablename            -   single table         -   tb1                          -   for individual tables `grant privilege on db.tb1 to 'user'@'hostname';`
-regexp              -   regular expression   -   regexp               -   tb1 2tb but not table3       -   this uses regexp ***
-storedprocedure     -   procedure name       -   single procedurure   -   pr1                          -   for individual procedures
+tablename            -   tabletype 			-   description
+                     -   all 		    	-   all database         -   db.*                         -   used generally like `grant privilege on db.* to 'user'@'hostname';`
+                     -   alltables 			-   all tables           -   db.tb1 db.tb2 db.tb3 etc     -   for all tables separately (used when there is a need to grant on all and revoke on a few tables)
+tablename            -   singletable		-   single table         -   tb1                          -   for individual tables `grant privilege on db.tb1 to 'user'@'hostname';`
+regular expression   -   regexp 			-   regexp               -   tb1 2tb but not table3       -   this uses regexp ***
+procedure name       -   storedprocedure 	-   single procedurure   -   pr1                          -   for individual procedures
+
 *** note that for regexp usage, if tables need to have a common prefix the best way would be to add a ^ in front of the prefix i.e. ^prefix
 
 13) grant_privileges_reverse_reconciliation('username','hostname','databasename','tablename','tabletype','rolename','emailaddress'); (version 0.1.1)
@@ -133,7 +134,17 @@ storedprocedure     -   procedure name       -   single procedurure   -   pr1   
 -- Revokes a privilege for a particular combination of username / hostname / databasename / tablename / role. The terminateconnectionsy is there to kill all threads for a particular user if set to Y which is revoked. Should you not want to cut off the user, just substitute it with n and the user won't be able to connect next time round but current connections remain intact. - tabletype should either be table (for a table) and storedprocedure (for a stored proc).
 
 21) set_password('username','hostname','oldpassword','newpassword'); (version 0.1.1) (version 0.1.4 added `oldpassword`)
--- Changes password for any user (if current user is root), otherwise changes own password if current user is not root. can change the password up to 11times in 1 day and stores the last 5 passwords which were not changed for at least 24hrs. Does not permit the new password to be the same as any of the old passwords. Resets update count if more than 24hrs passed from last first update of the day. Password must be longer than 10 characters, contain at least one number, one letter and one special character (minimum complexity requirement). In order for a user to change one's old password, the user needs to supply the old password apart from the new one as well.
+-- Changes password for any user (if current user is root), otherwise changes own password if current user is not root. can change the password up to 11times in 1 day and stores the last 5 passwords which were not changed for at least 24hrs. Does not permit the new password to be the same as any of the old passwords. Resets update count if more than 24hrs passed from last first update of the day. Password must be longer than '10 characters (configurable amount through sec_config.password_length)'. Complexity requirements are set on sec_config:
+password_length_check
+password_dictionary_check
+password_lowercase_check
+password_uppercase_check
+password_number_check
+password_special_character_check
+password_username_check
+Root user doesn't need to abide to the above password restrictions when creating a new user since the latter will have to change the password and set one of his own.
+
+In order for a user to change one's old password, the user needs to supply the old password apart from the new one as well.
 
 22) unblock_user ( 'usernamein','hostnamein','dbnamein' )
 -- Unblocks any user specified if it had blocked privileges / roles
@@ -143,6 +154,12 @@ storedprocedure     -   procedure name       -   single procedurure   -   pr1   
 
 24) password_check();
 -- This is password_check, a script used to check for password discrepancies between securich and mysql.
+
+25) show_reserved_usernames();
+-- Used to list the usernames currently set as reserved.
+
+26) set_my_password(oldpasswordin, newpasswordin)
+-- Used by users to set their own password.
 
 Note that the `mysql` database is purposely not included in the `sec_databases` table as it is a VERY SENSITIVE database and no one should have direct privileges to that database apart from root and other sensitive accounts (preferibly kept to a minimum)
 
