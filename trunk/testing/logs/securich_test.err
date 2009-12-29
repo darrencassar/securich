@@ -1,3 +1,0 @@
-ERROR 1045 (28000): Access denied for user 'peter'@'localhost' (using password: YES)
-ERROR 1045 (28000): Access denied for user 'peter'@'localhost' (using password: YES)
-./autotest.sh: line 422: 7: Bad file descriptor
