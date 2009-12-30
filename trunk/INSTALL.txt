@@ -5,11 +5,13 @@
    ===== INSTALL FROM A TARBALL
       download securich_install.tar from http://www.securich.com/ downloads section
       tar -xf securich_install.tar
-      chmod 700 securich_install.sh
-      ./install.sh
+      cd securich_install
+      chmod +x securich_install.sh
+      ./securich_install.sh
 
-      follow the instructions and decide weather you'd like to install the latest version of securich, upgrade your current installation or just install the securich tar.gz package you currently have.
-
+      follow the instructions and decide whether you'd like to install the
+      latest version of securich, upgrade your current installation or just
+      install the securich tar.gz package you currently have.
    ### you need to have the following in the PATH:
    ### mysql, wget, gunzip, tar
 
