@@ -12,6 +12,7 @@
       follow the instructions and decide whether you'd like to install the
       latest version of securich, upgrade your current installation or just
       install the securich tar.gz package you currently have.
+      
    ### you need to have the following in the PATH:
    ### mysql, wget, gunzip, tar
 
