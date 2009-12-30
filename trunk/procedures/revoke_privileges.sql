@@ -324,7 +324,7 @@ CREATE PROCEDURE `securich`.`revoke_privileges`( usernamein varchar(16), hostnam
 
           ELSEIF tabletype='storedprocedure' THEN
 
-             drop table if exists sec_tmp_tables;
+             drop table if exists sec_tmp_storedprocedures;
 
              create temporary table sec_tmp_storedprocedures
                 (
@@ -333,19 +333,19 @@ CREATE PROCEDURE `securich`.`revoke_privileges`( usernamein varchar(16), hostnam
                   PRIMARY KEY (`ID`)
                 ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
 
-						 insert into sec_tmp_storedprocedures select ID,STOREDPROCEDURENAME from sec_storedprocedures where STOREDPROCEDURENAME like tbnamein;
+			 insert into sec_tmp_storedprocedures select ID,STOREDPROCEDURENAME from sec_storedprocedures where STOREDPROCEDURENAME like tbnamein;
 
              REPEAT
-             SET tbcount = (select count(*) from sec_tmp_tables);
+             SET tbcount = (select count(*) from sec_tmp_storedprocedures);
 
              SET tbidvalue = (select ID from sec_tmp_storedprocedures limit 1);
 
                 update sec_us_ho_db_sp set STATE='R' where US_ID=usidvalue and HO_ID=hoidvalue and DB_ID=dbidvalue and SP_ID=tbidvalue;
                 delete sec_us_ho_db_sp_ro.* from sec_us_ho_db_sp_ro inner join (select ID from sec_us_ho_db_sp where STATE='R') removed where sec_us_ho_db_sp_ro.US_HO_DB_SP_ID = removed.ID and RO_ID like roidvalue;
 
-                delete from sec_tmp_tables where ID=tbidvalue;
+                delete from sec_tmp_storedprocedures where ID=tbidvalue;
 
-             UNTIL (select count(*) from sec_tmp_tables) = 0
+             UNTIL (select count(*) from sec_tmp_storedprocedures) = 0
              END REPEAT;
 
           ELSE
