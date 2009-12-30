@@ -193,10 +193,10 @@ fi
     OS=`uname -a | cut -d ' ' -f 1`
     if [ "$OS" == "Linux" ] || [ "$OS" == "SunOS" ] || [ "$OS" == "FreeBSD" ] || [ "$OS" == "CYGWIN_NT-5.12" ]
     then
-     wget http://www.securich.com/downloads/securich.$VN.tar.gz
+     wget http://securich.googlecode.com/files/securich.$VN.tar.gz
       if [ $? != 0 ]
       then
-       fetch http://www.securich.com/downloads/securich.$VN.tar.gz
+       fetch http://securich.googlecode.com/files/securich.$VN.tar.gz
         if [ $? != 0 ]
          then
           echo "Download problem, file does not exist or connection could not be established."
@@ -205,7 +205,7 @@ fi
       fi
     elif [ "$OS" == "Darwin" ]
     then
-     curl -o securich.$VN.tar.gz http://www.securich.com/downloads/securich.$VN.tar.gz
+     curl -o securich.$VN.tar.gz http://securich.googlecode.com/files/securich.$VN.tar.gz
       if [ $? != 0 ]
        then
         echo "Download problem, file does not exist or connection could not be established."
