@@ -1,14 +1,7 @@
 INSTALLATION
 
-   Drop all users apart from root@localhost and msandbox@localhost if you are using MySQL sandbox.
-   create database securich;
-
-   tar -zxf securich-<version>.tar.gz
-
-   source db/securich.sql
-   source db/data.sql
-
-   source procedures/*.sql
+   Drop all users apart from root@localhost and (msandbox@localhost if you are using MySQL sandbox).
+   Install using ./securich_install.sh
 
 WEB
 

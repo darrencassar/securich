@@ -134,7 +134,7 @@ fi
  fi
 
  echo ""
- echo -n "Enter version number (defualt $LV i.e. latest version): "
+ echo -n "Enter version number (default $LV i.e. latest version): "
  read -e VN                                                            ## VN = Version Number
     if [ "$VN" == "" ]
     then
@@ -151,7 +151,7 @@ fi
   if [ $CVN == 0 ]
    then
     echo ""
-    echo -n "Wrong value, please re-enter version number (defualt $LV i.e. latest version): "
+    echo -n "Wrong value, please re-enter version number (default $LV i.e. latest version): "
      read -e VN
       if [ "$VN" == "" ]
        then
@@ -176,7 +176,7 @@ fi
  
  while [ "$TOI" -lt "1" ] && [ "$TOI" -gt "2" ]
  do
-    echo -n "Wrong value, please re-enter choice (defualt 2 i.e. Download and install): "
+    echo -n "Wrong value, please re-enter choice (default 2 i.e. Download and install): "
      read -e TOI
       if [ "$TOI" == "" ]
        then
@@ -282,7 +282,7 @@ fi
 
  while [ "$FOU" -lt "1" ] && [ "$FOU" -gt "2" ]
  do
-    echo -n "Wrong value, please re-enter choice (defualt 1 i.e. fresh installation): "
+    echo -n "Wrong value, please re-enter choice (default 1 i.e. fresh installation): "
      read -e FOU
       if [ "$FOU" == "" ]
        then
@@ -308,7 +308,7 @@ fi
     
     while [ "$IM" -lt "1" ] && [ "$IM" -gt "2" ]
     do
-       echo -n "Wrong value, please re-enter choice (defualt 1 i.e. Import grants from MySQL to Securich): "
+       echo -n "Wrong value, please re-enter choice (default 1 i.e. Import grants from MySQL to Securich): "
         read -e IM
          if [ "$IM" == "" ]
           then
@@ -345,7 +345,7 @@ fi
 
  while [ "$CH" -lt "1" ] && [ "$CH" -gt "2" ]
  do
-    echo -n "Wrong value, please re-enter choice (defualt 1 i.e. TCP/IP): "
+    echo -n "Wrong value, please re-enter choice (default 1 i.e. TCP/IP): "
      read -e CH
       if [ "$CH" == "" ]
        then
