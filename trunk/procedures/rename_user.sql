@@ -27,11 +27,13 @@ DROP PROCEDURE IF EXISTS rename_user;
 DELIMITER $$
 
 
-CREATE PROCEDURE `securich`.`rename_user`( usernamein varchar(16), newusernamein varchar(16), newemailaddressin varchar(50), oldpassword varchar(50))
+CREATE PROCEDURE `securich`.`rename_user`( usernamein varchar(16), newusernamein varchar(16), newemailaddressin varchar(50))
   BEGIN
 
       DECLARE userexists int;
       DECLARE newuserexists int;
+      DECLARE usernameincount int;
+      DECLARE newusernameincount int;
 
       DECLARE randomnumber int;
       DECLARE randompassword char(15);
@@ -62,9 +64,16 @@ CREATE PROCEDURE `securich`.`rename_user`( usernamein varchar(16), newusernamein
       FLUSH PRIVILEGES;
                       /* Security feature does not permit an empty user / root user being granted through this package! */
 
-      IF usernamein = 'root' OR usernamein = '' or newusernamein = '' or newusernamein = 'root' THEN
+      SET usernameincount = (select count(*) from sec_reserved_usernames where USERNAME=usernamein);
+      SET newusernameincount = (select count(*) from sec_reserved_usernames where USERNAME=newusernamein);
+      
+      IF usernameincount > 0 THEN
 
-         select "Illegal username / hostname entry";
+         select "Illegal username entry - username is reserved." as ERROR;
+
+      ELSEIF newusernameincount > 0 THEN
+
+         select "Illegal new username entry - username is reserved." as ERROR;
 
       ELSE
 
@@ -81,9 +90,9 @@ CREATE PROCEDURE `securich`.`rename_user`( usernamein varchar(16), newusernamein
             );
 
          IF userexists < 1 THEN
-            select "Source username does not exist";
+            select "Source username does not exist" as ERROR;
          ELSEIF newuserexists > 0 THEN
-            select "Destination username already exists";
+            select "Destination username already exists" as ERROR;
          ELSE
             update sec_users set USERNAME=newusernamein, EMAIL_ADDRESS=newemailaddressin where USERNAME=usernamein;
 
@@ -110,7 +119,7 @@ CREATE PROCEDURE `securich`.`rename_user`( usernamein varchar(16), newusernamein
             
             call reconciliation('sync');
 
-            call set_password(newusernamein,hostname,oldpassword,randompassword);
+            call set_password(newusernamein,hostname,'xxx',randompassword);
 
             END WHILE cur_host_loop;
             CLOSE cur_host;
