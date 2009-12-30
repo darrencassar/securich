@@ -402,7 +402,7 @@ CREATE PROCEDURE `securich`.`revoke_privileges`( usernamein varchar(16), hostnam
              select count(*)
              from information_schema.processlist
              where USER=usernamein and
-             HOST like CONCAT(hostnamein ,':%')
+             HOST like CONCAT(hostnamein ,'%')
              );
 
           SET @VAR=1;
@@ -413,7 +413,7 @@ CREATE PROCEDURE `securich`.`revoke_privileges`( usernamein varchar(16), hostnam
                  select id
                  from information_schema.processlist
                  where USER=usernamein and
-                 HOST like CONCAT(hostnamein ,':%') limit 1
+                 HOST like CONCAT(hostnamein ,'%') limit 1
                  );
 
               SET @k = CONCAT('kill ' , @TID);
