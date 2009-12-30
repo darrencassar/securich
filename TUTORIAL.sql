@@ -20,23 +20,31 @@ CREATE TABLE salary (a INT);
 CREATE TABLE vacancies (a INT);
 CREATE TABLE salary_increase (a INT);
 
-USE securich;
-CALL grant_privileges('john3' , 'machine.domain.com' , 'testing' , '' , 'all' , 'role1' , 'john@domain.com');
-CALL check_full_user_entries('john3');
-CALL revoke_privileges('john3' , 'machine.domain.com' , 'testing' , '' , 'table' , 'role1' , 'N');
-CALL check_full_user_entries('paul');
-CALL grant_privileges('paul' , '10.0.0.2' , 'world' , '^country' , 'regexp' , 'role1' , 'paul@domain.com');
-CALL grant_privileges('peter' , 'localhost' , 'test' , '' , 'all' , 'role1' , 'peter@domain.com');
-CALL check_full_user_entries('paul');
-CALL create_update_role('add','role1','delete');
-CALL check_full_user_entries('paul');
-CALL set_password('paul' , '10.0.0.2' ,'', 'password123');
-CALL clone_user('paul' , '10.0.0.2' , 'judas' , '10.0.0.2' , 'judas@domain.com');
-CALL check_full_user_entries('judas');
-CALL check_user_privileges('judas' , '10.0.0.2' , 'world' , 'role1');
-CALL rename_user('judas' , 'james' , 'james@domain.com');
-CALL create_update_role('add','role2','execute');
-CALL grant_privileges('peter' , 'localhost' , 'securich' , 'my_privileges' , 'storedprocedure' , 'role2' , 'peter@domain.com');
+use securich; 
+call create_update_role('add','role1','select'); 
+call create_update_role('add','role1','insert'); 
+call create_update_role('add','role1','update');
+call show_roles();
+call show_privileges_in_roles('role1');
+call grant_privileges('john' , 'machine.domain.com' , 'employees' , '' , 'alltables' , 'role1' , 'john@domain.com');
+call revoke_privileges('john' , 'machine.domain.com' , 'employees' , 'salaries' , 'table' , 'role1' , 'N');
+call grant_privileges('paul' , '10.0.0.2' , 'world' , '^Country' , 'regexp' , 'role1' , 'paul@domain.com');
+call grant_privileges('peter' , 'localhost' , 'test' , '' , 'all' , 'role1' , 'peter@domain.com');
+call show_full_user_entries('paul');
+call create_update_role('add','role1','delete');
+call show_full_user_entries('paul');
+call set_password('paul' , '10.0.0.2' , 'e658901749cc15a1f2', 'password123');
+call clone_user('paul' , '10.0.0.2' , 'judas' , '10.0.0.2' , 'judas@domain.com');
+call show_full_user_entries('judas');
+call show_user_privileges('judas' , '10.0.0.2' , 'world' , 'role1');
+call rename_user('judas' , 'james' , 'james@domain.com');
+call create_update_role('add','role2','execute');
+call grant_privileges('peter' , 'localhost' , 'securich' , 'my_privileges' , 'storedprocedure' , 'role2' , 'peter@domain.com');
+Connect to mysql using thirduser peter in another session:
+show databases; use securich; show tables; call my_privileges('test'); show processlist;
+call revoke_privileges('peter' , 'localhost' , 'test' , '' , '' , 'role1' , 'Y');
+As user peter again from 2nd open instance run:
+show processlist;
 
 
 

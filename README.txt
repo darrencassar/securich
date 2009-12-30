@@ -154,6 +154,9 @@ In order for a user to change one's old password, the user needs to supply the o
 26) set_my_password(oldpasswordin, newpasswordin)
 -- Used by users to set their own password.
 
+26) drop_role(rolename)
+-- Used to drop a role (as long as it is not in use.
+
 Note that the `mysql` database is purposely not included in the `sec_databases` table as it is a VERY SENSITIVE database and no one should have direct privileges to that database apart from root and other sensitive accounts (preferibly kept to a minimum)
 
 

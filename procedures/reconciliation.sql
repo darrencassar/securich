@@ -64,13 +64,13 @@ CREATE PROCEDURE `securich`.`reconciliation`(command varchar(50))
          ROLLBACK;
          /* The below if statement blocks an alert if reconciliation is not possible due to no users to reconcile (happens normally at the beginning of an installation) */
          IF (select count(*) from sec_users) > 0 THEN
-            SELECT 'Error occurred - terminating - USER CREATION AND / OR PRIVILEGES GRANT FAILED';
+            SELECT 'Error occurred - terminating - USER CREATION AND / OR PRIVILEGES GRANT FAILED' as ERROR;
          END IF;
       END;
 
       IF command <> 'list' AND command <> 'sync' THEN
 
-         select "WRONG PARAMETER PASSED THROUGH RECONCILIATION";
+         select "WRONG PARAMETER PASSED THROUGH RECONCILIATION" as ERROR;
 
       ELSE
          FLUSH PRIVILEGES;
@@ -378,7 +378,7 @@ CREATE PROCEDURE `securich`.`reconciliation`(command varchar(50))
 
          ELSE
 
-            select "Incorrect command - should be either -list- or -sync-";
+            select "Incorrect command - should be either -list- or -sync-" as ERROR;
 
          END IF;
 
