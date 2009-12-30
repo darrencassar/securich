@@ -4,5 +4,5 @@
   * [Target]
   * [Installation]
   * [Documentation]
-  * [SampleCommands]
+  * [Tutorial]
   * [MailingList]
