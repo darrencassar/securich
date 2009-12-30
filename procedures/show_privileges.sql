@@ -1,6 +1,7 @@
 #######################################################################################
 ##                                                                                   ##
-##   This is show_user_list, a script used to find out the list of roles            ##
+##   This is show privileges, a script used to find out what privileges are          ##
+##   available to add to roles                                                       ##
 ##                                                                                   ##
 ##   This program was written by Darren Cassar 2009.                                 ##
 ##   Feedback and improvements are welcome at:                                       ##
@@ -22,16 +23,22 @@
 
 USE securich;
 
-DROP PROCEDURE IF EXISTS show_user_list;
+DROP PROCEDURE IF EXISTS show_privileges;
 
 DELIMITER $$
 
-CREATE PROCEDURE `securich`.`show_user_list`()
+CREATE PROCEDURE `securich`.`show_privileges`()
   BEGIN
 
-    select us.USERNAME, ho.HOSTNAME 
-    from sec_us_ho usho join sec_users us join sec_hosts ho
-    where usho.US_ID=us.ID and usho.HO_ID=ho.ID;
+    drop table if exists sec_tmp_privileges;
+    create temporary table sec_tmp_privileges select * from sec_privileges;
+    alter table sec_tmp_privileges add column TYPE_OF_PRIV varchar(255);
+    update sec_tmp_privileges set TYPE_OF_PRIV = 'Column Level' where TYPE=-1;
+    update sec_tmp_privileges set TYPE_OF_PRIV = 'Table Level' where TYPE=0;
+    update sec_tmp_privileges set TYPE_OF_PRIV = 'Stored Procedure Level' where TYPE=1;
+    update sec_tmp_privileges set TYPE_OF_PRIV = 'Database Level' where TYPE=2;
+    update sec_tmp_privileges set TYPE_OF_PRIV = 'Administration Level' where TYPE=3;
+    select PRIVILEGE, TYPE_OF_PRIV from sec_tmp_privileges order by TYPE asc;
 
   END$$
 
