@@ -41,6 +41,8 @@ CREATE PROCEDURE `securich`.`revoke_privileges`( usernamein varchar(16), hostnam
     DECLARE roledatabasestoredprocedureexists int;
     DECLARE userexists int;
     DECLARE remid int;
+    DECLARE sp_rolecount int;
+    DECLARE tb_rolecount int;
     DECLARE rolecount int;
     DECLARE ushodbtbid int;
     DECLARE tbidvalue int;
@@ -360,7 +362,7 @@ CREATE PROCEDURE `securich`.`revoke_privileges`( usernamein varchar(16), hostnam
 /*If the role revoked was the last role, thus user ended up without roles, then user is dropped*/
        call reconciliation('sync');
 
-       SET rolecount = (
+       SET tb_rolecount = (
           select count(*)
           from sec_roles as r join (
              select ID
@@ -380,6 +382,29 @@ CREATE PROCEDURE `securich`.`revoke_privileges`( usernamein varchar(16), hostnam
           where r.ID=uhdr.RO_ID and
           ids.ID=uhdr.US_HO_DB_TB_ID
           );
+          
+       SET sp_rolecount = (
+          select count(*)
+          from sec_roles as r join (
+             select ID
+             from sec_us_ho_db_sp a
+             where a.US_ID=(
+                select ID
+                from sec_users
+                where USERNAME=usernamein
+                )
+             and a.HO_ID=(
+                select ID
+                from sec_hosts
+                where HOSTNAME=hostnamein
+                )
+             ) ids
+          join sec_us_ho_db_sp_ro as uhdr
+          where r.ID=uhdr.RO_ID and
+          ids.ID=uhdr.US_HO_DB_SP_ID
+          );
+       
+       SET rolecount = sp_rolecount + tb_rolecount;
 
        IF rolecount < 1 AND (rolein != 'ALL' or rolein != 'all') THEN
 
