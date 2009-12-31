@@ -101,6 +101,16 @@ In order for a user to change one's old password, the user needs to supply the o
 24) password_check();
 -- This is password_check, a script used to check for password discrepancies between securich and mysql.
 
+25) show_reserved_usernames();
+-- Used to list the usernames currently set as reserved.
+
+26) set_my_password(oldpasswordin, newpasswordin)
+-- Used by users to set their own password.
+
+26) drop_role(rolename)
+-- Used to drop a role (as long as it is not in use.
+
+
 Note that the `mysql` database is purposely not included in the `sec_databases` table as it is a VERY SENSITIVE database and no one should have direct privileges to that database apart from root and other sensitive accounts (preferibly kept to a minimum) 
 
 passwordrotate.sh -- Cronned script which checks for users having passwords older than 30 days, alerting the users to change the password. This script only runs for users type user not users type applications (further user types can be added in the future). 
