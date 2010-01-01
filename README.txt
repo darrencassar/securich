@@ -125,7 +125,7 @@ procedure name       -   storedprocedure 	-   single procedurure   -   pr1      
 
 20) revoke_privileges('username','hostname','databasename','tablename','tabletype','rolename','terminateconnections');
 -- Revokes a privilege for a particular combination of username / hostname / databasename / tablename / role. The terminateconnectionsy is there to kill all threads for a particular user if set to Y which is revoked. Should you not want to cut off the user, just substitute it with n and the user won't be able to connect next time round but current connections remain intact. - tabletype should either be table (for a table) and storedprocedure (for a stored proc).
-
+    
 21) set_password('username','hostname','oldpassword','newpassword'); (version 0.1.1) (version 0.1.4 added `oldpassword`)
 -- Changes password for any user (if current user is root), otherwise changes own password if current user is not root. can change the password up to 11times in 1 day and stores the last 5 passwords which were not changed for at least 24hrs. Does not permit the new password to be the same as any of the old passwords. Resets update count if more than 24hrs passed from last first update of the day. Password must be longer than '10 characters (configurable amount through sec_config.password_length)'. Complexity requirements are set on sec_config:
 password_length_check

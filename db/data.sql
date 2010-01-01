@@ -58,7 +58,8 @@ INSERT  INTO `sec_privileges`(`ID`,`PRIVILEGE`,`TYPE`) VALUES
 
 INSERT INTO `sec_roles` VALUES
 (1,'read'),
-(2,'write');
+(2,'write'),
+(3,'execute');
 
 INSERT INTO `sec_reserved_usernames` VALUES
 (1,'root'),
@@ -69,7 +70,8 @@ INSERT INTO `sec_ro_pr` VALUES
 (1,1,1),
 (3,2,2),
 (4,2,3),
-(5,2,4);
+(5,2,4),
+(6,3,17);
 
 INSERT  INTO `securich`.`sec_help`(`ID`,`STOREDPROCEDURE`,`DESCRIPTION`) VALUES (1,'','\r\n   Securich is there to help you administer and secure your data easier and in a more friendly manner.\r\n\r\n   Cheers,\r\n   Darren\r\n');
 INSERT  INTO `securich`.`sec_help`(`ID`,`STOREDPROCEDURE`,`DESCRIPTION`) VALUES (2,'add_reserved_username','add_reserved_username(\'usernamein\'); (version 0.1.4)\r\n-- Used to add a username to the reserved list of usernames');
