@@ -25,15 +25,15 @@
 
 USE securich;
 
-DROP PROCEDURE IF EXISTS set_password;
+DROP PROCEDURE IF EXISTS set_my_password;
 
 DELIMITER $$
 
 CREATE PROCEDURE `securich`.`set_my_password`(oldpasswordin VARCHAR(50), newpasswordin VARCHAR(50))
   BEGIN
     
-    select @username=(select substring_index(user(),'@',1));
-    select @hostname=(select substring_index(user(),'@',-1));
+    set @username=(select substring_index(user(),'@',1));
+    set @hostname=(select substring_index(user(),'@',-1));
    
     call set_password(@username,@hostname,oldpasswordin,newpasswordin);
     
