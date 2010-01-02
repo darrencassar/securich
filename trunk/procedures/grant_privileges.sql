@@ -195,6 +195,8 @@ CREATE  DEFINER=`root`@`localhost` PROCEDURE `securich`.`grant_privileges`( user
       END;
 
       FLUSH PRIVILEGES;
+      CALL update_databases_tables_storedprocedures_list();
+
 
                       /* Security feature does not permit the user of reserved usernames through this package! */
 

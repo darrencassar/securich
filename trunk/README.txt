@@ -102,6 +102,8 @@ procedure name       -   storedprocedure 	-   single procedurure   -   pr1      
 
 *** note that for regexp usage, if tables need to have a common prefix the best way would be to add a ^ in front of the prefix i.e. ^prefix
 
+Granting privileges on a table which does not exist yet will automatically grant a create on that table so the user can create it automatically.
+
 13) grant_privileges_reverse_reconciliation('username','hostname','databasename','tablename','tabletype','rolename','emailaddress'); (version 0.1.1)
 -- Used in conjunction with `reverse_reconciliation` to reconcile MySQL grants with Securich tables.
 
