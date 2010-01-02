@@ -68,6 +68,8 @@ CREATE PROCEDURE `securich`.`reconciliation`(command varchar(50))
          END IF;
       END;
 
+      CALL update_databases_tables_storedprocedures_list();
+
       IF command <> 'list' AND command <> 'sync' THEN
 
          select "WRONG PARAMETER PASSED THROUGH RECONCILIATION" as ERROR;
