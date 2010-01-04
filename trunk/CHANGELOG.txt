@@ -45,12 +45,21 @@ SecuRich Changelog:
    * Stored proc check_user_entries was renamed to show_user_entries
    * Stored proc check_full_user_entries was renamed to show_full_user_entries
    
-2009-12-31: version 0.2.1
+2009-12-30: version 0.2.1
 
+   * Added enable/disable password complexity configuration
    * Added password dictionary check
    * Added uppercase and lowercase configurable check
    * Added digit in password configurable check
    * Added more verbose to wrong passwords
+   * Added drop_role stored procedure
+   * Added set_my_password stored procedure
+   * Added show_reserved_usernames stored procedure
+   * Added testing scripts for developers to test
+   * Fixed some typos in the install script
    
-   
+2009-12-30: version 0.2.1
+
+   * Added show_privileges stored procedure
+   * Granting rights on set_my_password to new users immediately
    
