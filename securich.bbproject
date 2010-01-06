@@ -168,6 +168,27 @@
 			<dict>
 				<key>AliasData</key>
 				<data>
+				AAAAAAFEAAIAAAJPUwAAAAAAAAAAAAAAAAAAAAAAAAAA
+				AAAAAADGuKcDSCsAAABhG0sIZGF0YS5zcWwAAAAAAAAA
+				AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+				AAAAAAAAAAAAAAAAAAAAAGEbYMdf6lpURVhUAAAAAP//
+				//8AAAkgAAAAAAAAAAAAAAAAAAAAAmRiABAACAAAxriY
+				8wAAABEACAAAx1/qWgAAAAEAEABhG0sAYRrvABqjUQAa
+				o04AAgAmT1M6bXlzcWw6c2VjdXJpY2g6c2VjdXJpY2g6
+				ZGI6ZGF0YS5zcWwADgASAAgAZABhAHQAYQAuAHMAcQBs
+				AA8ABgACAE8AUwASACNteXNxbC9zZWN1cmljaC9zZWN1
+				cmljaC9kYi9kYXRhLnNxbAAAEwABLwD//wAA
+				</data>
+				<key>FileURL</key>
+				<string>file://localhost/mysql/securich/securich/db/data.sql</string>
+				<key>TypeID</key>
+				<string>_CFileLocator</string>
+				<key>Version</key>
+				<integer>1</integer>
+			</dict>
+			<dict>
+				<key>AliasData</key>
+				<data>
 				AAAAAAGkAAIAAAJPUwAAAAAAAAAAAAAAAAAAAAAAAAAA
 				AAAAAADGuKcDSCsAAABhHAIac2hvd19mdWxsX3VzZXJf
 				ZW50cmllcy5zcWwAAAAAAAAAAAAAAAAAAAAAAAAAAAAA

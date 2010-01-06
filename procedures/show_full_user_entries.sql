@@ -60,6 +60,23 @@ CREATE PROCEDURE `securich`.`show_full_user_entries`( usernamein varchar(16))
     sec_databases.ID=ids.DB_ID and
     sec_tables.ID=ids.TB_ID;
 
+    insert into temp_tbl_2
+    select ids.ID, ids.STATE, sec_users.USERNAME, sec_hosts.HOSTNAME, sec_databases.DATABASENAME, sec_storedprocedures.STOREDPROCEDURENAME
+    from sec_users, sec_hosts, sec_databases, sec_storedprocedures
+    join (
+       select *
+       from sec_us_ho_db_sp a
+       where a.US_ID=(
+          select ID
+          from sec_users
+          where USERNAME=usernamein
+          )
+       ) ids
+    where sec_users.ID=ids.US_ID and
+    sec_hosts.ID=ids.HO_ID and
+    sec_databases.ID=ids.DB_ID and
+    sec_storedprocedures.ID=ids.SP_ID;
+
     drop table if exists temp_tbl_1;
     create temporary table temp_tbl_1 (`ID` int, `ROLE` varchar(60));
 
@@ -77,6 +94,20 @@ CREATE PROCEDURE `securich`.`show_full_user_entries`( usernamein varchar(16))
     where rids.ID=ushodbro.US_HO_DB_TB_ID and
     ushodbro.RO_ID=ro.ID;
 
+    insert into temp_tbl_1
+    select distinct  ro.ID, ro.ROLE
+    from sec_roles ro join sec_us_ho_db_sp_ro ushodbro join (
+       select ushodbsp.ID
+       from sec_us_ho_db_sp ushodbsp join (
+          select ID
+          from sec_users
+          where USERNAME=usernamein
+          ) usid
+       where usid.ID=ushodbsp.US_ID
+       ) rids
+    where rids.ID=ushodbro.US_HO_DB_SP_ID and
+    ushodbro.RO_ID=ro.ID;
+
     drop table if exists temp_tbl_3;
     create temporary table temp_tbl_3
     (  `RO_ID` int,
@@ -87,7 +118,12 @@ CREATE PROCEDURE `securich`.`show_full_user_entries`( usernamein varchar(16))
     select distinct c.RO_ID as roid, c.US_HO_DB_TB_ID as ushodbid
     from sec_us_ho_db_tb_ro c join temp_tbl_2 d
     where c.US_HO_DB_TB_ID=d.ID;
-
+    
+    insert into temp_tbl_3
+    select distinct c.RO_ID as roid, c.US_HO_DB_SP_ID as ushodbid
+    from sec_us_ho_db_sp_ro c join temp_tbl_2 d
+    where c.US_HO_DB_SP_ID=d.ID;
+   
     drop table if exists temp_tbl_4;
     create temporary table temp_tbl_4
     (
@@ -110,11 +146,11 @@ CREATE PROCEDURE `securich`.`show_full_user_entries`( usernamein varchar(16))
 
     update temp_tbl_4 tbl4 join sec_privileges pr on tbl4.PRIVILEGE=pr.PRIVILEGE
        set TABLENAME=''
-       where pr.TYPE='1';
+       where pr.TYPE='2';
 
     update temp_tbl_4 tbl4 join sec_privileges pr on tbl4.PRIVILEGE=pr.PRIVILEGE
        set DATABASENAME='', TABLENAME=''
-       where pr.TYPE='2' OR DATABASENAME='*';
+       where pr.TYPE='3' OR DATABASENAME='*';
 
     select * from temp_tbl_4 GROUP BY USERNAME, HOSTNAME, DATABASENAME, TABLENAME, ROLE, PRIVILEGE, STATE order by 2,3,4,5,6,7 asc;
 
