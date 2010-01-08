@@ -160,11 +160,76 @@
 				<key>Version</key>
 				<integer>1</integer>
 			</dict>
+			<dict>
+				<key>AliasData</key>
+				<data>
+				AAAAAAFKAAIAAQJPUwAAAAAAAAAAAAAAAAAAAAAAAAAA
+				AAAAAADGuKcDSCsAAABhG58FMC4yLjIAAAAAAAAAAAAA
+				AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+				AAAAAAAAAAAAAAAAAAAAAGLdmMdhNe0AAAAAAAAAAP//
+				//8AAAkgAAAAAAAAAAAAAAAAAAAACHVwZ3JhZGVzABAA
+				CAAAxriY8wAAABEACAAAx2E17QAAAAEAEABhG58AYRrv
+				ABqjUQAao04AAgApT1M6bXlzcWw6c2VjdXJpY2g6c2Vj
+				dXJpY2g6dXBncmFkZXM6MC4yLjIAAA4ADAAFADAALgAy
+				AC4AMgAPAAYAAgBPAFMAEgAmbXlzcWwvc2VjdXJpY2gv
+				c2VjdXJpY2gvdXBncmFkZXMvMC4yLjIAEwABLwD//wAA
+				</data>
+				<key>FileURL</key>
+				<string>file://localhost/mysql/securich/securich/upgrades/0.2.2/</string>
+				<key>TypeID</key>
+				<string>_CFileLocator</string>
+				<key>Version</key>
+				<integer>1</integer>
+			</dict>
 		</array>
 		<key>FileFilterID:darrencassar</key>
 		<integer>0</integer>
 		<key>OpenDocuments:darrencassar</key>
 		<array>
+			<dict>
+				<key>AliasData</key>
+				<data>
+				AAAAAAFwAAIAAAJPUwAAAAAAAAAAAAAAAAAAAAAAAAAA
+				AAAAAADGuKcDSCsAAABi3ZgLdXBncmFkZS5zcWwAAAAA
+				AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+				AAAAAAAAAAAAAAAAAAAAAGLdqMdhNfhURVhUAAAAAP//
+				//8AAAkgAAAAAAAAAAAAAAAAAAAABTAuMi4yAAAQAAgA
+				AMa4mPMAAAARAAgAAMdhNfgAAAABABQAYt2YAGEbnwBh
+				Gu8AGqNRABqjTgACADVPUzpteXNxbDpzZWN1cmljaDpz
+				ZWN1cmljaDp1cGdyYWRlczowLjIuMjp1cGdyYWRlLnNx
+				bAAADgAYAAsAdQBwAGcAcgBhAGQAZQAuAHMAcQBsAA8A
+				BgACAE8AUwASADJteXNxbC9zZWN1cmljaC9zZWN1cmlj
+				aC91cGdyYWRlcy8wLjIuMi91cGdyYWRlLnNxbAATAAEv
+				AP//AAA=
+				</data>
+				<key>FileURL</key>
+				<string>file://localhost/mysql/securich/securich/upgrades/0.2.2/upgrade.sql</string>
+				<key>TypeID</key>
+				<string>_CFileLocator</string>
+				<key>Version</key>
+				<integer>1</integer>
+			</dict>
+			<dict>
+				<key>AliasData</key>
+				<data>
+				AAAAAAFEAAIAAAJPUwAAAAAAAAAAAAAAAAAAAAAAAAAA
+				AAAAAADGuKcDSCsAAABhG0sIZGF0YS5zcWwAAAAAAAAA
+				AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+				AAAAAAAAAAAAAAAAAAAAAGEbYMdf6lpURVhUAAAAAP//
+				//8AAAkgAAAAAAAAAAAAAAAAAAAAAmRiABAACAAAxriY
+				8wAAABEACAAAx1/qWgAAAAEAEABhG0sAYRrvABqjUQAa
+				o04AAgAmT1M6bXlzcWw6c2VjdXJpY2g6c2VjdXJpY2g6
+				ZGI6ZGF0YS5zcWwADgASAAgAZABhAHQAYQAuAHMAcQBs
+				AA8ABgACAE8AUwASACNteXNxbC9zZWN1cmljaC9zZWN1
+				cmljaC9kYi9kYXRhLnNxbAAAEwABLwD//wAA
+				</data>
+				<key>FileURL</key>
+				<string>file://localhost/mysql/securich/securich/db/data.sql</string>
+				<key>TypeID</key>
+				<string>_CFileLocator</string>
+				<key>Version</key>
+				<integer>1</integer>
+			</dict>
 			<dict>
 				<key>AliasData</key>
 				<data>
