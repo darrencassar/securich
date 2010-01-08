@@ -410,8 +410,24 @@ CREATE PROCEDURE `securich`.`revoke_privileges`( usernamein varchar(16), hostnam
 
              SET @d = CONCAT('drop user "', usernamein , '"@"' , hostnamein , '"');
 
-	           PREPARE dropcom FROM @d;
-		         EXECUTE dropcom;
+	         PREPARE dropcom FROM @d;
+		     EXECUTE dropcom;
+		     
+		     SET @USID = (select ID from sec_users where USERNAME=usernamein);
+		     SET @HOID = (select ID from sec_hosts where HOSTNAME=hostnamein);
+		     SET @USHOID = (select ID from sec_us_ho where US_ID=@USID and HO_ID=@HOID);
+		     
+		     delete from sec_users where ID=@USID;
+		     delete from sec_us_ho where ID=@USHOID;
+		     delete from sec_us_ho_profile where US_HO_ID=@USHOID;
+		     delete from sec_us_ho_db_sp where US_ID=@USID and HO_ID=@HOID;
+		     delete from sec_us_ho_db_tb where US_ID=@USID and HO_ID=@HOID;
+		     
+             SET @g = CONCAT('User "', usernamein , '"@"' , hostnamein , '" completely dropped from securich');
+		     
+		     SET @un=(SELECT SUBSTRING_INDEX(USER(),'@',1));
+             SET @hn=(SELECT SUBSTRING_INDEX(USER(),'@',-1));
+             INSERT INTO aud_grant_revoke (USERNAME,HOSTNAME,COMMAND,TIMESTAMP) VALUES (@un,@hn,@g,NOW());
 
        END IF;
 
@@ -449,6 +465,44 @@ CREATE PROCEDURE `securich`.`revoke_privileges`( usernamein varchar(16), hostnam
               SET @VAR=@VAR+1;
 
           END WHILE;
+          
+          IF ((hostnamein='127.0.0.1') or (hostnamein='localhost')) THEN
+            
+             IF hostnamein='127.0.0.1' then
+                set hostnamein='localhost';
+             ELSEIF hostnamein='localhost' then
+                set hostnamein='127.0.0.1';             
+             END IF;
+
+             SET @CNT = (
+                select count(*)
+                from information_schema.processlist
+                where USER=usernamein and
+                HOST like CONCAT(hostnamein ,'%')
+             );
+   
+             SET @VAR=1;
+   
+             WHILE ( @VAR <= @CNT) DO
+   
+                SET @TID = (
+                   select id
+                   from information_schema.processlist
+                   where USER=usernamein and
+                   HOST like CONCAT(hostnamein ,'%') limit 1
+                );
+   
+                SET @k = CONCAT('kill ' , @TID);
+                PREPARE killcom FROM @k;
+                EXECUTE killcom;
+                set @k=NULL;
+   
+                SET @VAR=@VAR+1;
+
+             END WHILE;
+          
+          END IF;
+          
        ELSEIF terminateconnections = 'Y' or terminateconnections='y' THEN
           
           SELECT "Current version of MySQL doesn't allow terminating connections, please upgrade to 5.1.7 or later (latest GA version is suggested)" as Warning;          
