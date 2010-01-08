@@ -1,7 +1,7 @@
 #######################################################################################
 ##                                                                                   ##
-##   This is show_full_user_entries, a script used to check the full list of         ##
-##   privileges granted to a particular user                                         ##
+##   This is show_user_entries, a script used to check the roles assigned to a       ##
+##   particular user on which database and from which host.                          ##
 ##                                                                                   ##
 ##   This program was originally sponsored by TradingScreen Inc                      ##
 ##   Information about TS is found at www.tradingscreen.com                          ##
@@ -26,134 +26,190 @@
 
 USE securich;
 
-DROP PROCEDURE IF EXISTS show_full_user_entries;
+DROP PROCEDURE IF EXISTS show_user_entries;
 
 DELIMITER $$
 
-CREATE PROCEDURE `securich`.`show_full_user_entries`( usernamein varchar(16))
+CREATE PROCEDURE `securich`.`show_user_entries`( usernamein VARCHAR(16))
   BEGIN
 
-    drop table if exists temp_tbl_2;
-    create temporary table temp_tbl_2
-    ( `ID` int,
-      `STATE` char(1),
-      `USERNAME` varchar(16),
-      `HOSTNAME` varchar (60),
-      `DATABASENAME` varchar(64),
-      `TABLENAME` varchar(64)
-    );
+    IF (SELECT COUNT(*) FROM sec_users WHERE USERNAME=usernamein) = 0 THEN
 
-    insert into temp_tbl_2
-    select ids.ID, ids.STATE, sec_users.USERNAME, sec_hosts.HOSTNAME, sec_databases.DATABASENAME, sec_tables.TABLENAME
-    from sec_users, sec_hosts, sec_databases, sec_tables
-    join (
-       select *
-       from sec_us_ho_db_tb a
-       where a.US_ID=(
-          select ID
-          from sec_users
-          where USERNAME=usernamein
-          )
-       ) ids
-    where sec_users.ID=ids.US_ID and
-    sec_hosts.ID=ids.HO_ID and
-    sec_databases.ID=ids.DB_ID and
-    sec_tables.ID=ids.TB_ID;
+       SELECT "USER SPECIFIED DOES NOT EXIST";
 
-    insert into temp_tbl_2
-    select ids.ID, ids.STATE, sec_users.USERNAME, sec_hosts.HOSTNAME, sec_databases.DATABASENAME, sec_storedprocedures.STOREDPROCEDURENAME
-    from sec_users, sec_hosts, sec_databases, sec_storedprocedures
-    join (
-       select *
-       from sec_us_ho_db_sp a
-       where a.US_ID=(
-          select ID
-          from sec_users
-          where USERNAME=usernamein
-          )
-       ) ids
-    where sec_users.ID=ids.US_ID and
-    sec_hosts.ID=ids.HO_ID and
-    sec_databases.ID=ids.DB_ID and
-    sec_storedprocedures.ID=ids.SP_ID;
+    ELSE
 
-    drop table if exists temp_tbl_1;
-    create temporary table temp_tbl_1 (`ID` int, `ROLE` varchar(60));
+# Table section
 
-    insert into temp_tbl_1
-    select distinct  ro.ID, ro.ROLE
-    from sec_roles ro join sec_us_ho_db_tb_ro ushodbro join (
-       select ushodbtb.ID
-       from sec_us_ho_db_tb ushodbtb join (
-          select ID
-          from sec_users
-          where USERNAME=usernamein
-          ) usid
-       where usid.ID=ushodbtb.US_ID
-       ) rids
-    where rids.ID=ushodbro.US_HO_DB_TB_ID and
-    ushodbro.RO_ID=ro.ID;
+       DROP TABLE IF EXISTS temp_tbl_2;
+       CREATE TEMPORARY TABLE temp_tbl_2
+       ( `ID` INT,
+         `STATE` CHAR(1),
+         `USERNAME` VARCHAR(16),
+         `HOSTNAME` VARCHAR (60),
+         `DATABASENAME` VARCHAR(64),
+         `TABLENAME` VARCHAR(64),
+         `TYPE` CHAR(2) DEFAULT 'TB'
+       );
 
-    insert into temp_tbl_1
-    select distinct  ro.ID, ro.ROLE
-    from sec_roles ro join sec_us_ho_db_sp_ro ushodbro join (
-       select ushodbsp.ID
-       from sec_us_ho_db_sp ushodbsp join (
-          select ID
-          from sec_users
-          where USERNAME=usernamein
-          ) usid
-       where usid.ID=ushodbsp.US_ID
-       ) rids
-    where rids.ID=ushodbro.US_HO_DB_SP_ID and
-    ushodbro.RO_ID=ro.ID;
+       INSERT INTO temp_tbl_2
+       SELECT ids.ID, ids.STATE, sec_users.USERNAME, sec_hosts.HOSTNAME, sec_databases.DATABASENAME, sec_tables.TABLENAME, 'TB'
+       FROM sec_users, sec_hosts, sec_databases, sec_tables
+       JOIN (
+          SELECT *
+          FROM sec_us_ho_db_tb a
+          WHERE a.US_ID=(
+             SELECT ID
+             FROM sec_users
+             WHERE USERNAME=usernamein
+             )
+          ) ids
+       WHERE sec_users.ID=ids.US_ID AND
+       sec_hosts.ID=ids.HO_ID AND
+       sec_databases.ID=ids.DB_ID AND
+       sec_tables.ID=ids.TB_ID;
 
-    drop table if exists temp_tbl_3;
-    create temporary table temp_tbl_3
-    (  `RO_ID` int,
-       `US_HO_DB_TB_ID` int
-    );
+# Stored Procedure section
 
-    insert into temp_tbl_3
-    select distinct c.RO_ID as roid, c.US_HO_DB_TB_ID as ushodbid
-    from sec_us_ho_db_tb_ro c join temp_tbl_2 d
-    where c.US_HO_DB_TB_ID=d.ID;
-    
-    insert into temp_tbl_3
-    select distinct c.RO_ID as roid, c.US_HO_DB_SP_ID as ushodbid
-    from sec_us_ho_db_sp_ro c join temp_tbl_2 d
-    where c.US_HO_DB_SP_ID=d.ID;
-   
-    drop table if exists temp_tbl_4;
-    create temporary table temp_tbl_4
-    (
-      `USERNAME` varchar(16),
-      `HOSTNAME` varchar (60),
-      `DATABASENAME` varchar(64),
-      `TABLENAME` varchar(64),
-      `ROLE` varchar(64),
-      `PRIVILEGE` varchar(64),
-      `STATE` CHAR(1)
-    );
+       DROP TABLE IF EXISTS temp_tbl_12;
+       CREATE TEMPORARY TABLE temp_tbl_12
+       ( `ID` INT,
+         `STATE` CHAR(1),
+         `USERNAME` VARCHAR(16),
+         `HOSTNAME` VARCHAR (60),
+         `DATABASENAME` VARCHAR(64),
+         `STOREDPROCEDURENAME` VARCHAR(64),
+         `TYPE` CHAR(2) DEFAULT 'SP'
+       );
 
-    insert into temp_tbl_4
-       select b.USERNAME, b.HOSTNAME, b.DATABASENAME, b.TABLENAME, a.ROLE, pr.PRIVILEGE, b.STATE
-       from temp_tbl_2 b, temp_tbl_1 a join temp_tbl_3 c join sec_privileges pr join sec_ro_pr ropr
-       where b.ID=c.US_HO_DB_TB_ID and
-       a.ID=c.RO_ID and
+       INSERT INTO temp_tbl_12
+       SELECT ids.ID, ids.STATE, sec_users.USERNAME, sec_hosts.HOSTNAME, sec_databases.DATABASENAME, sec_storedprocedures.STOREDPROCEDURENAME, 'SP'
+       FROM sec_users, sec_hosts, sec_databases, sec_storedprocedures
+       JOIN (
+          SELECT *
+          FROM sec_us_ho_db_sp a
+          WHERE a.US_ID=(
+             SELECT ID
+             FROM sec_users
+             WHERE USERNAME=usernamein
+             )
+          ) ids
+       WHERE sec_users.ID=ids.US_ID AND
+       sec_hosts.ID=ids.HO_ID AND
+       sec_databases.ID=ids.DB_ID AND
+       sec_storedprocedures.ID=ids.SP_ID;
+       
+       
+# Table section
+
+       DROP TABLE IF EXISTS temp_tbl_1;
+       CREATE TEMPORARY TABLE temp_tbl_1 (`ID` INT, `ROLE` VARCHAR(60));
+
+       INSERT INTO temp_tbl_1
+       SELECT DISTINCT  ro.ID, ro.ROLE
+       FROM sec_roles ro JOIN sec_us_ho_db_tb_ro ushodbro JOIN (
+          SELECT ushodbtb.ID
+          FROM sec_us_ho_db_tb ushodbtb JOIN (
+             SELECT ID
+             FROM sec_users
+             WHERE USERNAME=usernamein
+             ) usid
+          WHERE usid.ID=ushodbtb.US_ID
+          ) rids
+       WHERE rids.ID=ushodbro.US_HO_DB_TB_ID AND
+       ushodbro.RO_ID=ro.ID;
+
+# Stored Procedure section
+
+       DROP TABLE IF EXISTS temp_tbl_11;
+       CREATE TEMPORARY TABLE temp_tbl_11 (`ID` INT, `ROLE` VARCHAR(60));
+
+       INSERT INTO temp_tbl_11
+       SELECT DISTINCT  ro.ID, ro.ROLE
+       FROM sec_roles ro JOIN sec_us_ho_db_sp_ro ushodbro JOIN (
+          SELECT ushodbsp.ID
+          FROM sec_us_ho_db_sp ushodbsp JOIN (
+             SELECT ID
+             FROM sec_users
+             WHERE USERNAME=usernamein
+             ) usid
+          WHERE usid.ID=ushodbsp.US_ID
+          ) rids
+       WHERE rids.ID=ushodbro.US_HO_DB_SP_ID AND
+       ushodbro.RO_ID=ro.ID;
+
+       
+# Table section
+       
+       DROP TABLE IF EXISTS temp_tbl_3;
+       CREATE TEMPORARY TABLE temp_tbl_3
+       (  `RO_ID` INT,
+          `US_HO_DB_TB_ID` INT
+       );       
+       
+# Stored Procedure section
+       
+       DROP TABLE IF EXISTS temp_tbl_13;
+       CREATE TEMPORARY TABLE temp_tbl_13
+       (  `RO_ID` INT,
+          `US_HO_DB_SP_ID` INT
+       );
+
+       INSERT INTO temp_tbl_3
+       SELECT DISTINCT c.RO_ID AS roid, c.US_HO_DB_TB_ID AS ushodbid
+       FROM sec_us_ho_db_tb_ro c JOIN temp_tbl_2 d
+       WHERE c.US_HO_DB_TB_ID=d.ID;
+       
+       INSERT INTO temp_tbl_13
+       SELECT DISTINCT c.RO_ID AS roid, c.US_HO_DB_SP_ID AS ushodbid
+       FROM sec_us_ho_db_sp_ro c JOIN temp_tbl_12 d
+       WHERE c.US_HO_DB_SP_ID=d.ID;
+
+
+# Combine both results into one table for show
+
+       DROP TABLE IF EXISTS temp_tbl_4;
+       CREATE TEMPORARY TABLE temp_tbl_4
+       ( 
+         `USERNAME` VARCHAR(16),
+         `HOSTNAME` VARCHAR (60),
+         `DATABASENAME` VARCHAR(64),
+         `OBJECT` VARCHAR(64),
+         `ROLE` VARCHAR(65),
+         `PRIVILEGE` varchar(64),
+         `TYPE` CHAR(2),
+         `STATE` CHAR(1)         
+       );
+       
+       
+       INSERT INTO temp_tbl_4 
+       SELECT b.USERNAME, b.HOSTNAME, b.DATABASENAME, b.TABLENAME, a.ROLE, pr.PRIVILEGE, b.TYPE, b.STATE
+       FROM temp_tbl_2 b, temp_tbl_1 a JOIN temp_tbl_3 c join sec_privileges pr join sec_ro_pr ropr
+       WHERE b.ID=c.US_HO_DB_TB_ID AND
+       a.ID=c.RO_ID  and
        c.RO_ID=ropr.RO_ID and
        pr.ID=ropr.PR_ID;
+       
+       INSERT INTO temp_tbl_4 
+       SELECT b.USERNAME, b.HOSTNAME, b.DATABASENAME, b.STOREDPROCEDURENAME, a.ROLE, pr.PRIVILEGE, b.TYPE, b.STATE
+       FROM temp_tbl_12 b, temp_tbl_11 a JOIN temp_tbl_13 c join sec_privileges pr join sec_ro_pr ropr
+       WHERE b.ID=c.US_HO_DB_SP_ID AND
+       a.ID=c.RO_ID  and
+       c.RO_ID=ropr.RO_ID and
+       pr.ID=ropr.PR_ID;
+             
+       
+       update temp_tbl_4 tbl4 join sec_privileges pr on tbl4.PRIVILEGE=pr.PRIVILEGE
+          set OBJECT=''
+          where pr.TYPE='2';
 
-    update temp_tbl_4 tbl4 join sec_privileges pr on tbl4.PRIVILEGE=pr.PRIVILEGE
-       set TABLENAME=''
-       where pr.TYPE='2';
+       update temp_tbl_4 tbl4 join sec_privileges pr on tbl4.PRIVILEGE=pr.PRIVILEGE
+          set DATABASENAME='', OBJECT=''
+          where pr.TYPE='3' OR DATABASENAME='*';
 
-    update temp_tbl_4 tbl4 join sec_privileges pr on tbl4.PRIVILEGE=pr.PRIVILEGE
-       set DATABASENAME='', TABLENAME=''
-       where pr.TYPE='3' OR DATABASENAME='*';
-
-    select * from temp_tbl_4 GROUP BY USERNAME, HOSTNAME, DATABASENAME, TABLENAME, ROLE, PRIVILEGE, STATE order by 2,3,4,5,6,7 asc;
-
+       select * from temp_tbl_4 GROUP BY USERNAME, HOSTNAME, DATABASENAME, OBJECT, ROLE, PRIVILEGE, STATE order by 2,3,4,5,6,7 asc;
+       
+       END IF;
 
   END$$
 
