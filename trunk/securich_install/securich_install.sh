@@ -370,6 +370,34 @@ fi
           PORT=3306
         fi
 
+## Check for mysql version
+
+      mybigversion=`mysql -u root --password=$PASS -h $HOST -P $PORT --execute="SELECT SUBSTRING_INDEX(VERSION(), '.', 1)" | cut -d " " -f 4`
+      mymidversion=`mysql -u root --password=$PASS -h $HOST -P $PORT --execute="SELECT SUBSTRING_INDEX(SUBSTRING_INDEX(VERSION(), '.', 2),'.',-1)"  | cut -d " " -f 4`
+      mysmallversion=`mysql -u root --password=$PASS -h $HOST -P $PORT --execute="SELECT SUBSTRING_INDEX(VERSION(), '.', -1)"  | cut -d " " -f 4`
+   
+    
+      if [ $mybigversion -gt 4 ] && [ $mymidversion -gt 0 ] && [ $mysmallversion -gt 6 ]; then
+      {
+         rm procedures/block_user_5.0.sql
+         rm procedures/drop_user_5.0.sql
+         rm procedures/revoke_privileges_5.0.sql
+      }
+      elif [ $mybigversion -gt 4 ] && [ $mymidversion -gt 1 ]; then
+      {
+         rm procedures/block_user_5.0.sql
+         rm procedures/drop_user_5.0.sql
+         rm procedures/revoke_privileges_5.0.sql
+      }
+      else
+      {
+         rm procedures/block_user.sql
+         rm procedures/drop_user.sql
+         rm procedures/revoke_privileges.sql
+      }
+      fi
+
+
 ## Import securich db into the instance
 
           mysql -u root --password=$PASS -h $HOST -P $PORT --execute="drop database if exists securich"
@@ -454,6 +482,35 @@ fi
          then
           SOCK=/tmp/mysql.sock
         fi
+
+
+
+## Check for mysql version
+
+      mybigversion=`mysql -u root --password=$PASS --socket=$SOCK --execute="SELECT SUBSTRING_INDEX(VERSION(), '.', 1)" | cut -d " " -f 4`
+      mymidversion=`mysql -u root --password=$PASS --socket=$SOCK --execute="SELECT SUBSTRING_INDEX(SUBSTRING_INDEX(VERSION(), '.', 2),'.',-1)"  | cut -d " " -f 4`
+      mysmallversion=`mysql -u root --password=$PASS --socket=$SOCK --execute="SELECT SUBSTRING_INDEX(VERSION(), '.', -1)"  | cut -d " " -f 4`
+   
+    
+      if [ $mybigversion -gt 4 ] && [ $mymidversion -gt 0 ] && [ $mysmallversion -gt 6 ]; then
+      {
+         rm procedures/block_user_5.0.sql
+         rm procedures/drop_user_5.0.sql
+         rm procedures/revoke_privileges_5.0.sql
+      }
+      elif [ $mybigversion -gt 4 ] && [ $mymidversion -gt 1 ]; then
+      {
+         rm procedures/block_user_5.0.sql
+         rm procedures/drop_user_5.0.sql
+         rm procedures/revoke_privileges_5.0.sql
+      }
+      else
+      {
+         rm procedures/block_user.sql
+         rm procedures/drop_user.sql
+         rm procedures/revoke_privileges.sql
+      }
+      fi
 
           mysql -u root --password=$PASS --socket=$SOCK --execute="drop database if exists securich"
 
