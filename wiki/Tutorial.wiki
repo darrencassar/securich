@@ -34,7 +34,7 @@ Securich Tutorial (for securich version 0.2.1)
   # Go to www.securich.com downloads page or code,gogle.com/p/securich and download the install script
   # Untar the install script and run it using ./securich_install.sh and it'll install everything automatically
 {{{
-      [darrencassar@mac /mysql/securich/securich_install 14:43:26]$ ./securich_install.sh 
+[darrencassar@mac /mysql/securich/securich_install 14:43:26]$ ./securich_install.sh 
                                                              
                                                  __          
                                       __        /\ \         
