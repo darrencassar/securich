@@ -372,10 +372,11 @@ fi
 
 ## Check for mysql version
 
-      mybigversion=`mysql -u root --password=$PASS -h $HOST -P $PORT --execute="SELECT SUBSTRING_INDEX(VERSION(), '.', 1)" | cut -d " " -f 4`
-      mymidversion=`mysql -u root --password=$PASS -h $HOST -P $PORT --execute="SELECT SUBSTRING_INDEX(SUBSTRING_INDEX(VERSION(), '.', 2),'.',-1)"  | cut -d " " -f 4`
-      mysmallversion=`mysql -u root --password=$PASS -h $HOST -P $PORT --execute="SELECT SUBSTRING_INDEX(VERSION(), '.', -1)"  | cut -d " " -f 4`
-   
+      mybigversion=`mysql -u root --password=$PASS -B -s -h $HOST -P $PORT --execute="SELECT SUBSTRING_INDEX(VERSION(), '.', 1)"`
+      mymidversion=`mysql -u root --password=$PASS -B -s -h $HOST -P $PORT --execute="SELECT SUBSTRING_INDEX(SUBSTRING_INDEX(VERSION(), '.', 2),'.',-1)"`
+      mysmallversion=`mysql -u root --password=$PASS -B -s -h $HOST -P $PORT --execute="SELECT SUBSTRING_INDEX(VERSION(), '.', -1)"`
+      innodbyes=`mysql -u root --password=$PASS -s -B -h $HOST -P $PORT --execute="show engines" | cut -f 1,2 | grep InnoDB | cut -f 2`
+
     
       if [ $mybigversion -gt 4 ] && [ $mymidversion -gt 0 ] && [ $mysmallversion -gt 6 ]; then
       {
@@ -397,12 +398,20 @@ fi
       }
       fi
 
-
 ## Import securich db into the instance
 
           mysql -u root --password=$PASS -h $HOST -P $PORT --execute="drop database if exists securich"
 
-          mysql -u root --password=$PASS -h $HOST -P $PORT  < db/securich.sql
+          if [ "$innodbyes" = 'YES' ]; then
+          {
+             mysql -u root --password=$PASS -h $HOST -P $PORT  < db/securich.sql
+          }
+          else
+          {
+             mysql -u root --password=$PASS -h $HOST -P $PORT  < db/securich_noinnodb.sql
+          }
+          fi
+          
           if [ $? != 0 ]; then
            {
              echo "Problem creating securich db"
@@ -487,9 +496,10 @@ fi
 
 ## Check for mysql version
 
-      mybigversion=`mysql -u root --password=$PASS --socket=$SOCK --execute="SELECT SUBSTRING_INDEX(VERSION(), '.', 1)" | cut -d " " -f 4`
-      mymidversion=`mysql -u root --password=$PASS --socket=$SOCK --execute="SELECT SUBSTRING_INDEX(SUBSTRING_INDEX(VERSION(), '.', 2),'.',-1)"  | cut -d " " -f 4`
-      mysmallversion=`mysql -u root --password=$PASS --socket=$SOCK --execute="SELECT SUBSTRING_INDEX(VERSION(), '.', -1)"  | cut -d " " -f 4`
+      mybigversion=`mysql -u root --password=$PASS -B -s --socket=$SOCK --execute="SELECT SUBSTRING_INDEX(VERSION(), '.', 1)"`
+      mymidversion=`mysql -u root --password=$PASS -B -s --socket=$SOCK --execute="SELECT SUBSTRING_INDEX(SUBSTRING_INDEX(VERSION(), '.', 2),'.',-1)"`
+      mysmallversion=`mysql -u root --password=$PASS -B -s --socket=$SOCK --execute="SELECT SUBSTRING_INDEX(VERSION(), '.', -1)"`
+      innodbyes=`mysql -u root --password=$PASS -s -B --socket=$SOCK --execute="show engines" | cut -f 1,2 | grep InnoDB | cut -f 2`
    
     
       if [ $mybigversion -gt 4 ] && [ $mymidversion -gt 0 ] && [ $mysmallversion -gt 6 ]; then
@@ -514,7 +524,16 @@ fi
 
           mysql -u root --password=$PASS --socket=$SOCK --execute="drop database if exists securich"
 
-          mysql -u root --password=$PASS --socket=$SOCK  < db/securich.sql
+          if [ "$innodbyes" = 'YES' ]; then
+          {
+             mysql -u root --password=$PASS --socket=$SOCK < db/securich.sql
+          }
+          else
+          {
+             mysql -u root --password=$PASS --socket=$SOCK < db/securich_noinnodb.sql
+          }
+          fi
+
           if [ $? != 0 ]; then
            {
              echo "Problem creating securich db"
@@ -664,10 +683,11 @@ fi
           
           ## Check for mysql version
 
-          mybigversion=`mysql -u root --password=$PASS -h $HOST -P $PORT --execute="SELECT SUBSTRING_INDEX(VERSION(), '.', 1)" | cut -d " " -f 4`
-          mymidversion=`mysql -u root --password=$PASS -h $HOST -P $PORT --execute="SELECT SUBSTRING_INDEX(SUBSTRING_INDEX(VERSION(), '.', 2),'.',-1)"  | cut -d " " -f 4`
-          mysmallversion=`mysql -u root --password=$PASS -h $HOST -P $PORT --execute="SELECT SUBSTRING_INDEX(VERSION(), '.', -1)"  | cut -d " " -f 4`
-   
+          mybigversion=`mysql -u root --password=$PASS -B -s -h $HOST -P $PORT --execute="SELECT SUBSTRING_INDEX(VERSION(), '.', 1)"`
+          mymidversion=`mysql -u root --password=$PASS -B -s -h $HOST -P $PORT --execute="SELECT SUBSTRING_INDEX(SUBSTRING_INDEX(VERSION(), '.', 2),'.',-1)"`
+          mysmallversion=`mysql -u root --password=$PASS -B -s -h $HOST -P $PORT --execute="SELECT SUBSTRING_INDEX(VERSION(), '.', -1)"`
+          innodbyes=`mysql -u root --password=$PASS -s -B -h $HOST -P $PORT --execute="show engines" | cut -f 1,2 | grep InnoDB | cut -f 2`
+
     
           if [ $mybigversion -gt 4 ] && [ $mymidversion -gt 0 ] && [ $mysmallversion -gt 6 ]; then
           {
@@ -766,9 +786,9 @@ fi
 
           ## Check for mysql version
 
-          mybigversion=`mysql -u root --password=$PASS --socket=$SOCK --execute="SELECT SUBSTRING_INDEX(VERSION(), '.', 1)" | cut -d " " -f 4`
-          mymidversion=`mysql -u root --password=$PASS --socket=$SOCK --execute="SELECT SUBSTRING_INDEX(SUBSTRING_INDEX(VERSION(), '.', 2),'.',-1)"  | cut -d " " -f 4`
-          mysmallversion=`mysql -u root --password=$PASS --socket=$SOCK --execute="SELECT SUBSTRING_INDEX(VERSION(), '.', -1)"  | cut -d " " -f 4`
+          mybigversion=`mysql -u root --password=$PASS -B -s --socket=$SOCK --execute="SELECT SUBSTRING_INDEX(VERSION(), '.', 1)"`
+          mymidversion=`mysql -u root --password=$PASS -B -s --socket=$SOCK --execute="SELECT SUBSTRING_INDEX(SUBSTRING_INDEX(VERSION(), '.', 2),'.',-1)"`
+          mysmallversion=`mysql -u root --password=$PASS -B -s --socket=$SOCK --execute="SELECT SUBSTRING_INDEX(VERSION(), '.', -1)"`
    
     
           if [ $mybigversion -gt 4 ] && [ $mymidversion -gt 0 ] && [ $mysmallversion -gt 6 ]; then

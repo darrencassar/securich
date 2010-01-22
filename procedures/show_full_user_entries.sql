@@ -26,11 +26,11 @@
 
 USE securich;
 
-DROP PROCEDURE IF EXISTS show_user_entries;
+DROP PROCEDURE IF EXISTS show_full_user_entries;
 
 DELIMITER $$
 
-CREATE PROCEDURE `securich`.`show_user_entries`( usernamein VARCHAR(16))
+CREATE PROCEDURE `securich`.`show_full_user_entries`( usernamein VARCHAR(16))
   BEGIN
 
     IF (SELECT COUNT(*) FROM sec_users WHERE USERNAME=usernamein) = 0 THEN
