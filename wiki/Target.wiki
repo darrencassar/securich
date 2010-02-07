@@ -2,7 +2,7 @@
 
 = Introduction =
 
-Securich is an incredibly handy and versatile tool for managing user privileges on MySQL through the use of roles. It basically makes granting and revoking rights a piece of cake, not to mention added security it provides through password expiry, history and complexity, the customization level it permits, the fact that it runs on any MySQL 5.0 or later and it's easily deployable on any official MySQL binary, platform independent.
+Securich is an incredibly handy and versatile tool for managing user privileges on MySQL through the use of roles. It basically makes granting and revoking rights a piece of cake, not to mention added security it provides through password expiry, history and complexity, the customization level it permits, the fact that it runs on any MySQL 5.1.07 or later and it's easily deployable on any official MySQL binary, platform independent.
 
 = Origins =
 
