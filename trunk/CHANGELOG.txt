@@ -58,8 +58,22 @@ SecuRich Changelog:
    * Added testing scripts for developers to test
    * Fixed some typos in the install script
    
-2009-12-30: version 0.2.1
+2010-01-22: version 0.2.2
 
-   * Added show_privileges stored procedure
-   * Granting rights on set_my_password to new users immediately
+   * Created SAM-My - http://code.google.com/p/sam-my
    
+   * Added show_privileges stored procedure
+   * Added rep_user to reserved_usernames list
+   * Granting rights on set_my_password to new users immediately
+   * Catering for instances without innodb engines installed
+   * Enhanced revoke_privileges to remove users once they don't have any privileges at all
+   * Fixed installation on 5.0 (lack of information_schema tables)
+   * Fixed show_user_entries to include stored procedures
+   * Fixed show_full_user_entries to include stored procedures
+
+2010-02-19: version 0.2.3
+   
+   * Added password expirable setting (per user)
+   * Added set_password_expirable
+   * 
+
