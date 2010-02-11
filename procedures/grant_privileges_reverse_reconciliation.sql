@@ -205,7 +205,7 @@ CREATE  DEFINER=`root`@`localhost` PROCEDURE `securich`.`grant_privileges_revers
 
                SET randomnumber = 0;
 
-               WHILE randomnumber < 12 OR randomnumber > 20 DO
+               WHILE randomnumber < 12 OR randomnumber > 15 DO
                   SET randomnumber=(SELECT ROUND(RAND()*100));
                END WHILE;
 

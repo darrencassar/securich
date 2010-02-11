@@ -1,6 +1,6 @@
 #######################################################################################
 ##                                                                                   ##
-##   This is set_password, a script used to update users' passwords.                 ##
+##   This is set_password, a script used to update users' password expiry setting.   ##
 ##                                                                                   ##
 ##   This program was originally sponsored by TradingScreen Inc                      ##
 ##   Information about TS is found at www.tradingscreen.com                          ##
@@ -25,25 +25,22 @@
 
 USE securich;
 
-DROP PROCEDURE IF EXISTS set_my_password;
+DROP PROCEDURE IF EXISTS set_password_expirable;
 
 DELIMITER $$
 
-CREATE PROCEDURE `securich`.`set_my_password`(oldpasswordin VARCHAR(50), newpasswordin VARCHAR(50))
+CREATE PROCEDURE `securich`.`set_password_expirable`(usernamein VARCHAR(50), passwordexpirable CHAR(1))
   BEGIN
-    
-    set @username=(select substring_index(current_user(),'@',1));
-    set @hostname=(select substring_index(current_user(),'@',-1));
-    
-    select @username;
-    select @hostname;
-    
-    SET @call = CONCAT('call set_password ("' , @username , '","' , @hostname , '","' , oldpasswordin , '","' , newpasswordin , '");');
-
-    select @call;
-    
-    #PREPARE callsetpassword FROM @call;
-    #EXECUTE callsetpassword;
+  
+    IF (SELECT COUNT(*) FROM sec_users WHERE USERNAME=usernamein) = 1 THEN
+       IF passwordexpirable = 'Y' or passwordexpirable='y' or passwordexpirable = 'N' or passwordexpirable='n' THEN
+          update sec_users set PASS_EXPIRABLE=setting where USERNAME=usernamein;
+       ELSE
+          select "Setting specified can't be used ... please set to either Y or N" as ERROR;
+       END IF;
+    ELSE
+       select "User does not exist" as ERROR;
+    END IF;
        
   END$$
 

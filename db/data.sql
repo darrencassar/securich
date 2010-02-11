@@ -102,6 +102,7 @@ INSERT  INTO `securich`.`sec_help`(`ID`,`STOREDPROCEDURE`,`DESCRIPTION`) VALUES 
 INSERT  INTO `securich`.`sec_help`(`ID`,`STOREDPROCEDURE`,`DESCRIPTION`) VALUES (26,'set_my_password','set_my_password(oldpasswordin, newpasswordin); (version 0.2.1)\r\n-- Used by users to set their own password.');
 INSERT  INTO `securich`.`sec_help`(`ID`,`STOREDPROCEDURE`,`DESCRIPTION`) VALUES (27,'drop_role','drop_role(rolename); (version 0.2.1)\r\n-- Used to drop a role (as long as it is not in use.');
 INSERT  INTO `securich`.`sec_help`(`ID`,`STOREDPROCEDURE`,`DESCRIPTION`) VALUES (28,'reverse_reconciliation','reverse_reconciliation();\r\n-- Used in conjunction with `grant_privileges_reverse_reconciliation` to reconcile MySQL grants with Securich tables.');
+INSERT  INTO `securich`.`sec_help`(`ID`,`STOREDPROCEDURE`,`DESCRIPTION`) VALUES (29,'set_password_expirable','set_password_expirable(\'username\',\'setting\');\r\n-- Set a user to have an expirable password (for devs and human users) or not (for application, replication or other non human users).');
 
 CALL update_databases_tables_storedprocedures_list();
 
