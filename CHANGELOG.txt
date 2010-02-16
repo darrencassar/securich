@@ -75,5 +75,5 @@ SecuRich Changelog:
    
    * Added password expirable setting (per user)
    * Added set_password_expirable
-   * 
+   * Added rename_user_at_host
 

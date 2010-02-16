@@ -1,0 +1,1 @@
+update sec_help set DESCRIPTIOn='rename_user_at_host(\'username\',\'hostname\',\'newusername\',\'newhostname\');\r\n-- Rename username@hostname to newusername@newhostname. It takes care of all the necessary changes and makes sure the old username@hostname grants are revoked completely.' where STOREDPROCEDURE='rename_user_at_host';
