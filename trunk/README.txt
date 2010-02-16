@@ -159,6 +159,16 @@ In order for a user to change one's old password, the user needs to supply the o
 26) drop_role(rolename)
 -- Used to drop a role (as long as it is not in use.
 
+27) set_password_expirable('username','setting')
+-- Set a user to have an expirable password (for devs and human users) or not (for application, replication or other non human users).
+
+28) drop_user('username','hostname')
+-- Drop user completely
+
+29) rename_user_at_host('username','hostname','newusername','newhostname')
+-- Rename username@hostname to newusername@newhostname. It takes care of all the necessary changes and makes sure the old username@hostname grants are revoked completely.
+
+
 Note that the `mysql` database is purposely not included in the `sec_databases` table as it is a VERY SENSITIVE database and no one should have direct privileges to that database apart from root and other sensitive accounts (preferibly kept to a minimum)
 
 
