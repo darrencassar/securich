@@ -500,8 +500,6 @@ CREATE  DEFINER=`root`@`localhost` PROCEDURE `securich`.`grant_privileges_revers
          INSERT INTO aud_grant_revoke (USERNAME,HOSTNAME,COMMAND,TIMESTAMP) VALUES (@un,@hn,@g,NOW());
       END IF;
               
-      CALL reconciliation('sync');
-
       FLUSH PRIVILEGES;
 
   END$$

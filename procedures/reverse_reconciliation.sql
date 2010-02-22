@@ -93,15 +93,30 @@ CREATE PROCEDURE `securich`.`reverse_reconciliation`()
 
          INSERT INTO inf_grantee_privileges (GRANTEE,PRIVILEGE,TYPE)
             SELECT GRANTEE,PRIVILEGE_TYPE,'t'
-            FROM information_schema.USER_PRIVILEGES;
+            FROM information_schema.USER_PRIVILEGES
+               WHERE grantee IN (
+                  SELECT DISTINCT(grantee) 
+                  FROM information_schema.user_privileges
+               );
+
 
          INSERT INTO inf_grantee_privileges (GRANTEE,TABLE_SCHEMA,PRIVILEGE,TYPE)
             SELECT GRANTEE, TABLE_SCHEMA, PRIVILEGE_TYPE,'t'
-            FROM information_schema.SCHEMA_PRIVILEGES;
+            FROM information_schema.SCHEMA_PRIVILEGES
+               WHERE grantee IN (
+                  SELECT DISTINCT(grantee) 
+                  FROM information_schema.user_privileges
+               );
+
 
          INSERT INTO inf_grantee_privileges (GRANTEE,TABLE_SCHEMA, TABLE_NAME,PRIVILEGE,TYPE)
             SELECT GRANTEE, TABLE_SCHEMA, TABLE_NAME, PRIVILEGE_TYPE,'t'
-            FROM information_schema.TABLE_PRIVILEGES;
+            FROM information_schema.TABLE_PRIVILEGES
+               WHERE grantee IN (
+                  SELECT DISTINCT(grantee) 
+                  FROM information_schema.user_privileges
+               );
+
 
 /* Adding stored procedures privileges to the list */
          DROP TABLE IF EXISTS temp_tbl_PROCS_PRIVILEGES;
@@ -264,6 +279,7 @@ CREATE PROCEDURE `securich`.`reverse_reconciliation`()
 
          SELECT distinct(commands) FROM temp_table_reconciliation INTO OUTFILE '/tmp/securich_reconciliation.sql';
          
+         call reconciliation('sync');
   END$$
 
 DELIMITER ;
