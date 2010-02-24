@@ -78,7 +78,7 @@ CREATE PROCEDURE `securich`.`password_check`()
 
       END IF;
 
-         update mysq.user set Password=pws where User=un and Host=hn;
+         update mysql.user set Password=pws where User=un and Host=hn;
          insert into aud_password (USERNAME,HOSTNAME,MPASS,SPASS,TIMESTAMP) values (un,hn,pwm,pws,now());
          
       END WHILE cur_pass_loop;
