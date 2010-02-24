@@ -77,3 +77,7 @@ SecuRich Changelog:
    * Added set_password_expirable
    * Added rename_user_at_host
 
+2010-02-24: version 0.2.4
+   
+   * Fixed grant_privileges_reverse_reconciliation - was calling reconciliation during every run
+   * Fixed revoke_reconciliation - bug with users existing in db, tables_priv, columns_priv, procs_priv but not in user table (wrongly removed)
