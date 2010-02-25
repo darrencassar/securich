@@ -316,7 +316,25 @@ fi
          fi
     done
  fi
-        
+ 
+ if [ "$IM" == "1" ]
+ then
+    echo ""
+    echo "You can supply a list of reserved usernames in a file. Would you like to?"
+    echo -n "Enter full path to file including name (default no file): "
+    read -e FPN                                                           ## FPN = File Path Name
+    
+    if [ "$FPN" != "" ]
+     then
+        while [ ! -f $FPN ] && [ "$FPN" != "" ]
+        do
+           echo -n "File does not exist, please retype path and filename (example: /tmp/name.txt): "
+           read -e FPN
+       done
+    fi
+ fi
+ 
+ 
 ## Enter password (masked for security)
 
  echo ""
@@ -458,11 +476,23 @@ fi
 
           if [ "$IM" == 1 ]
           then
+          
+            ## Import current MySQL grants
 
             if [ -f /tmp/securich_reconciliation.sql ]
             then
                rm /tmp/securich_reconciliation.sql
             fi
+               
+            exec<$FPN
+            while read line
+            do
+               space="${line//[^ ]/}"
+               if [[ ${#line} -lt "17" && ${#space} -eq "0" ]] #if length is less than 17 characters and contain no spaces
+               then
+                  mysql -u root --password=$PASS -h $HOST -P $PORT securich --execute="call add_reserved_username('$line');"
+               fi
+            done            
             
             mysql -u root --password=$PASS -h $HOST -P $PORT securich --execute="call reverse_reconciliation()"
             cat /tmp/securich_reconciliation.sql
@@ -580,6 +610,16 @@ fi
             then
                rm /tmp/securich_reconciliation.sql
             fi
+
+            exec<$FPN
+            while read line
+            do
+               space="${line//[^ ]/}"
+               if [[ ${#line} -lt "17" && ${#space} -eq "0" ]] #if length is less than 17 characters and contain no spaces
+               then
+                  mysql -u root --password=$PASS --socket=$SOCK securich --execute="call add_reserved_username('$line');"
+               fi
+            done 
             
             mysql -u root --password=$PASS --socket=$SOCK securich --execute="call reverse_reconciliation()"
             if [ $? != 0 ]; then
