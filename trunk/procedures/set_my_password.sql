@@ -32,19 +32,32 @@ DELIMITER $$
 CREATE PROCEDURE `securich`.`set_my_password`(oldpasswordin VARCHAR(50), newpasswordin VARCHAR(50))
   BEGIN
     
-    set @username=(select substring_index(current_user(),'@',1));
-    set @hostname=(select substring_index(current_user(),'@',-1));
-    
-    select @username;
-    select @hostname;
-    
-    SET @call = CONCAT('call set_password ("' , @username , '","' , @hostname , '","' , oldpasswordin , '","' , newpasswordin , '");');
+    DECLARE un varchar(16);
+    DECLARE hn varchar(60);
+    DECLARE tors int;
 
-    select @call;
+    set un=(select (substring_index(user(),'@',1)));
+    set hn=(select (substring_index(user(),'@',-1)));
     
-    #PREPARE callsetpassword FROM @call;
-    #EXECUTE callsetpassword;
+    /*IF it's a tcp session it could still be showing as localhost due to dns but the following resolves the problem*/
+    set tors=(select count(HOST) from information_schema.processlist where ID=(select connection_id()) and HOST like '%:%');
+     
+    IF hn = 'localhost' && tors = '1' THEN
        
+       set hn='127.0.0.1';
+
+       SET @call = CONCAT('call set_password ("' , un , '","' , hn , '","' , oldpasswordin , '","' , newpasswordin , '");');
+       PREPARE callsetpassword FROM @call;
+       EXECUTE callsetpassword;
+       
+    ELSE
+    
+       SET @call = CONCAT('call set_password ("' , un , '","' , hn , '","' , oldpasswordin , '","' , newpasswordin , '");');
+       PREPARE callsetpassword FROM @call;
+       EXECUTE callsetpassword;
+       
+    END IF;
+
   END$$
 
 DELIMITER ;
