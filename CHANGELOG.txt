@@ -81,3 +81,8 @@ SecuRich Changelog:
    
    * Fixed grant_privileges_reverse_reconciliation - was calling reconciliation during every run
    * Fixed revoke_reconciliation - bug with users existing in db, tables_priv, columns_priv, procs_priv but not in user table (wrongly removed)
+
+2010-03-02: version 0.2.5
+
+   * Updated add reserved username stored procedure to check for spaces in names and duplicates in sec_reserved_usernames
+   * securich_install.sh has been enhanced to accept a file containing a list of reserved usernames
