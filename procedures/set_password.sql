@@ -50,9 +50,10 @@ CREATE PROCEDURE `securich`.`set_password`( usernamein VARCHAR(50), hostnamein V
     
     /*IF it's a tcp session it could still be showing as localhost due to dns but the following resolves the problem*/
     set tors=(select count(HOST) from information_schema.processlist where ID=(select connection_id()) and HOST like '%:%');
-      
-    IF hostnamein='localhost' && tors='1' then
-        SET CORRECTUSER= (SELECT CONCAT(usernamein,'@127.0.0.1')=USER());
+     
+    IF hostnamein='127.0.0.1' && tors='1' then
+        SET CORRECTUSER= ('1');
+
     ELSE
         SET CORRECTUSER= (SELECT CONCAT(usernamein,'@',hostnamein)=USER());
     END IF;
