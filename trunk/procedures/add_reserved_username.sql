@@ -32,9 +32,21 @@ DELIMITER $$
 
 CREATE PROCEDURE `securich`.`add_reserved_username`( usernamein varchar(16))
   BEGIN
-
-     insert into sec_reserved_usernames (USERNAME) values (usernamein);
-
+     
+     DECLARE NOU INT; /* number of usernames */
+     DECLARE NOS INT; /* number of spaces */
+     
+     SET NOU = (SELECT COUNT(*) FROM sec_reserved_usernames WHERE USERNAME=usernamein);
+     SET NOS =  (SELECT LENGTH(usernamein) - LENGTH(REPLACE(usernamein, ' ', '')));
+          
+     IF NOU= 0 && NOS = 0 THEN
+           insert into sec_reserved_usernames (USERNAME) values (usernamein);
+     ELSE
+        IF NOS > 0 THEN
+           select "Username can't contain spaces" as ERROR;
+        END IF;
+     END IF;
+     
   END$$
 
 DELIMITER ;
