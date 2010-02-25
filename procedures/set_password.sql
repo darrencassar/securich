@@ -46,9 +46,13 @@ CREATE PROCEDURE `securich`.`set_password`( usernamein VARCHAR(50), hostnamein V
     DECLARE ROOTUSER VARCHAR(16);
     DECLARE message VARCHAR(256);
     DECLARE countdict INT;
+    DECLARE tors int;
     
-    IF hostnamein='localhost' or hostnamein='127.0.0.1' then
-        SET CORRECTUSER= ((SELECT CONCAT(usernamein,'@127.0.0.1')=USER()) or (SELECT CONCAT(usernamein,'@localhost')=USER()));
+    /*IF it's a tcp session it could still be showing as localhost due to dns but the following resolves the problem*/
+    set tors=(select count(HOST) from information_schema.processlist where ID=(select connection_id()) and HOST like '%:%');
+      
+    IF hostnamein='localhost' && tors='1' then
+        SET CORRECTUSER= (SELECT CONCAT(usernamein,'@127.0.0.1')=USER());
     ELSE
         SET CORRECTUSER= (SELECT CONCAT(usernamein,'@',hostnamein)=USER());
     END IF;

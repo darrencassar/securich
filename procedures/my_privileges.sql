@@ -33,14 +33,22 @@ CREATE PROCEDURE `securich`.`my_privileges`( dbnamein varchar(64))
 
       DECLARE un varchar(16);
       DECLARE hn varchar(60);
+      DECLARE tors int;
 
       set un=(select (substring_index(user(),'@',1)));
       set hn=(select (substring_index(user(),'@',-1)));
-
-      IF dbnamein = '*' THEN
+      
+      /*IF it's a tcp session it could still be showing as localhost due to dns but the following resolves the problem*/
+      set tors=(select count(HOST) from information_schema.processlist where ID=(select connection_id()) and HOST like '%:%');
+      
+      IF dbnamein = '' THEN
          call show_full_user_entries(un);
       ELSE
-         call show_user_privileges(un,hn,dbnamein,'all');
+         IF hn = 'localhost' && tors = '1' THEN
+            call show_user_privileges(un,'127.0.0.1',dbnamein,'all');
+         ELSE
+            call show_user_privileges(un,hn,dbnamein,'all');
+         END IF;
       END IF;
 
 END$$
