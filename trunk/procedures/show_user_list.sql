@@ -31,7 +31,8 @@ CREATE PROCEDURE `securich`.`show_user_list`()
 
     select us.USERNAME, ho.HOSTNAME 
     from sec_us_ho usho join sec_users us join sec_hosts ho
-    where usho.US_ID=us.ID and usho.HO_ID=ho.ID;
+    where usho.US_ID=us.ID and usho.HO_ID=ho.ID
+    order by 1,2 asc;
 
   END$$
 

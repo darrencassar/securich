@@ -193,7 +193,7 @@ CREATE PROCEDURE `securich`.`show_user_entries`( usernamein VARCHAR(16))
        a.ID=c.RO_ID
        GROUP BY USERNAME, HOSTNAME, DATABASENAME, STOREDPROCEDURENAME, ROLE, STATE;
        
-       SELECT * FROM temp_tbl_4;
+       SELECT * FROM temp_tbl_4 order by 1,2,3,4 asc;
 
     END IF;
 
