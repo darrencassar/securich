@@ -55,7 +55,7 @@ CREATE PROCEDURE `securich`.`set_password`( usernamein VARCHAR(50), hostnamein V
         SET CORRECTUSER= ('1');
 
     ELSE
-        SET CORRECTUSER= (SELECT CONCAT(usernamein,'@',hostnamein)=USER());
+        SET CORRECTUSER=(SELECT (SUBSTRING_INDEX(USER(),'@',1))=usernamein);
     END IF;
     
     SET PASSWORDLENGTH= (SELECT VALUE FROM sec_config WHERE PROPERTY='password_length');
