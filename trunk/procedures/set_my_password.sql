@@ -30,14 +30,15 @@ DROP PROCEDURE IF EXISTS set_my_password;
 DELIMITER $$
 
 CREATE PROCEDURE `securich`.`set_my_password`(oldpasswordin VARCHAR(50), newpasswordin VARCHAR(50))
+SQL SECURITY INVOKER
   BEGIN
     
     DECLARE un varchar(16);
     DECLARE hn varchar(60);
     DECLARE tors int;
 
-    set un=(select (substring_index(user(),'@',1)));
-    set hn=(select (substring_index(user(),'@',-1)));
+    set un=(select (substring_index(current_user(),'@',1)));
+    set hn=(select (substring_index(current_user(),'@',-1)));
     
     /*IF it's a tcp session it could still be showing as localhost due to dns but the following resolves the problem*/
     set tors=(select count(HOST) from information_schema.processlist where ID=(select connection_id()) and HOST like '%:%');
