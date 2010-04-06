@@ -50,7 +50,7 @@ CREATE PROCEDURE `securich`.`help`( storedprocedurenamein varchar(255) )
           select distinct STOREDPROCEDURE
           from sec_help
           where STOREDPROCEDURE <> ''
-          order by ID asc;
+          order by STOREDPROCEDURE asc;
 
        ELSE
 
