@@ -70,6 +70,8 @@ if [ -z "$1" ]
     ARGUMENT=notsilent
 fi
 
+clear
+
 if [ "$ARGUMENT" != "silent" ]
 then
   ## Catering for traps ... hindering a messed up securich
@@ -321,6 +323,7 @@ fi
  then
     echo ""
     echo "You can supply a list of reserved usernames in a file. Would you like to?"
+    echo "Note that there should only be one entry per line."
     echo -n "Enter full path to file including name (default no file): "
     read -e FPN                                                           ## FPN = File Path Name
     
@@ -484,15 +487,18 @@ fi
                rm /tmp/securich_reconciliation.sql
             fi
                
-            exec<$FPN
-            while read line
-            do
-               space="${line//[^ ]/}"
-               if [[ ${#line} -lt "17" && ${#space} -eq "0" ]] #if length is less than 17 characters and contain no spaces
-               then
-                  mysql -u root --password=$PASS -h $HOST -P $PORT securich --execute="call add_reserved_username('$line');"
-               fi
-            done            
+            if [ "$FPN" != "" ]
+            then
+               exec<$FPN
+               while read line
+               do
+                  space="${line//[^ ]/}"
+                  if [[ ${#line} -lt "17" && ${#space} -eq "0" ]] #if length is less than 17 characters and contain no spaces
+                  then
+                     mysql -u root --password=$PASS -h $HOST -P $PORT securich --execute="call add_reserved_username('$line');"
+                  fi
+               done            
+            fi
             
             mysql -u root --password=$PASS -h $HOST -P $PORT securich --execute="call reverse_reconciliation()"
             cat /tmp/securich_reconciliation.sql
@@ -611,15 +617,19 @@ fi
                rm /tmp/securich_reconciliation.sql
             fi
 
-            exec<$FPN
-            while read line
-            do
-               space="${line//[^ ]/}"
-               if [[ ${#line} -lt "17" && ${#space} -eq "0" ]] #if length is less than 17 characters and contain no spaces
-               then
-                  mysql -u root --password=$PASS --socket=$SOCK securich --execute="call add_reserved_username('$line');"
-               fi
-            done 
+            if [ "$FPN" != "" ]
+            then
+               exec<$FPN
+               while read line
+               do
+                  space="${line//[^ ]/}"
+                  if [[ ${#line} -lt "17" && ${#space} -eq "0" ]] #if length is less than 17 characters and contain no spaces
+                  then
+                     mysql -u root --password=$PASS --socket=$SOCK securich --execute="call add_reserved_username('$line');"
+                  fi
+               done            
+            fi
+
             
             mysql -u root --password=$PASS --socket=$SOCK securich --execute="call reverse_reconciliation()"
             if [ $? != 0 ]; then
