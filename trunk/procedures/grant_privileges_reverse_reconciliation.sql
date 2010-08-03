@@ -62,6 +62,8 @@ CREATE  PROCEDURE `securich`.`grant_privileges_reverse_reconciliation`( username
       DECLARE tbname VARCHAR(64);
       DECLARE spname VARCHAR(64);
       DECLARE reservedusername INT;
+      DECLARE modeofoperation VARCHAR(40);
+
 
       DECLARE EXIT HANDLER FOR SQLEXCEPTION
       BEGIN
@@ -73,6 +75,12 @@ CREATE  PROCEDURE `securich`.`grant_privileges_reverse_reconciliation`( username
 
                       /* Security feature does not permit the user of reserved usernames through this package! */
 
+      SET modeofoperation= (
+         SELECT conf_value
+         FROM sec_configuration
+         WHERE conf_param='mode'
+         );
+
       SET reservedusername = (
          SELECT COUNT(*)
          FROM sec_reserved_usernames
@@ -83,7 +91,7 @@ CREATE  PROCEDURE `securich`.`grant_privileges_reverse_reconciliation`( username
 
          SELECT "Illegal username entry";
          
-      ELSEIF dbnamein = 'mysql' THEN
+      ELSEIF dbnamein = 'mysql' AND modeofoperation='strict' THEN
 
          SELECT "Illegal database name entry";
          
