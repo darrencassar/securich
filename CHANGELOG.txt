@@ -86,3 +86,8 @@ SecuRich Changelog:
 
    * Updated add reserved username stored procedure to check for spaces in names and duplicates in sec_reserved_usernames
    * securich_install.sh has been enhanced to accept a file containing a list of reserved usernames
+
+2010-08-05: version 0.3.0
+
+   * Any user with sufficient privileges can now be used to install securich. For installations where the root user has been dropped and another user with same kind of privileges exist this is a must
+   * Grants on the 'mysql' database are now possible by setting configuration value to 'lenient' where configuration parameter mode exists in sec_configuration table. By default the value is 'strict' disabling such power.
