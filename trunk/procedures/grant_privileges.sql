@@ -41,7 +41,7 @@ rolein = name of role to be used
 emailaddressin = email address of the user who is being granted access
 */
 
-CREATE  DEFINER=`root`@`localhost` PROCEDURE `securich`.`grant_privileges`( usernamein VARCHAR(16), hostnamein VARCHAR(60), dbnamein VARCHAR(64), tbnamein VARCHAR(64), tabletype VARCHAR(16), rolein VARCHAR(60), emailaddressin VARCHAR(50))
+CREATE  PROCEDURE `securich`.`grant_privileges`( usernamein VARCHAR(16), hostnamein VARCHAR(60), dbnamein VARCHAR(64), tbnamein VARCHAR(64), tabletype VARCHAR(16), rolein VARCHAR(60), emailaddressin VARCHAR(50))
   BEGIN
 
       DECLARE userexists INT;
@@ -77,6 +77,7 @@ CREATE  DEFINER=`root`@`localhost` PROCEDURE `securich`.`grant_privileges`( user
       DECLARE tbname VARCHAR(64);
       DECLARE spname VARCHAR(64);
       DECLARE reservedusername INT;
+      DECLARE modeofoperation VARCHAR(40);
 
       DECLARE RL VARCHAR(20);
       DECLARE PRIV_OBO_GRANT VARCHAR(50);
@@ -200,6 +201,12 @@ CREATE  DEFINER=`root`@`localhost` PROCEDURE `securich`.`grant_privileges`( user
 
                       /* Security feature does not permit the user of reserved usernames through this package! */
 
+      SET modeofoperation= (
+         SELECT conf_value
+         FROM sec_configuration
+         WHERE conf_param='mode'
+         );
+
       SET reservedusername = (
          SELECT COUNT(*)
          FROM sec_reserved_usernames
@@ -210,7 +217,7 @@ CREATE  DEFINER=`root`@`localhost` PROCEDURE `securich`.`grant_privileges`( user
 
          SELECT "Illegal username entry" as ERROR;
          
-      ELSEIF dbnamein = 'mysql'  THEN
+      ELSEIF dbnamein = 'mysql' and modeofoperation='strict' THEN
 
          SELECT "Illegal database name entry" as ERROR;
       

@@ -36,8 +36,7 @@ CREATE PROCEDURE `securich`.`update_databases_tables_storedprocedures_list`()
      insert into securich.sec_databases (DATABASENAME)
         select SCHEMA_NAME
         from information_schema.SCHEMATA
-        where SCHEMA_NAME <> 'mysql' and
-        SCHEMA_NAME <> 'information_schema' and
+        where SCHEMA_NAME <> 'information_schema' and
         SCHEMA_NAME not in (
            select DATABASENAME
            from securich.sec_databases
@@ -47,7 +46,6 @@ CREATE PROCEDURE `securich`.`update_databases_tables_storedprocedures_list`()
         select distinct TABLE_NAME
         from information_schema.tables
         where table_schema <> 'information_schema' and
-        table_schema <> 'mysql' and
         TABLE_NAME not in (
            select TABLENAME
            from securich.sec_tables
@@ -57,7 +55,6 @@ CREATE PROCEDURE `securich`.`update_databases_tables_storedprocedures_list`()
         select distinct SPECIFIC_NAME
         from information_schema.routines
         where ROUTINE_SCHEMA <> 'information_schema' and
-        ROUTINE_SCHEMA <> 'mysql' and
         SPECIFIC_NAME not in (
            select STOREDPROCEDURENAME
            from securich.sec_storedprocedures
@@ -71,8 +68,7 @@ CREATE PROCEDURE `securich`.`update_databases_tables_storedprocedures_list`()
            from sec_databases db, sec_tables tb join (
               select TABLE_SCHEMA, TABLE_NAME
               from information_schema.tables
-              where table_schema <> 'information_schema' and
-              table_schema <> 'mysql'
+              where table_schema <> 'information_schema' 
               ) nms
            where nms.TABLE_SCHEMA = db.DATABASENAME and
            nms.TABLE_NAME = tb.TABLENAME
@@ -91,8 +87,7 @@ CREATE PROCEDURE `securich`.`update_databases_tables_storedprocedures_list`()
            from sec_databases db, sec_storedprocedures sp join (
               select ROUTINE_SCHEMA, SPECIFIC_NAME
               from information_schema.routines
-              where ROUTINE_SCHEMA <> 'information_schema' and
-              ROUTINE_SCHEMA <> 'mysql'
+              where ROUTINE_SCHEMA <> 'information_schema' 
               ) nms
            where nms.ROUTINE_SCHEMA = db.DATABASENAME and
            nms.SPECIFIC_NAME = sp.STOREDPROCEDURENAME

@@ -26,7 +26,7 @@ DELIMITER $$
 
 DROP PROCEDURE IF EXISTS `securich`.`create_update_role`$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `create_update_role`( way varchar(12), rolenamein varchar(64), privilegenamein varchar(64))
+CREATE PROCEDURE `create_update_role`( way varchar(12), rolenamein varchar(64), privilegenamein varchar(64))
 BEGIN
 
     DECLARE ROLE_ID INT;
