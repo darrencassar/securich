@@ -17,6 +17,8 @@ INSERT INTO `sec_config` (`PROPERTY`,`VALUE`) values ('password_number_check',1)
 INSERT INTO `sec_config` (`PROPERTY`,`VALUE`) values ('password_special_character_check',1);
 INSERT INTO `sec_config` (`PROPERTY`,`VALUE`) values ('password_username_check',1);
 
+INSERT INTO `sec_configuration` (`CONF_PARAM`,`CONF_VALUE`) values ('mode','strict');
+
 INSERT INTO `sec_databases` (`ID`,`DATABASENAME`) VALUES
 (1,'');
 
