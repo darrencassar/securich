@@ -27,7 +27,7 @@ DROP PROCEDURE IF EXISTS grant_privileges_reverse_reconciliation;
 
 DELIMITER $$
 
-CREATE  DEFINER=`root`@`localhost` PROCEDURE `securich`.`grant_privileges_reverse_reconciliation`( usernamein VARCHAR(16), hostnamein VARCHAR(60), dbnamein VARCHAR(64), tbnamein VARCHAR(64), tabletype VARCHAR(16), rolein VARCHAR(60), emailaddressin VARCHAR(50))
+CREATE  PROCEDURE `securich`.`grant_privileges_reverse_reconciliation`( usernamein VARCHAR(16), hostnamein VARCHAR(60), dbnamein VARCHAR(64), tbnamein VARCHAR(64), tabletype VARCHAR(16), rolein VARCHAR(60), emailaddressin VARCHAR(50))
   BEGIN
 
       DECLARE userexists INT;
