@@ -43,7 +43,8 @@ CREATE PROCEDURE `securich`.`set_password`( usernamein VARCHAR(50), hostnamein V
     DECLARE UPDATECOUNT INT;
     DECLARE LASTUPDATE INT;
     DECLARE CORRECTUSER INT;
-    DECLARE ROOTUSER VARCHAR(16);
+    DECLARE SUPERUSER VARCHAR(16);
+    DECLARE ADMINUSER VARCHAR(16);
     DECLARE message VARCHAR(256);
     DECLARE countdict INT;
     DECLARE tors int;
@@ -59,9 +60,10 @@ CREATE PROCEDURE `securich`.`set_password`( usernamein VARCHAR(50), hostnamein V
     END IF;
     
     SET PASSWORDLENGTH= (SELECT VALUE FROM sec_config WHERE PROPERTY='password_length');
-    SET ROOTUSER= (SELECT (SUBSTRING_INDEX(USER(),'@',1)));
+    SET SUPERUSER= (SELECT (SUBSTRING_INDEX(USER(),'@',1)));
+    SET ADMINUSER= (SELECT conf_value FROM sec_config WHERE PROPERTY='admin_user');
 
-     IF CORRECTUSER = 1 OR ROOTUSER = 'root' THEN
+     IF CORRECTUSER = 1 OR SUPERUSER = 'root' THEN
 
         SET USHOID= (
            SELECT ID
@@ -83,16 +85,16 @@ CREATE PROCEDURE `securich`.`set_password`( usernamein VARCHAR(50), hostnamein V
            FROM sec_us_ho_profile
            WHERE US_HO_ID = USHOID );
 
-        IF (SELECT PASSWORD(oldpasswordin)) <> PASSW0 AND ROOTUSER <> 'root' THEN
+        IF (SELECT PASSWORD(oldpasswordin)) <> PASSW0 AND SUPERUSER <> 'root' THEN
 
            SET message = "Invalid original password, please check your own password and try again!";
 
            SELECT SLEEP(5); /* If the password is not guessed this sleep takes place. It is there to hinder a brute force attack!*/
 
-        ELSEIF ROOTUSER <> 'root' THEN
+        ELSEIF SUPERUSER <> 'root' THEN
                 
            -- check the password length  
-           IF ((SELECT LENGTH(newpasswordin)) < PASSWORDLENGTH) AND ((SELECT VALUE FROM sec_config WHERE PROPERTY='password_length_check') = 1) THEN
+           IF ((SELECT LENGTH(newpasswordin)) < PASSWORDLENGTH) AND ((SELECT VALUE FROM sec_config WHERE PROPERTY='password_length_check') = '1') THEN
               SET message = CONCAT("Password should be at least " , PASSWORDLENGTH , " characters long");
            END IF;
            
@@ -100,37 +102,37 @@ CREATE PROCEDURE `securich`.`set_password`( usernamein VARCHAR(50), hostnamein V
            -- a table that holds a dictionary of simple words (admin.dict)
            SELECT COUNT(*) INTO countdict FROM sec_dictionary WHERE WORD = newpasswordin;
            
-           IF (countdict > 0) AND ((SELECT VALUE FROM sec_config WHERE PROPERTY='password_dictionary_check') = 1) THEN
+           IF (countdict > 0) AND ((SELECT VALUE FROM sec_config WHERE PROPERTY='password_dictionary_check') = '1') THEN
              SET message = CONCAT_WS(',',message,' Password too simple');
            END IF;
            
            -- check for a lower case character  
-           IF (newpasswordin NOT RLIKE '[[:lower:]]') AND ((SELECT VALUE FROM sec_config WHERE PROPERTY='password_lowercase_check') = 1) THEN
+           IF (newpasswordin NOT RLIKE '[[:lower:]]') AND ((SELECT VALUE FROM sec_config WHERE PROPERTY='password_lowercase_check') = '1') THEN
               SET message = CONCAT_WS(',',message,
                                     ' Password should contain lower case character');
            END IF;
            
            -- check for an upper case character  
-           IF (newpasswordin NOT RLIKE '[[:upper:]]') AND ((SELECT VALUE FROM sec_config WHERE PROPERTY='password_uppercase_check') = 1) THEN
+           IF (newpasswordin NOT RLIKE '[[:upper:]]') AND ((SELECT VALUE FROM sec_config WHERE PROPERTY='password_uppercase_check') = '1') THEN
               SET message = CONCAT_WS(',',message,
                                      ' Password should contain upper case character');
            END IF;
            
            -- check for a digit  
-           IF (newpasswordin NOT RLIKE '[[:digit:]]') AND ((SELECT VALUE FROM sec_config WHERE PROPERTY='password_number_check') = 1) THEN
+           IF (newpasswordin NOT RLIKE '[[:digit:]]') AND ((SELECT VALUE FROM sec_config WHERE PROPERTY='password_number_check') = '1') THEN
               SET message = CONCAT_WS(',',message,
                                      ' Password should contain a digit');
            END IF;
            
            -- check for punctuation  
-           IF (newpasswordin NOT RLIKE '[[:punct:]]') AND ((SELECT VALUE FROM sec_config WHERE PROPERTY='password_special_character_check') = 1) THEN
+           IF (newpasswordin NOT RLIKE '[[:punct:]]') AND ((SELECT VALUE FROM sec_config WHERE PROPERTY='password_special_character_check') = '1') THEN
               SET message = CONCAT_WS(',',message,
                                       ' Password should contain punctuation');
            END IF;
            
            -- lastly check whether username and password are the same 
            -- if it is, admonish!
-           IF (usernamein = newpasswordin) AND ((SELECT VALUE FROM sec_config WHERE PROPERTY='password_username_check') = 1) THEN
+           IF (usernamein = newpasswordin) AND ((SELECT VALUE FROM sec_config WHERE PROPERTY='password_username_check') = '1') THEN
               SET message = 'Username and password are the same!';
            END IF;
            
