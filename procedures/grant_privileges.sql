@@ -202,9 +202,9 @@ CREATE  PROCEDURE `securich`.`grant_privileges`( usernamein VARCHAR(16), hostnam
                       /* Security feature does not permit the user of reserved usernames through this package! */
 
       SET modeofoperation= (
-         SELECT conf_value
-         FROM sec_configuration
-         WHERE conf_param='mode'
+         SELECT VALUE
+         FROM sec_config
+         WHERE PROPERTY='mode'
          );
 
       SET reservedusername = (

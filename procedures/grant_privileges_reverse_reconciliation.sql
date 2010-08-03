@@ -76,9 +76,9 @@ CREATE  PROCEDURE `securich`.`grant_privileges_reverse_reconciliation`( username
                       /* Security feature does not permit the user of reserved usernames through this package! */
 
       SET modeofoperation= (
-         SELECT conf_value
-         FROM sec_configuration
-         WHERE conf_param='mode'
+         SELECT VALUE
+         FROM sec_config
+         WHERE PROPERTY='mode'
          );
 
       SET reservedusername = (

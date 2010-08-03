@@ -63,7 +63,7 @@ BEGIN
 
           insert into sec_ro_pr (RO_ID,PR_ID) values (ROLE_ID,PRIV_ID);
           set @g= CONCAT("add " , privilegenamein , " to " , rolenamein );
-          IF (select value from sec_config where PROPERTY = 'reverse_reconciliation_in_progress') = 0 THEN
+          IF (select value from sec_config where PROPERTY = 'reverse_reconciliation_in_progress') = '0' THEN
              call reconciliation('sync'); 
           END IF;
           INSERT INTO aud_roles (USERNAME,HOSTNAME,COMMAND,TIMESTAMP) VALUES (@un,@hn,@g,NOW());
@@ -78,7 +78,7 @@ BEGIN
 
           delete from sec_ro_pr where RO_ID=ROLE_ID and PR_ID=PRIV_ID;
           set @g= CONCAT("remove " , privilegenamein , " from " , rolenamein );          
-          IF (select value from sec_config where PROPERTY = 'reverse_reconciliation_in_progress') = 0 THEN
+          IF (select value from sec_config where PROPERTY = 'reverse_reconciliation_in_progress') = '0' THEN
              call reconciliation('sync'); 
           END IF;
           INSERT INTO aud_roles (USERNAME,HOSTNAME,COMMAND,TIMESTAMP) VALUES (@un,@hn,@g,NOW());
