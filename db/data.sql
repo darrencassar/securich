@@ -7,17 +7,17 @@ flush privileges;
 
 USE securich;
 
-INSERT INTO `sec_config` (`PROPERTY`,`VALUE`) values ('reverse_reconciliation_in_progress',0);
-INSERT INTO `sec_config` (`PROPERTY`,`VALUE`) values ('password_length',10);
-INSERT INTO `sec_config` (`PROPERTY`,`VALUE`) values ('password_length_check',1);
-INSERT INTO `sec_config` (`PROPERTY`,`VALUE`) values ('password_dictionary_check',1);
-INSERT INTO `sec_config` (`PROPERTY`,`VALUE`) values ('password_lowercase_check',1);
-INSERT INTO `sec_config` (`PROPERTY`,`VALUE`) values ('password_uppercase_check',1);
-INSERT INTO `sec_config` (`PROPERTY`,`VALUE`) values ('password_number_check',1);
-INSERT INTO `sec_config` (`PROPERTY`,`VALUE`) values ('password_special_character_check',1);
-INSERT INTO `sec_config` (`PROPERTY`,`VALUE`) values ('password_username_check',1);
-
-INSERT INTO `sec_configuration` (`CONF_PARAM`,`CONF_VALUE`) values ('mode','strict');
+INSERT INTO `sec_config` (`PROPERTY`,`VALUE`) VALUES ('reverse_reconciliation_in_progress','0');
+INSERT INTO `sec_config` (`PROPERTY`,`VALUE`) VALUES ('password_length','10');
+INSERT INTO `sec_config` (`PROPERTY`,`VALUE`) VALUES ('password_length_check','1');
+INSERT INTO `sec_config` (`PROPERTY`,`VALUE`) VALUES ('password_dictionary_check','1');
+INSERT INTO `sec_config` (`PROPERTY`,`VALUE`) VALUES ('password_lowercase_check','1');
+INSERT INTO `sec_config` (`PROPERTY`,`VALUE`) VALUES ('password_uppercase_check','1');
+INSERT INTO `sec_config` (`PROPERTY`,`VALUE`) VALUES ('password_number_check','1');
+INSERT INTO `sec_config` (`PROPERTY`,`VALUE`) VALUES ('password_special_character_check','1');
+INSERT INTO `sec_config` (`PROPERTY`,`VALUE`) VALUES ('password_username_check','1');
+INSERT INTO `sec_config` (`PROPERTY`,`VALUE`) VALUES ('mode','strict');
+INSERT INTO `sec_config` (`PROPERTY`,`VALUE`) VALUES ('admin_user',(select substring_index(user(),'@',1)));
 
 INSERT INTO `sec_databases` (`ID`,`DATABASENAME`) VALUES
 (1,'');

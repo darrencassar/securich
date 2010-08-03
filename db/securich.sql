@@ -392,7 +392,7 @@ DROP TABLE IF EXISTS `securich`.`sec_config` ;
 CREATE  TABLE IF NOT EXISTS `securich`.`sec_config` (
   `ID` INT UNSIGNED NULL DEFAULT NULL AUTO_INCREMENT ,
   `PROPERTY` VARCHAR(255) NULL DEFAULT NULL ,
-  `VALUE` INT NULL DEFAULT NULL ,
+  `VALUE` VARCHAR(40) NULL DEFAULT NULL ,
   PRIMARY KEY (`ID`) )
 ENGINE = InnoDB;
 
@@ -407,17 +407,6 @@ CREATE  TABLE IF NOT EXISTS `securich`.`sec_dictionary` (
 ENGINE = MyISAM;
 
 CREATE INDEX `WORD_IDX` ON `securich`.`sec_dictionary` (`WORD` ASC) ;
-
-
--- -----------------------------------------------------
--- Table `securich`.`sec_configuration`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `securich`.`sec_configuration` ;
-
-CREATE TABLE IF NOT EXISTS `securich`.`sec_configuration` (
-  `CONF_PARAM` VARCHAR(40),
-  `CONF_VALUE` VARCHAR(40) )
-ENGINE=MYISAM;
 
 
 
