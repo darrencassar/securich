@@ -8,10 +8,11 @@ List of features:
 6. Updatable roles, that is when a role is updated, users using that role can be updated using `call RECONCILIATION('sync');`
 7. Clone a new user from one you know is the same (everything is the same apart from the username, host, emailaddress and password).
 8. Updating a role propagates to the privileges any user having that role has i.e. it is dynamic.
-9. `mysql` database is considered a "sacred" database by securich and therefore the latter (securich) doesn't list the former (mysql) anywhere in it's tables avoiding granting rights on it
+9. `mysql` database is considered a "sacred" database by securich and therefore the latter (securich) doesn't allow granting of privileges to it by default. A configuration parameter needs to be teaked in sec_config setting mode=lenient instead of the default mode='strict' in order to allow grants on mysql db.
 10. Can automatically reconcile from mysql to securich.
 11. Password restrictions are fully configurable.
 12. Includes a password dictionary to make sure no common passwords are used.
+13. enables installation by other users not just root
 
 Limitations:
 

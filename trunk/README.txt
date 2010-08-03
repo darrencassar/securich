@@ -169,7 +169,9 @@ In order for a user to change one's old password, the user needs to supply the o
 -- Rename username@hostname to newusername@newhostname. It takes care of all the necessary changes and makes sure the old username@hostname grants are revoked completely.
 
 
-Note that the `mysql` database is purposely not included in the `sec_databases` table as it is a VERY SENSITIVE database and no one should have direct privileges to that database apart from root and other sensitive accounts (preferibly kept to a minimum)
+Note that the `mysql` database is a VERY SENSITIVE database and no one should have direct privileges to that database apart from root and other sensitive accounts (preferibly kept to a minimum)
+Having said that the followign command permits granting any kind of privilege on the mysql database as part of a new stand towards making securich more flexible:
+update sec_configuration set conf_value='lenient' where conf_param='mode';
 
 
 passwordrotate.sh
