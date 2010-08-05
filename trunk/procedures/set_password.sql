@@ -61,9 +61,9 @@ CREATE PROCEDURE `securich`.`set_password`( usernamein VARCHAR(50), hostnamein V
     
     SET PASSWORDLENGTH= (SELECT VALUE FROM sec_config WHERE PROPERTY='password_length');
     SET SUPERUSER= (SELECT (SUBSTRING_INDEX(USER(),'@',1)));
-    SET ADMINUSER= (SELECT conf_value FROM sec_config WHERE PROPERTY='admin_user');
+    SET ADMINUSER= (SELECT VALUE FROM sec_config WHERE PROPERTY='admin_user');
 
-     IF CORRECTUSER = 1 OR SUPERUSER = 'root' THEN
+     IF CORRECTUSER = 1 OR SUPERUSER = 'root' OR SUPERUSER = ADMINUSER THEN
 
         SET USHOID= (
            SELECT ID
@@ -85,13 +85,13 @@ CREATE PROCEDURE `securich`.`set_password`( usernamein VARCHAR(50), hostnamein V
            FROM sec_us_ho_profile
            WHERE US_HO_ID = USHOID );
 
-        IF (SELECT PASSWORD(oldpasswordin)) <> PASSW0 AND SUPERUSER <> 'root' THEN
+        IF (SELECT PASSWORD(oldpasswordin)) <> PASSW0 AND ( SUPERUSER <> 'root' OR SUPERUSER <> ADMINUSER ) THEN
 
            SET message = "Invalid original password, please check your own password and try again!";
 
            SELECT SLEEP(5); /* If the password is not guessed this sleep takes place. It is there to hinder a brute force attack!*/
 
-        ELSEIF SUPERUSER <> 'root' THEN
+        ELSEIF ( SUPERUSER <> 'root' AND SUPERUSER <> ADMINUSER ) THEN
                 
            -- check the password length  
            IF ((SELECT LENGTH(newpasswordin)) < PASSWORDLENGTH) AND ((SELECT VALUE FROM sec_config WHERE PROPERTY='password_length_check') = '1') THEN
