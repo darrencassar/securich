@@ -55,12 +55,12 @@ CREATE PROCEDURE `securich`.`rename_user`( usernamein varchar(16), newusernamein
 
       DECLARE CONTINUE HANDLER FOR not found SET done = 1;
 
-      DECLARE EXIT HANDLER FOR SQLEXCEPTION
+/*      DECLARE EXIT HANDLER FOR SQLEXCEPTION
       BEGIN
          ROLLBACK;
          SELECT 'Error occurred - terminating - USER CREATION AND / OR PRIVILEGES GRANT FAILED';
       END; 
-
+*/
       FLUSH PRIVILEGES;
                       /* Security feature does not permit an empty user / root user being granted through this package! */
 
