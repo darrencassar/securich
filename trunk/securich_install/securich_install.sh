@@ -71,6 +71,8 @@ if [ -z "$1" ]
 fi
 
 clear
+bold=`tput bold`
+normal=`tput sgr0`
 
 if [ "$ARGUMENT" != "silent" ]
 then
@@ -87,6 +89,11 @@ then
   echo " brought to you by Darren Cassar "
   echo " http://www.mysqlpreacher.com "
   echo ""
+  echo ""
+  echo "${bold}Have you taken a backup of your mysql database yet? PLEASE DO!!${normal}"
+  echo ""
+  echo "${bold}A backup will be automatically created in the securich folder${normal}"
+  echo "${bold}but it is safer to just take a backup of your own just in case ${normal}"
   echo ""
   echo "Anytime you need to cancel installation just press ( Ctrl + C )"
   echo ""
@@ -243,12 +250,16 @@ fi
    mkdir securich
  fi
 
+ cp securich.$VN.tar.gz securich.$VN.tar.gz_tmp
+
  mv -f securich.$VN.tar.gz securich
   if [ $? != 0 ]
    then
     echo "Problem encountered ... exiting"
     exit 1
   fi
+
+ cp securich.$VN.tar.gz_tmp securich.$VN.tar.gz
 
  cd securich
 
