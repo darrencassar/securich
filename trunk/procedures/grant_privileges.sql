@@ -182,10 +182,10 @@ CREATE  PROCEDURE `securich`.`grant_privileges`( usernamein VARCHAR(16), hostnam
 	             ) dbids
 	          WHERE dbids.ID = sec_db_tb.DB_ID AND
 	          sec_tables.id = sec_db_tb.TB_ID AND
-	          TABLENAME REGEXP tbnamein;
+	          TABLENAME REGEXP binary(tbnamein);
 
       DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
-
+/*
       DECLARE EXIT HANDLER FOR SQLEXCEPTION
       BEGIN
          ROLLBACK;
@@ -194,7 +194,7 @@ CREATE  PROCEDURE `securich`.`grant_privileges`( usernamein VARCHAR(16), hostnam
 
          SELECT 'Error occurred - terminating - USER CREATION AND / OR PRIVILEGES GRANT FAILED' as ERROR;
       END;
-
+*/
       FLUSH PRIVILEGES;
       CALL update_databases_tables_storedprocedures_list();
 
@@ -263,7 +263,7 @@ CREATE  PROCEDURE `securich`.`grant_privileges`( usernamein VARCHAR(16), hostnam
 
                       /* provide some error handling and graceful output if there is a problem */
 
-         IF roleexists = 0 OR ( databaseexists = 0 AND tabletype = 'singletable' )THEN
+         IF roleexists = 0 OR ( databaseexists = 0 AND (tabletype = 'singletable' or tabletype = 'regexp' ) )THEN
 
 	          IF roleexists = 0 THEN
                SELECT "Role specified does not exist, please check role list and retry";
@@ -700,14 +700,15 @@ CREATE  PROCEDURE `securich`.`grant_privileges`( usernamein VARCHAR(16), hostnam
 
                    END IF;
                ELSEIF tabletype = 'regexp' THEN
-
+                      
                       /* granting privileges to a set of tables who'se name has something in common */
 
                OPEN cur_tables_regexp;
                REPEAT
+
                      FETCH cur_tables_regexp INTO tbname;
 
-                     SET tbidvalue = (SELECT ID FROM sec_tables WHERE TABLENAME=tbname);
+                     SET tbidvalue = (SELECT ID FROM sec_tables WHERE TABLENAME= binary(tbname));
 
                       /* used to create a combination of the objects in sec_us_ho_db_tb if there exists none */
 
