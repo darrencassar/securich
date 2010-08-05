@@ -467,6 +467,16 @@ fi
              exit 1
            }
           fi
+          
+          if [ $INSTUSER = 'root' ]; then
+           {
+              mysql -u $INSTUSER --password=$PASS -h $HOST -P $PORT  --execute="delete from securich.sec_reserved_usernames where id=2"
+           }
+          else
+           {
+              mysql -u $INSTUSER --password=$PASS -h $HOST -P $PORT  --execute="update securich.sec_reserved_usernames set USERNAME='$INSTUSER' where id=1"
+           }
+          fi
 
 ## Import all stored procedures into the database
 
@@ -521,7 +531,7 @@ fi
             mv /tmp/securich_reconciliation.sql $BASEDIR/logs/
           else
             mysql -u $INSTUSER --password=$PASS -h $HOST -P $PORT securich --execute="call reconciliation('sync')"
-            mysql -u $INSTUSER --password=$PASS -h $HOST -P $PORT securich --execute="delete from mysql.user where User != 'root' and User != 'msandbox' and User != ''"
+            mysql -u $INSTUSER --password=$PASS -h $HOST -P $PORT securich --execute="delete from mysql.user where User not in (select USERNAME from securich.sec_reserved_usernames)"
           fi
 
 ## If connection is handled through socket file, do the same as above but using socket
@@ -602,6 +612,16 @@ fi
            }
           fi
 
+          if [ $INSTUSER = 'root' ]; then
+           {
+              mysql -u $INSTUSER --password=$PASS --socket=$SOCK --execute="delete from securich.sec_reserved_usernames where id=2"
+           }
+          else
+           {
+              mysql -u $INSTUSER --password=$PASS --socket=$SOCK --execute="update securich.sec_reserved_usernames set USERNAME='$INSTUSER' where id=1"
+           }
+          fi
+
           for proc in `ls procedures/`
            do
             mysql -u $INSTUSER --password=$PASS --socket=$SOCK securich < procedures/$proc
@@ -651,7 +671,7 @@ fi
             mv /tmp/securich_reconciliation.sql $BASEDIR/logs/
           else
             mysql -u $INSTUSER --password=$PASS -h $HOST -P $PORT securich --execute="call reconciliation('sync')"
-            mysql -u $INSTUSER --password=$PASS -h $HOST -P $PORT securich --execute="delete from mysql.user where User != 'root' and User != 'msandbox' and User != ''"
+            mysql -u $INSTUSER --password=$PASS -h $HOST -P $PORT securich --execute="delete from mysql.user where User not in (select USERNAME from securich.sec_reserved_usernames)"
           fi
           
      else
