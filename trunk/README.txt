@@ -1,6 +1,6 @@
 INSTALLATION
 
-   Drop all users apart from root@localhost and (msandbox@localhost if you are using MySQL sandbox).
+   Drop all users apart from root and the installation user.
    Install using ./securich_install.sh
 
 WEB
@@ -114,7 +114,7 @@ Granting privileges on a table which does not exist yet will automatically grant
 -- This script is to be executed by any user (if grant has been permitted by the dba to run it) thus letting any user know what privileges he / she has. It is not totally recommended but might be helpful in development, qa and uat environments. The user can either type in a dbname he likes or '*' to get a full detailed list of privileges he/she got on individual tables, stored procedures / databases.
 
 16) reconciliation('value'); (version 0.1.1)
--- This list ignores root privileges as well as the privilege 'usage'. It caters both for database privileges as well as for global privileges and supplies the difference between the the securich package privileges and those actually in the mysql system. Using parameter 'list' provides the differences explaining where a particular grant is found thus implying where it is not found (MySQL meaning it is found in MySQL database and not in securich database and vice versa). The parameter 'sync' can be used to re-synchronize the two systems thus obtaining a consistent state.
+-- This list ignores reserved_usernames privileges as well as the privilege 'usage'. It caters both for database privileges as well as for global privileges and supplies the difference between the the securich package privileges and those actually in the mysql system. Using parameter 'list' provides the differences explaining where a particular grant is found thus implying where it is not found (MySQL meaning it is found in MySQL database and not in securich database and vice versa). The parameter 'sync' can be used to re-synchronize the two systems thus obtaining a consistent state.
 
 17) remove_reserved_username('usernamein'); (version 0.1.4)
 -- Does the opposite of add_reserved_username, removes a username from the reserved list
@@ -169,7 +169,7 @@ In order for a user to change one's old password, the user needs to supply the o
 -- Rename username@hostname to newusername@newhostname. It takes care of all the necessary changes and makes sure the old username@hostname grants are revoked completely.
 
 
-Note that the `mysql` database is a VERY SENSITIVE database and no one should have direct privileges to that database apart from root and other sensitive accounts (preferibly kept to a minimum)
+Note that the `mysql` database is a VERY SENSITIVE database and no one should have direct privileges to that database apart from root and any user used to install securich and other sensitive accounts (preferibly kept to a minimum)
 Having said that the followign command permits granting any kind of privilege on the mysql database as part of a new stand towards making securich more flexible:
 update sec_configuration set conf_value='lenient' where conf_param='mode';
 
