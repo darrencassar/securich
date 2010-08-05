@@ -65,9 +65,7 @@ INSERT INTO `sec_roles` VALUES
 
 INSERT INTO `sec_reserved_usernames` VALUES
 (1,'root'),
-(2,''),
-(3,'msandbox'),
-(4,'rep_user');
+(2,'root');
 
 INSERT INTO `sec_ro_pr` VALUES
 (1,1,1),
