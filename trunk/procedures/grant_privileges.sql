@@ -45,6 +45,7 @@ CREATE  PROCEDURE `securich`.`grant_privileges`( usernamein VARCHAR(16), hostnam
   BEGIN
 
       DECLARE userexists INT;
+      DECLARE userexistsonmysql INT;
       DECLARE roleexists INT;
       DECLARE hostexists INT;
       DECLARE databaseexists INT;
@@ -215,11 +216,11 @@ CREATE  PROCEDURE `securich`.`grant_privileges`( usernamein VARCHAR(16), hostnam
 
       IF reservedusername > 0 /*usernamein = 'root' or usernamein = 'msandbox' or usernamein = '' or any other reserved usernames */ THEN
 
-         SELECT "Illegal username entry" as ERROR;
+         SELECT "Illegal username entry: Username used is a reserved username in securich" as ERROR;
          
       ELSEIF dbnamein = 'mysql' and modeofoperation='strict' THEN
 
-         SELECT "Illegal database name entry" as ERROR;
+         SELECT "Illegal database name entry: `mysql` db can not be used when securich is running in 'strict' mode" as ERROR;
       
       ELSEIF tabletype != 'all' and tabletype != 'alltables' and tabletype != 'singletable' and tabletype != 'regexp' and tabletype != 'storedprocedure' then
       
@@ -355,6 +356,18 @@ CREATE  PROCEDURE `securich`.`grant_privileges`( usernamein VARCHAR(16), hostnam
                       /* if the user doesn't exist, then create it and provide a random 15character password (never create a user without a password) */
 
                IF ushoidcount < 1 THEN
+
+                  SET userexistsonmysql=(select count(*) from  information_schema.USER_PRIVILEGES where grantee=concat("'",usernamein,"'@'",hostnamein,"'"));
+
+                  IF userexistsonmysql = 1 THEN
+                  
+                     SET @d = CONCAT('drop user "' , usernamein , '"@"' , hostnamein , '"');
+
+                     PREPARE dropcom FROM @d;
+                     EXECUTE dropcom;
+
+                  END IF;
+
 
                   SET @c = CONCAT('create user "' , usernamein , '"@"' , hostnamein , '" identified by "' , randompassword , '"');
 
