@@ -31,6 +31,7 @@ CREATE PROCEDURE `securich`.`clone_user`( usernamein varchar(16), hostnamein var
   BEGIN
 
       DECLARE userexists int;
+      DECLARE userexistsonmysql int;
       DECLARE hostexists int;
       DECLARE newuserexists int;
       DECLARE newhostexists int;
@@ -123,7 +124,7 @@ CREATE PROCEDURE `securich`.`clone_user`( usernamein varchar(16), hostnamein var
 
             IF (select count(*) from sec_us_ho where US_ID=newusidvalue and HO_ID=newhoidvalue) > 0 THEN
 
-               select "Illegal operation - User you are trying to clone out already exists! issue a `call check_user_entries(USERNAME);` for further details.";
+               select "Illegal operation - User you are trying to clone out already exists! Issue a `call check_user_entries(USERNAME);` for further details.";
 
             ELSE
 
@@ -135,6 +136,18 @@ CREATE PROCEDURE `securich`.`clone_user`( usernamein varchar(16), hostnamein var
 
 
                SET randompassword = (select substring(md5(rand()) from 1 for randomnumber));
+
+               SET userexistsonmysql=(select count(*) from  information_schema.USER_PRIVILEGES where grantee=concat("'",usernamein,"'@'",hostnamein,"'"));
+
+               IF userexistsonmysql = 1 THEN
+                     
+                   SET @d = CONCAT('drop user "' , usernamein , '"@"' , hostnamein , '"');
+                              
+                   PREPARE dropcom FROM @d;
+                   EXECUTE dropcom;
+                                             
+               END IF;
+
 
                SET @c = CONCAT('create user "' , newusernamein , '"@"' , newhostnamein , '" identified by "' , randompassword , '"');
 
