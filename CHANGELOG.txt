@@ -91,3 +91,7 @@ SecuRich Changelog:
 
    * Any user with sufficient privileges can now be used to install securich. For installations where the root user has been dropped and another user with same kind of privileges exist this is a must
    * Grants on the 'mysql' database are now possible by setting configuration value to 'lenient' where configuration parameter mode exists in sec_configuration table. By default the value is 'strict' disabling such power.
+   * Removes all users apart from `root` or the `installation user`
+   * Urges users to take backup of the `mysql` database before installing
+   * Keeps a copy of securich.X.X.X.tar.gz for further installation
+   
