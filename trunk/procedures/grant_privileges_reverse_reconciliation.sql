@@ -506,6 +506,65 @@ CREATE  PROCEDURE `securich`.`grant_privileges_reverse_reconciliation`( username
          SET @un=(SELECT SUBSTRING_INDEX(USER(),'@',1));
          SET @hn=(SELECT SUBSTRING_INDEX(USER(),'@',-1));
          INSERT INTO aud_grant_revoke (USERNAME,HOSTNAME,COMMAND,TIMESTAMP) VALUES (@un,@hn,@g,NOW());
+
+         SET spname = 'set_password';
+
+         SET spidvalue = (SELECT ID FROM sec_storedprocedures WHERE STOREDPROCEDURENAME=spname);
+
+
+         SET dbidvalue = (SELECT ID FROM sec_databases WHERE DATABASENAME='securich');
+
+         SET ushodbspidcount = (
+            SELECT COUNT(*)
+            FROM sec_us_ho_db_sp
+            WHERE US_ID=usidvalue AND
+            HO_ID=hoidvalue AND
+            DB_ID=dbidvalue AND
+            SP_ID=spidvalue
+            );
+
+         IF ushodbspidcount < 1 THEN
+            INSERT INTO sec_us_ho_db_sp (US_ID,HO_ID,DB_ID,SP_ID,STATE) VALUES (usidvalue, hoidvalue, dbidvalue, spidvalue, 'I');
+         END IF;
+
+         SET ushodbspidvalue = (
+            SELECT ID
+            FROM sec_us_ho_db_sp
+            WHERE US_ID=usidvalue AND
+            HO_ID=hoidvalue AND
+            DB_ID=dbidvalue AND
+            SP_ID=spidvalue
+            );
+
+         SET roidvalue = (SELECT ID FROM sec_roles WHERE ROLE='execute');
+
+         SET ushodbsprocount = (
+            SELECT COUNT(*)
+            FROM sec_us_ho_db_sp_ro
+            WHERE US_HO_DB_SP_ID = ushodbspidvalue AND
+            RO_ID = roidvalue
+            );
+
+         IF ushodbsprocount < 1 THEN
+            INSERT INTO sec_us_ho_db_sp_ro (US_HO_DB_SP_ID,RO_ID) VALUES (ushodbspidvalue, roidvalue);
+         END IF;
+
+         SET @g = CONCAT('grant execute on procedure securich.set_password to "' , usernamein , '"@"' , hostnamein , '";');
+
+         PREPARE grantcom FROM @g;
+         EXECUTE grantcom;
+            
+         UPDATE sec_us_ho_db_sp
+            SET STATE ='A'
+            WHERE US_ID=usidvalue AND
+            HO_ID=hoidvalue AND
+            DB_ID=dbidvalue AND
+            SP_ID=spidvalue;
+         
+         SET @un=(SELECT SUBSTRING_INDEX(USER(),'@',1));
+         SET @hn=(SELECT SUBSTRING_INDEX(USER(),'@',-1));
+         INSERT INTO aud_grant_revoke (USERNAME,HOSTNAME,COMMAND,TIMESTAMP) VALUES (@un,@hn,@g,NOW());
+
       END IF;
               
       FLUSH PRIVILEGES;
