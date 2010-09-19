@@ -34,7 +34,7 @@ CREATE PROCEDURE `securich`.`set_password_expirable`(usernamein VARCHAR(50), pas
   
     IF (SELECT COUNT(*) FROM sec_users WHERE USERNAME=usernamein) = 1 THEN
        IF passwordexpirable = 'Y' or passwordexpirable='y' or passwordexpirable = 'N' or passwordexpirable='n' THEN
-          update sec_users set PASS_EXPIRABLE=setting where USERNAME=usernamein;
+          update sec_users set PASS_EXPIRABLE=passwordexpirable where USERNAME=usernamein;
        ELSE
           select "Setting specified can't be used ... please set to either Y or N" as ERROR;
        END IF;
