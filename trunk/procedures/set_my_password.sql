@@ -36,15 +36,24 @@ SQL SECURITY INVOKER
     DECLARE un varchar(16);
     DECLARE hn varchar(60);
     DECLARE tors int;
+    DECLARE tors_sock INT;
 
     set un=(select (substring_index(current_user(),'@',1)));
     set hn=(select (substring_index(current_user(),'@',-1)));
     
     /*IF it's a tcp session it could still be showing as localhost due to dns but the following resolves the problem*/
-    set tors=(select count(HOST) from information_schema.processlist where ID=(select connection_id()) and HOST like '%:%');
-     
-    IF hn = 'localhost' && tors = '1' THEN
+    SET tors=(select COUNT(HOST) from information_schema.processlist WHERE ID=(SELECT connection_id()) AND HOST LIKE '%:%');
+    SET tors_sock=(SELECT COUNT(HOST) FROM information_schema.processlist WHERE ID=(SELECT CONNECTION_ID()) AND HOST = 'localhost');
+
+    IF hn = 'localhost' && tors_sock = '1' THEN
+    
+       SET @CALL = CONCAT('call set_password ("' , un , '","' , hn , '","' , oldpasswordin , '","' , newpasswordin , '");');
+
+       PREPARE callsetpassword FROM @CALL;
+       EXECUTE callsetpassword;
        
+    ELSEIF hn = 'localhost' && tors = '1' THEN
+        
        set hn='127.0.0.1';
 
        SET @call = CONCAT('call set_password ("' , un , '","' , hn , '","' , oldpasswordin , '","' , newpasswordin , '");');
