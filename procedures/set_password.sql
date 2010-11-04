@@ -109,13 +109,13 @@ CREATE PROCEDURE `securich`.`set_password`( usernamein VARCHAR(50), hostnamein V
            END IF;
            
            -- check for a lower case character  
-           IF (newpasswordin NOT RLIKE '[[:lower:]]') AND ((SELECT VALUE FROM sec_config WHERE PROPERTY='password_lowercase_check') = '1') THEN
+           IF (newpasswordin NOT RLIKE '[[:lower:]]' collate latin1_general_cs) AND ((SELECT VALUE FROM sec_config WHERE PROPERTY='password_lowercase_check') = '1') THEN
               SET message = CONCAT_WS(',',message,
                                     ' Password should contain lower case character');
            END IF;
            
            -- check for an upper case character  
-           IF (newpasswordin NOT RLIKE '[[:upper:]]') AND ((SELECT VALUE FROM sec_config WHERE PROPERTY='password_uppercase_check') = '1') THEN
+           IF (newpasswordin NOT RLIKE '[[:upper:]]' collate latin1_general_cs) AND ((SELECT VALUE FROM sec_config WHERE PROPERTY='password_uppercase_check') = '1') THEN
               SET message = CONCAT_WS(',',message,
                                      ' Password should contain upper case character');
            END IF;
