@@ -153,7 +153,7 @@ CREATE PROCEDURE `securich`.`reconciliation`(command varchar(50))
               PRIMARY KEY (`ID`)
             ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
 
-				 insert into sec_tmp_reserved_usernames select ID,USERNAME from sec_reserved_usernames;
+	     insert into sec_tmp_reserved_usernames select ID,USERNAME from sec_reserved_usernames;
 
          /* Remove any records of privileges for reserved usernames inside of the above tables */
 
