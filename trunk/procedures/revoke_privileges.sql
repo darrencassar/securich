@@ -431,10 +431,17 @@ CREATE PROCEDURE `securich`.`revoke_privileges`( usernamein varchar(16), hostnam
 
        END IF;
 
-    SET mybigversion = (SELECT SUBSTRING_INDEX(VERSION(), '.', 1));
-    SET mymidversion = (SELECT SUBSTRING_INDEX(SUBSTRING_INDEX(VERSION(), '.', 2),'.',-1));
-    SET mysmallversion = (SELECT SUBSTRING_INDEX(VERSION(), '.', -1));
-           
+	   SET @mybigversion = (SELECT SUBSTRING_INDEX(@version, '.', 1));
+	   SET @mymidversion = (SELECT SUBSTRING_INDEX(SUBSTRING_INDEX(@version, '.', 2),'.',-1));
+       SET @mysmallversion = (SELECT left(SUBSTRING_INDEX(SUBSTRING_INDEX(@version, '.', 3),'.',-1),3));
+
+  	   IF (@mysmallversion RLIKE '[[:lower:]]') || (@mysmallversion  RLIKE '[[:punct:]]') THEN
+          set @mysmallversion=(select left(@mysmallversion,2));
+          IF (@mysmallversion RLIKE '[[:lower:]]') || (@mysmallversion  RLIKE '[[:punct:]]') THEN
+             set @mysmallversion=(select left(@mysmallversion,1));
+          END IF;
+       END IF;        
+       
        /* If mysql version is 5.1.7 or above then processlist view is available on information_schema */
 
        IF terminateconnections = 'Y' or terminateconnections='y' and ( mybigversion > '4' AND mymidversion > 0 AND mysmallversion > 6  ) or ( mybigversion > '4' AND mymidversion > 1 ) THEN

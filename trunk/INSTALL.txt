@@ -3,7 +3,7 @@
    To install securich, choose one of the following methods:
 
    ===== INSTALL FROM A TARBALL
-      download securich_install.tar from http://www.securich.com/ downloads section
+      download securich_install.tar from http://http://code.google.com/p/securich/downloads/ 
       tar -xf securich_install.tar
       cd securich_install
       chmod +x securich_install.sh
