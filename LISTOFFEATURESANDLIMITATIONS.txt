@@ -12,7 +12,7 @@ List of features:
 10. Can automatically reconcile from mysql to securich.
 11. Password restrictions are fully configurable.
 12. Includes a password dictionary to make sure no common passwords are used.
-13. enables installation by other users not just root
+13. Enables installation by other users not just root
 
 Limitations:
 

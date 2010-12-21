@@ -1,7 +1,7 @@
 #######################################################################################
 ##                                                                                   ##
 ##   This is reverse_reconciliation, used to migrate MySQL user accounts to          ##
-##   Securich.
+##   Securich.                                                                       ##
 ##                                                                                   ##
 ##   This program was written by Darren Cassar 2009.                                 ##
 ##   Feedback and improvements are welcome at:                                       ##

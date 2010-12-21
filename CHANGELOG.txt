@@ -95,3 +95,6 @@ SecuRich Changelog:
    * Urges users to take backup of the `mysql` database before installing
    * Keeps a copy of securich.X.X.X.tar.gz for further installation
    
+2011-02-01: version 0.5.0
+
+   * 

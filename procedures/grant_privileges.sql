@@ -196,6 +196,7 @@ CREATE  PROCEDURE `securich`.`grant_privileges`( usernamein VARCHAR(16), hostnam
          SELECT 'Error occurred - terminating - USER CREATION AND / OR PRIVILEGES GRANT FAILED' as ERROR;
       END;
 */
+
       FLUSH PRIVILEGES;
       CALL update_databases_tables_storedprocedures_list();
 
@@ -462,7 +463,6 @@ CREATE  PROCEDURE `securich`.`grant_privileges`( usernamein VARCHAR(16), hostnam
 
                      END IF;
 
-
                      PREPARE grantcom FROM @g;
                      EXECUTE grantcom;
                      
@@ -583,7 +583,6 @@ CREATE  PROCEDURE `securich`.`grant_privileges`( usernamein VARCHAR(16), hostnam
                         SET @g = CONCAT('grant ', PRIV_OBO_GRANT , ' on *.* to "' , usernamein , '"@"' , hostnamein , '"');
 
                      END IF;
-
 
                      PREPARE grantcom FROM @g;
                      EXECUTE grantcom;
@@ -902,6 +901,7 @@ CREATE  PROCEDURE `securich`.`grant_privileges`( usernamein VARCHAR(16), hostnam
                      ELSE
                         SET @g = CONCAT('select "Privilege ' , PRIV_OBO_GRANT , ' can not be granted to a stored procedure." as ERROR;');
                      END IF;
+
 
                      PREPARE grantcom FROM @g;
                      EXECUTE grantcom;

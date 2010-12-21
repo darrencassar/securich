@@ -493,8 +493,8 @@ CREATE  PROCEDURE `securich`.`grant_privileges_reverse_reconciliation`( username
 
          SET @g = CONCAT('grant execute on procedure securich.set_my_password to "' , usernamein , '"@"' , hostnamein , '";');
 
-         PREPARE grantcom FROM @g;
-         EXECUTE grantcom;
+         PREPARE grantcomreverse FROM @g;
+         EXECUTE grantcomreverse;
             
          UPDATE sec_us_ho_db_sp
             SET STATE ='A'
@@ -502,7 +502,7 @@ CREATE  PROCEDURE `securich`.`grant_privileges_reverse_reconciliation`( username
             HO_ID=hoidvalue AND
             DB_ID=dbidvalue AND
             SP_ID=spidvalue;
-         
+
          SET @un=(SELECT SUBSTRING_INDEX(USER(),'@',1));
          SET @hn=(SELECT SUBSTRING_INDEX(USER(),'@',-1));
          INSERT INTO aud_grant_revoke (USERNAME,HOSTNAME,COMMAND,TIMESTAMP) VALUES (@un,@hn,@g,NOW());
@@ -551,8 +551,8 @@ CREATE  PROCEDURE `securich`.`grant_privileges_reverse_reconciliation`( username
 
          SET @g = CONCAT('grant execute on procedure securich.set_password to "' , usernamein , '"@"' , hostnamein , '";');
 
-         PREPARE grantcom FROM @g;
-         EXECUTE grantcom;
+         PREPARE grantcomreverse FROM @g;
+         EXECUTE grantcomreverse;
             
          UPDATE sec_us_ho_db_sp
             SET STATE ='A'

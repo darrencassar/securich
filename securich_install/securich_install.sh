@@ -16,8 +16,8 @@ terminate () {
 
    if [ "$CH" == "" ] || [ "$CH" == "1"  ]
     then
-     mysql -u root --password=$PASS -h $HOST -P $PORT --execute="drop database if exists securich"
-     mysql -u root --password=$PASS -h $HOST -P $PORT --execute="create database securich"
+     mysql --user=$SUPERUSER --password=$PASS -h $HOST -P $PORT --execute="drop database if exists securich"
+     mysql --user=$SUPERUSER --password=$PASS -h $HOST -P $PORT --execute="create database securich"
 
 ## If the choice was to update, then a rollback involves reloading old securich database
 
@@ -26,7 +26,7 @@ terminate () {
 
 ## load backup
 
-         mysql -u root --password=$PASS -h $HOST -P $PORT securich < backup/securich_`/bin/date +%Y%m%d`.sql
+         mysql --user=$SUPERUSER --password=$PASS -h $HOST -P $PORT securich < backup/securich_`/bin/date +%Y%m%d`.sql
          if [ $? != 0 ]
           then
 
@@ -43,13 +43,13 @@ terminate () {
 
    elif [ "$CH" == "2" ]
     then
-     mysql -u root --password=$PASS --socket=$SOCK --execute="drop database if exists securich"
-     mysql -u root --password=$PASS --socket=$SOCK --execute="create database securich"
+     mysql --user=$SUPERUSER --password=$PASS --socket=$SOCK --execute="drop database if exists securich"
+     mysql --user=$SUPERUSER --password=$PASS --socket=$SOCK --execute="create database securich"
 
        if [ "$FOU" == "2" ]
        then
          ##load backup
-         mysql -u root --password=$PASS --socket=$SOCK securich < backup/securich_`/bin/date +%Y%m%d`.sql
+         mysql --user=$SUPERUSER --password=$PASS --socket=$SOCK securich < backup/securich_`/bin/date +%Y%m%d`.sql
          if [ $? != 0 ]
           then
            echo "***** MAJOR PROBLEM - Rollback not possible. Backup file is in backup folder, please import manually."
@@ -246,7 +246,7 @@ fi
    mkdir securich
  fi
 
- mv -f securich.$VN.tar.gz securich
+ cp -f securich.$VN.tar.gz securich
   if [ $? != 0 ]
    then
     echo "Problem encountered ... exiting"
@@ -295,55 +295,20 @@ fi
       fi
  done
  
- if [ "$FOU" == 1 ]
- then
-    ## Import current MySQL grants
-    
-    echo ""
-    echo "Would you like to import current MySQL grants to Securich:"
-    echo "1. Import"
-    echo "2. No start from scratch (This will clear out any non reserved usernames (not 'root','msandbox' etc) grants so please be sure of your answer)"
-    echo -n "Enter choice (default 1): "
-    read -e IM                                                           ## IM = Import choice
-    
-    if [ "$IM" == "" ]
-     then
-      IM=1
-    fi
-    
-    while [ "$IM" -lt "1" ] && [ "$IM" -gt "2" ]
-    do
-       echo -n "Wrong value, please re-enter choice (default 1 i.e. Import grants from MySQL to Securich): "
-        read -e IM
-         if [ "$IM" == "" ]
-          then
-           IM=1
-         fi
-    done
+
+ echo ""
+ echo -n "Enter mysql installation user username (default 'root'): "
+ read -e SUPERUSER
+
+ if [ "$SUPERUSER" == "" ]
+   then
+   SUPERUSER=root
  fi
- 
- if [ "$IM" == "1" ]
- then
-    echo ""
-    echo "You can supply a list of reserved usernames in a file. Would you like to?"
-    echo -n "Enter full path to file including name (default no file): "
-    read -e FPN                                                           ## FPN = File Path Name
-    
-    if [ "$FPN" != "" ]
-     then
-        while [ ! -f $FPN ] && [ "$FPN" != "" ]
-        do
-           echo -n "File does not exist, please retype path and filename (example: /tmp/name.txt): "
-           read -e FPN
-       done
-    fi
- fi
- 
  
 ## Enter password (masked for security)
 
  echo ""
- echo -n "Enter mysql root Password (default ''): "
+ echo -n "Enter mysql $SUPERUSER Password (default ''): "
 
  stty_orig=`stty -g`
  trap "echo ''; echo 'Installation aborted during password entry'; stty $stty_orig ; exit" 1 2 15
@@ -375,63 +340,56 @@ fi
         CH=1
       fi
  done
+ 
+ if [ "$CH" == "" ] || [ "$CH" == "1"  ]
+ then
+    echo -n "Enter mysql Hostname/IP (default '127.0.0.1'): "
+    read -e HOST
+    if [ "$HOST" == "" ]
+    then
+       HOST=127.0.0.1
+    fi
+    echo -n "Enter mysql Port (default '3306'): "
+    read -e PORT
+    if [ "$PORT" == "" ]
+    then
+       PORT=3306
+    fi
     
+    COMM_MEANS=`echo "--host=$HOST --port=$PORT "`
+    
+ elif [ "$CH" == "2" ]
+ then
+    SOCK=inexisting_file
+    while [ ! -e $SOCK ]
+    do
+       echo ""
+       echo -n "Enter mysql socket (default '/tmp/mysql.sock'): "
+       read -e SOCK
+       if [ "$SOCK" == "" ]
+       then
+          SOCK=/tmp/mysql.sock       
+       fi
+    
+    COMM_MEANS=`echo " --socket=$SOCK "`
+
+    done
+ fi       
+            
  if [ "$FOU" == 1 ]
  then
-    if [ "$CH" == "" ] || [ "$CH" == "1"  ]
-    then
-       echo -n "Enter mysql Hostname/IP (default '127.0.0.1'): "
-       read -e HOST
-         if [ "$HOST" == "" ]
-          then
-           HOST=127.0.0.1
-         fi
-       echo -n "Enter mysql Port (default '3306'): "
-       read -e PORT
-        if [ "$PORT" == "" ]
-         then
-          PORT=3306
-        fi
-
-## Check for mysql version
-
-      mybigversion=`mysql -u root --password=$PASS -B -s -h $HOST -P $PORT --execute="SELECT SUBSTRING_INDEX(VERSION(), '.', 1)"`
-      mymidversion=`mysql -u root --password=$PASS -B -s -h $HOST -P $PORT --execute="SELECT SUBSTRING_INDEX(SUBSTRING_INDEX(VERSION(), '.', 2),'.',-1)"`
-      mysmallversion=`mysql -u root --password=$PASS -B -s -h $HOST -P $PORT --execute="SELECT SUBSTRING_INDEX(VERSION(), '.', -1)"`
-      innodbyes=`mysql -u root --password=$PASS -s -B -h $HOST -P $PORT --execute="show engines" | cut -f 1,2 | grep InnoDB | cut -f 2`
-
-    
-      if [ $mybigversion -gt 4 ] && [ $mymidversion -gt 0 ] && [ $mysmallversion -gt 6 ]; then
-      {
-         rm procedures/block_user_5.0.sql
-         rm procedures/drop_user_5.0.sql
-         rm procedures/revoke_privileges_5.0.sql
-      }
-      elif [ $mybigversion -gt 4 ] && [ $mymidversion -gt 1 ]; then
-      {
-         rm procedures/block_user_5.0.sql
-         rm procedures/drop_user_5.0.sql
-         rm procedures/revoke_privileges_5.0.sql
-      }
-      else
-      {
-         rm procedures/block_user.sql
-         rm procedures/drop_user.sql
-         rm procedures/revoke_privileges.sql
-      }
-      fi
 
 ## Import securich db into the instance
 
-          mysql -u root --password=$PASS -h $HOST -P $PORT --execute="drop database if exists securich"
+          mysql --user=$SUPERUSER --password=$PASS $COMM_MEANS --execute="drop database if exists securich"
 
           if [ "$innodbyes" = 'YES' ]; then
           {
-             mysql -u root --password=$PASS -h $HOST -P $PORT  < db/securich.sql
+             mysql --user=$SUPERUSER --password=$PASS $COMM_MEANS < db/securich.sql
           }
           else
           {
-             mysql -u root --password=$PASS -h $HOST -P $PORT  < db/securich_noinnodb.sql
+             mysql --user=$SUPERUSER --password=$PASS $COMM_MEANS < db/securich_noinnodb.sql
           }
           fi
           
@@ -444,7 +402,7 @@ fi
 
 ## Import first stored procedure (used during installation)
 
-          mysql -u root --password=$PASS -h $HOST -P $PORT securich < procedures/update_databases_tables_storedprocedures_list.sql
+          mysql --user=$SUPERUSER --password=$PASS $COMM_MEANS securich < procedures/update_databases_tables_storedprocedures_list.sql
           if [ $? != 0 ]; then
            {
              echo "Problems importing procedure update_databses_tables_storedprocedures_list"
@@ -454,7 +412,7 @@ fi
 
 ## Create first sets of data in tables (2 simple roles, list of privileges etc)
 
-          mysql -u root --password=$PASS -h $HOST -P $PORT securich < db/data.sql
+          mysql --user=$SUPERUSER --password=$PASS $COMM_MEANS securich < db/data.sql
           if [ $? != 0 ]; then
            {
              echo "Problems importing data into securich db"
@@ -466,7 +424,7 @@ fi
 
           for proc in `ls procedures/`
            do
-            mysql -u root --password=$PASS -h $HOST -P $PORT securich < procedures/$proc
+            mysql --user=$SUPERUSER --password=$PASS $COMM_MEANS securich < procedures/$proc
             if [ $? != 0 ]; then
              {
                echo "Problem importing procedure $proc into securich db"
@@ -475,175 +433,11 @@ fi
             fi
           done
 
-          mysql -u root --password=$PASS -h $HOST -P $PORT  --execute="insert into securich.sec_version (VERSION,UPDATED_TIMESTAMP) values ('$VN',now())"
+          mysql --user=$SUPERUSER --password=$PASS $COMM_MEANS --execute="insert into securich.sec_version (VERSION,UPDATED_TIMESTAMP) values ('$VN',now())"
 
-## If import grants is chosen, reverse reconciliation to populate securich database
+## Run reconciliation to populate securich database
 
-          if [ "$IM" == 1 ]
-          then
-          
-            ## Import current MySQL grants
-
-            if [ -f /tmp/securich_reconciliation.sql ]
-            then
-               rm /tmp/securich_reconciliation.sql
-            fi
-               
-            exec<$FPN
-            while read line
-            do
-               space="${line//[^ ]/}"
-               if [[ ${#line} -lt "17" && ${#space} -eq "0" ]] #if length is less than 17 characters and contain no spaces
-               then
-                  mysql -u root --password=$PASS -h $HOST -P $PORT securich --execute="call add_reserved_username('$line');"
-               fi
-            done            
-            
-            mysql -u root --password=$PASS -h $HOST -P $PORT securich --execute="call reverse_reconciliation()"
-            cat /tmp/securich_reconciliation.sql
-            if [ $? != 0 ]; then
-             {
-               echo "Problem populating Securich with MySQL grants"
-               exit 1
-             }
-            fi
-            
-            mysql -u root --password=$PASS -h $HOST -P $PORT securich < /tmp/securich_reconciliation.sql
-            mv /tmp/securich_reconciliation.sql $BASEDIR/logs/
-          else
-            mysql -u root --password=$PASS -h $HOST -P $PORT securich --execute="call reconciliation('sync')"
-            mysql -u root --password=$PASS -h $HOST -P $PORT securich --execute="delete from mysql.user where User != 'root' and User != 'msandbox' and User != ''"
-          fi
-
-## If connection is handled through socket file, do the same as above but using socket
-
-     elif [ "$CH" == "2" ]
-      then
-       echo ""
-       echo -n "Enter mysql socket (default '/tmp/mysql.sock'): "
-       read -e SOCK
-        if [ "$SOCK" == "" ]
-         then
-          SOCK=/tmp/mysql.sock
-        fi
-
-
-
-## Check for mysql version
-
-      mybigversion=`mysql -u root --password=$PASS -B -s --socket=$SOCK --execute="SELECT SUBSTRING_INDEX(VERSION(), '.', 1)"`
-      mymidversion=`mysql -u root --password=$PASS -B -s --socket=$SOCK --execute="SELECT SUBSTRING_INDEX(SUBSTRING_INDEX(VERSION(), '.', 2),'.',-1)"`
-      mysmallversion=`mysql -u root --password=$PASS -B -s --socket=$SOCK --execute="SELECT SUBSTRING_INDEX(VERSION(), '.', -1)"`
-      innodbyes=`mysql -u root --password=$PASS -s -B --socket=$SOCK --execute="show engines" | cut -f 1,2 | grep InnoDB | cut -f 2`
-   
-    
-      if [ $mybigversion -gt 4 ] && [ $mymidversion -gt 0 ] && [ $mysmallversion -gt 6 ]; then
-      {
-         rm procedures/block_user_5.0.sql
-         rm procedures/drop_user_5.0.sql
-         rm procedures/revoke_privileges_5.0.sql
-      }
-      elif [ $mybigversion -gt 4 ] && [ $mymidversion -gt 1 ]; then
-      {
-         rm procedures/block_user_5.0.sql
-         rm procedures/drop_user_5.0.sql
-         rm procedures/revoke_privileges_5.0.sql
-      }
-      else
-      {
-         rm procedures/block_user.sql
-         rm procedures/drop_user.sql
-         rm procedures/revoke_privileges.sql
-      }
-      fi
-
-          mysql -u root --password=$PASS --socket=$SOCK --execute="drop database if exists securich"
-
-          if [ "$innodbyes" = 'YES' ]; then
-          {
-             mysql -u root --password=$PASS --socket=$SOCK < db/securich.sql
-          }
-          else
-          {
-             mysql -u root --password=$PASS --socket=$SOCK < db/securich_noinnodb.sql
-          }
-          fi
-
-          if [ $? != 0 ]; then
-           {
-             echo "Problem creating securich db"
-             exit 1
-           }
-          fi
-
-          mysql -u root --password=$PASS --socket=$SOCK securich < procedures/update_databases_tables_storedprocedures_list.sql
-
-          if [ $? != 0 ]; then
-           {
-             echo "Problems importing procedure update_databses_tables_storedprocedures_list"
-             exit 1
-           }
-          fi
-
-          mysql -u root --password=$PASS --socket=$SOCK securich < db/data.sql
-          if [ $? != 0 ]; then
-           {
-             echo "Problems importing data into securich db"
-             exit 1
-           }
-          fi
-
-          for proc in `ls procedures/`
-           do
-            mysql -u root --password=$PASS --socket=$SOCK securich < procedures/$proc
-            if [ $? != 0 ]; then
-             {
-               echo "Problem importing procedure $proc into securich db"
-               exit 1
-             }
-            fi
-          done
-
-          mysql -u root --password=$PASS --socket=$SOCK  --execute="insert into securich.sec_version (VERSION,UPDATED_TIMESTAMP) values ('$VN',now())"
-
-## If import grants is chosen, reverse reconciliation to populate securich database
-
-          if [ "$IM" == 1 ]
-          then
-            
-            if [ -f /tmp/securich_reconciliation.sql ]
-            then
-               rm /tmp/securich_reconciliation.sql
-            fi
-
-            exec<$FPN
-            while read line
-            do
-               space="${line//[^ ]/}"
-               if [[ ${#line} -lt "17" && ${#space} -eq "0" ]] #if length is less than 17 characters and contain no spaces
-               then
-                  mysql -u root --password=$PASS --socket=$SOCK securich --execute="call add_reserved_username('$line');"
-               fi
-            done 
-            
-            mysql -u root --password=$PASS --socket=$SOCK securich --execute="call reverse_reconciliation()"
-            if [ $? != 0 ]; then
-             {
-               echo "Problem populating Securich with MySQL grants"
-               exit 1
-             }
-            fi
-            
-            mysql -u root --password=$PASS --socket=$SOCK securich < /tmp/securich_reconciliation.sql
-            mv /tmp/securich_reconciliation.sql $BASEDIR/logs/
-          else
-            mysql -u root --password=$PASS -h $HOST -P $PORT securich --execute="call reconciliation('sync')"
-            mysql -u root --password=$PASS -h $HOST -P $PORT securich --execute="delete from mysql.user where User != 'root' and User != 'msandbox' and User != ''"
-          fi
-          
-     else
-      echo "Wrong value selected, please enter 1 or 2."
-    fi
+          mysql --user=$SUPERUSER --password=$PASS $COMM_MEANS securich --execute="call reconciliation('sync')"
 
 ## If upgrading, run upgrade scripts
 
@@ -660,26 +454,9 @@ fi
 
    UST=0                                                              ## UST = Upgrade STarted
 
-   if [ "$CH" == "" ] || [ "$CH" == "1"  ]
-    then
-       echo ""
-       echo -n "Enter mysql Hostname/IP (default '127.0.0.1'): "
-       read -e HOST
-         if [ "$HOST" == "" ]
-          then
-           HOST=127.0.0.1
-         fi
-       echo ""
-       echo -n "Enter mysql Port (default '3306'): "
-       read -e PORT
-        if [ "$PORT" == "" ]
-         then
-          PORT=3306
-        fi
-
 ## CURV = Current Version
 
-          CURV=`mysql -u root --password=$PASS -h $HOST -P $PORT securich --execute="select VERSION from sec_version order by ID desc limit 1" | tail -1`
+          CURV=`mysql --user=$SUPERUSER --password=$PASS $COMM_MEANS securich --execute="select VERSION from sec_version order by ID desc limit 1" | tail -1`
             if [ $? != 0 ]; then
              {
                CURV=0.1.1
@@ -696,7 +473,7 @@ fi
 
 ## Backup securich db in case we need to rollback
 
-          mysqldump -q --add-drop-table --single-transaction --no-autocommit -u root --password=$PASS -h $HOST -P $PORT securich > backup/securich_`/bin/date +%Y%m%d`.sql
+          mysqldump -q --add-drop-table --single-transaction --no-autocommit --user=$SUPERUSER --password=$PASS $COMM_MEANS securich > backup/securich_`/bin/date +%Y%m%d`.sql
 
           echo ""
           echo "MySQL Security database backup taken"
@@ -709,7 +486,7 @@ fi
 
           for VERSION in `sed -n "/$CURV/,/$LV/p" $BASEDIR/version | grep -v $CURV`
           do
-            mysql -u root --password=$PASS -h $HOST -P $PORT securich < upgrades/$VERSION/upgrade.sql
+            mysql --user=$SUPERUSER --password=$PASS $COMM_MEANS securich < upgrades/$VERSION/upgrade.sql
             if [ $? != 0 ]; then
              {
                echo "Problem updating securich db"
@@ -718,46 +495,17 @@ fi
             fi
           done
 
-          mysql -u root --password=$PASS -h $HOST -P $PORT securich < procedures/update_databases_tables_storedprocedures_list.sql
+          mysql --user=$SUPERUSER --password=$PASS $COMM_MEANS securich < procedures/update_databases_tables_storedprocedures_list.sql
           if [ $? != 0 ]; then
            {
              echo "Problems importing procedure update_databses_tables_storedprocedures_list"
              exit 1
            }
           fi
-          
-          ## Check for mysql version
-
-          mybigversion=`mysql -u root --password=$PASS -B -s -h $HOST -P $PORT --execute="SELECT SUBSTRING_INDEX(VERSION(), '.', 1)"`
-          mymidversion=`mysql -u root --password=$PASS -B -s -h $HOST -P $PORT --execute="SELECT SUBSTRING_INDEX(SUBSTRING_INDEX(VERSION(), '.', 2),'.',-1)"`
-          mysmallversion=`mysql -u root --password=$PASS -B -s -h $HOST -P $PORT --execute="SELECT SUBSTRING_INDEX(VERSION(), '.', -1)"`
-          innodbyes=`mysql -u root --password=$PASS -s -B -h $HOST -P $PORT --execute="show engines" | cut -f 1,2 | grep InnoDB | cut -f 2`
-
-    
-          if [ $mybigversion -gt 4 ] && [ $mymidversion -gt 0 ] && [ $mysmallversion -gt 6 ]; then
-          {
-             rm procedures/block_user_5.0.sql
-             rm procedures/drop_user_5.0.sql
-             rm procedures/revoke_privileges_5.0.sql
-          }
-          elif [ $mybigversion -gt 4 ] && [ $mymidversion -gt 1 ]; then
-          {
-             rm procedures/block_user_5.0.sql
-             rm procedures/drop_user_5.0.sql
-             rm procedures/revoke_privileges_5.0.sql
-          }
-          else
-          {
-              rm procedures/block_user.sql
-              rm procedures/drop_user.sql
-              rm procedures/revoke_privileges.sql
-          }
-          fi
-
-
+        
           for proc in `ls procedures/`
            do
-            mysql -u root --password=$PASS -h $HOST -P $PORT securich < procedures/$proc
+            mysql --user=$SUPERUSER --password=$PASS $COMM_MEANS securich < procedures/$proc
             if [ $? != 0 ]; then
              {
                echo "Problem importing procedure $proc into securich db"
@@ -766,112 +514,8 @@ fi
             fi
           done
 
-          mysql -u root --password=$PASS -h $HOST -P $PORT --execute="insert into securich.sec_version (VERSION,UPDATED_TIMESTAMP) values ('$VN',now())"
+          mysql --user=$SUPERUSER --password=$PASS $COMM_MEANS --execute="insert into securich.sec_version (VERSION,UPDATED_TIMESTAMP) values ('$VN',now())"
 
-     elif [ "$CH" == "2" ]
-      then
-       echo -n "Enter mysql socket (default '/tmp/mysql.sock'): "
-       read -e SOCK
-       if [ "$SOCK" == "" ]
-        then
-         SOCK=/tmp/mysql.sock
-       fi
-       
-       while [ ! -e $SOCK ]
-       do
-        echo -n "Socket file does not exist, please re-enter location: "
-        read -e SOCK
-       done
-
-## CURV = CURrent Version
-
-          CURV=`mysql -u root --password=$PASS --socket=$SOCK securich --execute="select VERSION from sec_version order by ID desc limit 1" | tail -1`
-          if [ $? != 0 ]; then
-           {
-             CURV=0.1.1
-           }
-          fi
-
-## If version requested is older than current version then upgrade is not possible
-
-          if [ `sed -n "/$VN/,/$LV/p" $BASEDIR/version | grep -c $CURV` != 0 ]       ## New Or Old
-          then
-            echo "Upgrading a recent version $CURV with the same or older version $VN is not possible"
-            exit 0
-          fi
-
-          mysqldump -q --add-drop-table --single-transaction --no-autocommit -u root --password=$PASS --socket=$SOCK securich > backup/securich_`/bin/date +%Y%m%d`.sql
-
-          echo ""
-          echo "MySQL Security database backup taken"
-          echo ""
-
-## Upgrade version of securich
-
-          UST=1
-
-          for VERSION in `sed -n "/$CURV/,/$LV/p" $BASEDIR/version | grep -v $CURV`
-          do
-            mysql -u root --password=$PASS --socket=$SOCK securich < upgrades/$VERSION/upgrade.sql
-            if [ $? != 0 ]; then
-             {
-               echo "Problem updateing securich db"
-               exit 1
-             }
-            fi
-          done
-
-          mysql -u root --password=$PASS --socket=$SOCK securich < procedures/update_databases_tables_storedprocedures_list.sql
-          if [ $? != 0 ]; then
-           {
-             echo "Problems importing procedure update_databses_tables_storedprocedures_list"
-             exit 1
-           }
-          fi
-
-          ## Check for mysql version
-
-          mybigversion=`mysql -u root --password=$PASS -B -s --socket=$SOCK --execute="SELECT SUBSTRING_INDEX(VERSION(), '.', 1)"`
-          mymidversion=`mysql -u root --password=$PASS -B -s --socket=$SOCK --execute="SELECT SUBSTRING_INDEX(SUBSTRING_INDEX(VERSION(), '.', 2),'.',-1)"`
-          mysmallversion=`mysql -u root --password=$PASS -B -s --socket=$SOCK --execute="SELECT SUBSTRING_INDEX(VERSION(), '.', -1)"`
-   
-    
-          if [ $mybigversion -gt 4 ] && [ $mymidversion -gt 0 ] && [ $mysmallversion -gt 6 ]; then
-          {
-             rm procedures/block_user_5.0.sql
-             rm procedures/drop_user_5.0.sql
-             rm procedures/revoke_privileges_5.0.sql
-          }
-          elif [ $mybigversion -gt 4 ] && [ $mymidversion -gt 1 ]; then
-          {
-             rm procedures/block_user_5.0.sql
-             rm procedures/drop_user_5.0.sql
-             rm procedures/revoke_privileges_5.0.sql
-          }
-          else
-          {
-              rm procedures/block_user.sql
-              rm procedures/drop_user.sql
-              rm procedures/revoke_privileges.sql
-          }
-          fi
-
-          for proc in `ls procedures/`
-           do
-            mysql -u root --password=$PASS --socket=$SOCK securich < procedures/$proc
-            if [ $? != 0 ]; then
-             {
-               echo "Problem importing procedure $proc into securich db"
-               exit 1
-             }
-            fi
-          done
-
-          mysql -u root --password=$PASS --socket=$SOCK  --execute="insert into securich.sec_version (VERSION,UPDATED_TIMESTAMP) values ('$VN',now())"
-
-     else
-      echo "Wrong value selected, please enter 1 or 2."
-    fi
  else
   echo "Wrong value for type of installation selected, please enter 1 or 2."
  fi

@@ -33,14 +33,6 @@ DOCUMENTATION
 THE ONLY TWO STORED PROCEDURES WHICH USERS MIGHT BE ALLOWED TO CALL UPON ARE set_password AND my_privileges.
 ALL OTHER STORED PROCEDURES ARE VERY SENSITIVE AND POTENTIALLY DANGEROUS.
 
-note that stored proc check_roles was renamed to show_roles
-note that stored proc check_role_privileges was renamed to show_privileges_in_roles
-note that stored proc check_user_privileges was renamed to show_user_privileges
-note that stored proc check_privilege_users was renamed to show_users_with_privilege
-note that stored proc check_user_list was renamed to show_user_list
-note that stored proc check_user_entries was renamed to show_user_entries
-note that stored proc check_full_user_entries was renamed to show_full_user_entries
-
 
 The stored procedures currently included are:
 

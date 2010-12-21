@@ -17,6 +17,7 @@ INSERT INTO `sec_config` (`PROPERTY`,`VALUE`) VALUES ('password_number_check','1
 INSERT INTO `sec_config` (`PROPERTY`,`VALUE`) VALUES ('password_special_character_check','1');
 INSERT INTO `sec_config` (`PROPERTY`,`VALUE`) VALUES ('password_username_check','1');
 INSERT INTO `sec_config` (`PROPERTY`,`VALUE`) VALUES ('mode','strict');
+INSERT INTO `sec_config` (`PROPERTY`,`VALUE`) VALUES ('prive_mode','safe');
 INSERT INTO `sec_config` (`PROPERTY`,`VALUE`) VALUES ('admin_user',(select substring_index(user(),'@',1)));
 
 INSERT INTO `sec_databases` (`ID`,`DATABASENAME`) VALUES

@@ -58,24 +58,41 @@ CREATE PROCEDURE `securich`.`reconciliation`(command varchar(50))
 
       DECLARE CONTINUE HANDLER FOR not found SET done = 1;
 
-      /* Exception handler */
+      /* Exception handler 
       DECLARE EXIT HANDLER FOR SQLEXCEPTION
       BEGIN
          ROLLBACK;
-         /* The below if statement blocks an alert if reconciliation is not possible due to no users to reconcile (happens normally at the beginning of an installation) */
          IF (select count(*) from sec_users) > 0 THEN
             SELECT 'Error occurred - terminating - USER CREATION AND / OR PRIVILEGES GRANT FAILED' as ERROR;
          END IF;
-      END;
+      END;*/
+
+	  SET @@session.max_sp_recursion_depth=30; 
 
       CALL update_databases_tables_storedprocedures_list();
 
-      IF command <> 'list' AND command <> 'sync' THEN
+      IF command <> 'list' AND command <> 'sync' AND command <> 'reverse' THEN
 
          select "WRONG PARAMETER PASSED THROUGH RECONCILIATION" as ERROR;
-
-      ELSE
+         
+      ELSEIF command = 'reverse' THEN
+      
          FLUSH PRIVILEGES;
+         call mysql_reconciliation();
+         
+      ELSE
+      
+         FLUSH PRIVILEGES;
+         
+         IF command = 'sync' THEN
+         
+            IF (select `value` from sec_config where property='prive_mode') = 'safe' THEN
+            
+               call mysql_reconciliation();
+        	
+        	END IF;
+
+         END IF;
 
          drop table if exists inf_grantee_privileges;
 
@@ -270,7 +287,7 @@ CREATE PROCEDURE `securich`.`reconciliation`(command varchar(50))
             HAVING COUNT(*) = 1
             ORDER BY GRANTEE;
 
-         ELSEif command = 'sync' THEN
+         ELSEIF command = 'sync' THEN
 
             update sec_grantee_privileges_reconcile
             set TABLE_NAME='*'

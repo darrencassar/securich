@@ -90,9 +90,16 @@ CREATE PROCEDURE `securich`.`drop_user`( usernamein varchar(16), hostnamein varc
         SET @hn=(SELECT SUBSTRING_INDEX(USER(),'@',-1));
         INSERT INTO aud_grant_revoke (USERNAME,HOSTNAME,COMMAND,TIMESTAMP) VALUES (@un,@hn,@g,NOW());
         
-        SET mybigversion = (SELECT SUBSTRING_INDEX(VERSION(), '.', 1));
-        SET mymidversion = (SELECT SUBSTRING_INDEX(SUBSTRING_INDEX(VERSION(), '.', 2),'.',-1));
-        SET mysmallversion = (SELECT SUBSTRING_INDEX(VERSION(), '.', -1));
+	    SET @mybigversion = (SELECT SUBSTRING_INDEX(@version, '.', 1));
+	    SET @mymidversion = (SELECT SUBSTRING_INDEX(SUBSTRING_INDEX(@version, '.', 2),'.',-1));
+        SET @mysmallversion = (SELECT left(SUBSTRING_INDEX(SUBSTRING_INDEX(@version, '.', 3),'.',-1),3));
+
+  	    IF (@mysmallversion RLIKE '[[:lower:]]') || (@mysmallversion  RLIKE '[[:punct:]]') THEN
+           set @mysmallversion=(select left(@mysmallversion,2));
+           IF (@mysmallversion RLIKE '[[:lower:]]') || (@mysmallversion  RLIKE '[[:punct:]]') THEN
+              set @mysmallversion=(select left(@mysmallversion,1));
+           END IF;
+        END IF; 
            
         /* If mysql version is 5.1.7 or above then processlist view is available on information_schema */
 
