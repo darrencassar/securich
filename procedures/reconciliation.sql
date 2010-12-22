@@ -58,7 +58,7 @@ CREATE PROCEDURE `securich`.`reconciliation`(command varchar(50))
 
       DECLARE CONTINUE HANDLER FOR not found SET done = 1;
 
-      /* Exception handler 
+      /* Exception handler
       DECLARE EXIT HANDLER FOR SQLEXCEPTION
       BEGIN
          ROLLBACK;
@@ -67,29 +67,29 @@ CREATE PROCEDURE `securich`.`reconciliation`(command varchar(50))
          END IF;
       END;*/
 
-	  SET @@session.max_sp_recursion_depth=30; 
+	  SET @@session.max_sp_recursion_depth=30;
 
       CALL update_databases_tables_storedprocedures_list();
 
-      IF command <> 'list' AND command <> 'sync' AND command <> 'reverse' THEN
+      IF command <> 'list' AND command <> 'sync' AND command <> 'securichsync' AND command <> 'mysqlsync' THEN
 
          select "WRONG PARAMETER PASSED THROUGH RECONCILIATION" as ERROR;
-         
-      ELSEIF command = 'reverse' THEN
-      
+
+      ELSEIF command = 'mysqlsync' THEN
+
          FLUSH PRIVILEGES;
-         call mysql_reconciliation();
-         
+         call mysql_reconciliation('mysqlsync');
+
       ELSE
-      
+
          FLUSH PRIVILEGES;
-         
+
          IF command = 'sync' THEN
-         
+
             IF (select `value` from sec_config where property='prive_mode') = 'safe' THEN
-            
-               call mysql_reconciliation();
-        	
+
+               call mysql_reconciliation('');
+
         	END IF;
 
          END IF;
@@ -216,7 +216,8 @@ CREATE PROCEDURE `securich`.`reconciliation`(command varchar(50))
                   select ushodbro.US_HO_DB_TB_ID, pr.PRIVILEGE
                   from sec_us_ho_db_tb_ro ushodbro join sec_ro_pr ropr join  sec_privileges pr
                   where ropr.PR_ID=pr.ID and
-                  ropr.RO_ID=ushodbro.RO_ID
+                  ropr.RO_ID=ushodbro.RO_ID and
+                  ushodbro.STATE='A'
                   ) ushodbroids
                where ushodbtb.ID=ushodbroids.US_HO_DB_TB_ID and
                ushodbtb.STATE='A' /* do not take up any records which are revoked or blocked */
@@ -235,7 +236,8 @@ CREATE PROCEDURE `securich`.`reconciliation`(command varchar(50))
                   select ushodbro.US_HO_DB_SP_ID, pr.PRIVILEGE
                   from sec_us_ho_db_sp_ro ushodbro join sec_ro_pr ropr join  sec_privileges pr
                   where ropr.PR_ID=pr.ID and
-                  ropr.RO_ID=ushodbro.RO_ID
+                  ropr.RO_ID=ushodbro.RO_ID and
+                  ushodbro.STATE='A'
                   ) ushodbroids
                where ushodbsp.ID=ushodbroids.US_HO_DB_SP_ID and
                ushodbsp.STATE='A' /* do not take up any records which are revoked or blocked */
@@ -287,7 +289,7 @@ CREATE PROCEDURE `securich`.`reconciliation`(command varchar(50))
             HAVING COUNT(*) = 1
             ORDER BY GRANTEE;
 
-         ELSEIF command = 'sync' THEN
+         ELSEIF command = 'sync' or command = 'securichsync' THEN
 
             update sec_grantee_privileges_reconcile
             set TABLE_NAME='*'
@@ -389,7 +391,7 @@ CREATE PROCEDURE `securich`.`reconciliation`(command varchar(50))
             CLOSE cur_reconcile;
 
             FLUSH PRIVILEGES;
-            
+
             SET @un=(SELECT SUBSTRING_INDEX(USER(),'@',1));
             SET @hn=(SELECT SUBSTRING_INDEX(USER(),'@',-1));
             INSERT INTO aud_grant_revoke (USERNAME,HOSTNAME,COMMAND,TIMESTAMP) VALUES (@un,@hn,@g,NOW());

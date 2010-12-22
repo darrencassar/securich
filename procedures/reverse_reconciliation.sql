@@ -70,7 +70,7 @@ CREATE PROCEDURE `securich`.`reverse_reconciliation`()
          END IF;
       END;
 
-         update sec_config set VALUE = '1' where PROPERTY = 'reverse_reconciliation_in_progress';
+         update sec_config set VALUE = '1' where PROPERTY = 'mysql_to_securich_reconciliation_in_progress';
 
          FLUSH PRIVILEGES;
 
@@ -275,7 +275,7 @@ CREATE PROCEDURE `securich`.`reverse_reconciliation`()
 
          CLOSE cur_user;
          
-         update sec_config set VALUE = '0' where PROPERTY = 'reverse_reconciliation_in_progress';
+         update sec_config set VALUE = '0' where PROPERTY = 'mysql_to_securich_reconciliation_in_progress';
 
          SELECT distinct(commands) FROM temp_table_reconciliation INTO OUTFILE '/tmp/securich_reconciliation.sql';
          
