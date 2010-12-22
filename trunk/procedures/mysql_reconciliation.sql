@@ -27,13 +27,14 @@ DROP PROCEDURE IF EXISTS mysql_reconciliation;
 
 DELIMITER $$
 
-CREATE PROCEDURE `securich`.`mysql_reconciliation`()
+CREATE PROCEDURE `securich`.`mysql_reconciliation`(command_mysqlrecon varchar(50))
   BEGIN
 
       DECLARE dbnamein VARCHAR(60);
       DECLARE rowcount INT;
       DECLARE reservedusername VARCHAR(50);
       DECLARE usernameinathostnamein VARCHAR(76);
+      DECLARE SYSTEMPARAM VARCHAR(10);
       DECLARE tableschema VARCHAR(60);
       DECLARE tablename VARCHAR(60);
       DECLARE role VARCHAR(60);
@@ -46,17 +47,17 @@ CREATE PROCEDURE `securich`.`mysql_reconciliation`()
       DECLARE dbdone INT DEFAULT 0;
 
       DECLARE cur_role CURSOR FOR
-         SELECT DISTINCT(PRIVILEGE) 
+         SELECT DISTINCT(PRIVILEGE)
          FROM inf_grantee_privileges;
-         
+
       DECLARE cur_user CURSOR FOR
-         SELECT GRANTEE, TABLE_SCHEMA, TABLE_NAME, PRIVILEGE, TYPE
-         FROM sec_two_grantee_privileges_reconcile where SYSTEM='mysql';
-      
+         SELECT SYSTEM, GRANTEE, TABLE_SCHEMA, TABLE_NAME, PRIVILEGE, TYPE
+         FROM sec_two_grantee_privileges_reconcile;
+
       DECLARE cur_databases CURSOR FOR
          SELECT DATABASENAME
          FROM sec_databases
-         WHERE DATABASENAME <> '';         
+         WHERE DATABASENAME <> '';
 
       DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
 
@@ -64,9 +65,9 @@ CREATE PROCEDURE `securich`.`mysql_reconciliation`()
       /*DECLARE EXIT HANDLER FOR SQLEXCEPTION
       BEGIN
          ROLLBACK;
-      END;*/ 
+      END;*/
 
-         update sec_config set VALUE = '1' where PROPERTY = 'reverse_reconciliation_in_progress';
+         update sec_config set VALUE = '1' where PROPERTY = 'mysql_to_securich_reconciliation_in_progress';
 
          FLUSH PRIVILEGES;
 
@@ -91,7 +92,7 @@ CREATE PROCEDURE `securich`.`mysql_reconciliation`()
             SELECT GRANTEE,PRIVILEGE_TYPE,'t'
             FROM information_schema.USER_PRIVILEGES
                WHERE grantee IN (
-                  SELECT DISTINCT(grantee) 
+                  SELECT DISTINCT(grantee)
                   FROM information_schema.user_privileges
                );
 
@@ -100,7 +101,7 @@ CREATE PROCEDURE `securich`.`mysql_reconciliation`()
             SELECT GRANTEE, TABLE_SCHEMA, PRIVILEGE_TYPE,'t'
             FROM information_schema.SCHEMA_PRIVILEGES
                WHERE grantee IN (
-                  SELECT DISTINCT(grantee) 
+                  SELECT DISTINCT(grantee)
                   FROM information_schema.user_privileges
                );
 
@@ -109,7 +110,7 @@ CREATE PROCEDURE `securich`.`mysql_reconciliation`()
             SELECT GRANTEE, TABLE_SCHEMA, TABLE_NAME, PRIVILEGE_TYPE,'t'
             FROM information_schema.TABLE_PRIVILEGES
                WHERE grantee IN (
-                  SELECT DISTINCT(grantee) 
+                  SELECT DISTINCT(grantee)
                   FROM information_schema.user_privileges
                );
 
@@ -167,7 +168,7 @@ CREATE PROCEDURE `securich`.`mysql_reconciliation`()
          DELETE
          FROM inf_grantee_privileges
          WHERE PRIVILEGE='USAGE';
-         
+
          drop table if exists sec_two_grantee_privileges;
 
 /* Tables used to hold securich privs */
@@ -207,7 +208,8 @@ CREATE PROCEDURE `securich`.`mysql_reconciliation`()
                   select ushodbro.US_HO_DB_TB_ID, pr.PRIVILEGE
                   from sec_us_ho_db_tb_ro ushodbro join sec_ro_pr ropr join  sec_privileges pr
                   where ropr.PR_ID=pr.ID and
-                  ropr.RO_ID=ushodbro.RO_ID
+                  ropr.RO_ID=ushodbro.RO_ID and
+                  ushodbro.STATE='A'
                   ) ushodbroids
                where ushodbtb.ID=ushodbroids.US_HO_DB_TB_ID and
                ushodbtb.STATE='A' /* do not take up any records which are revoked or blocked */
@@ -226,7 +228,8 @@ CREATE PROCEDURE `securich`.`mysql_reconciliation`()
                   select ushodbro.US_HO_DB_SP_ID, pr.PRIVILEGE
                   from sec_us_ho_db_sp_ro ushodbro join sec_ro_pr ropr join  sec_privileges pr
                   where ropr.PR_ID=pr.ID and
-                  ropr.RO_ID=ushodbro.RO_ID
+                  ropr.RO_ID=ushodbro.RO_ID and
+                  ushodbro.STATE='A'
                   ) ushodbroids
                where ushodbsp.ID=ushodbroids.US_HO_DB_SP_ID and
                ushodbsp.STATE='A' /* do not take up any records which are revoked or blocked */
@@ -261,8 +264,8 @@ CREATE PROCEDURE `securich`.`mysql_reconciliation`()
          ) tmp
          GROUP BY GRANTEE, TABLE_SCHEMA, TABLE_NAME, PRIVILEGE, TYPE
          HAVING COUNT(*) = 1
-         ORDER BY GRANTEE;         
-                
+         ORDER BY GRANTEE;
+
          OPEN cur_role;
 
             cur_role_loop:WHILE(done=0) DO
@@ -273,31 +276,31 @@ CREATE PROCEDURE `securich`.`mysql_reconciliation`()
                SET done=0;
                LEAVE cur_role_loop;
             END IF;
-            
+
             SET @a= CONCAT('set @b=(SELECT COUNT(*) FROM sec_roles WHERE ROLE="' , privilegerole , '")');
 
             PREPARE temporarycom FROM @a;
             EXECUTE temporarycom;
-            
-            
+
+
             IF @b < 1 THEN
 
                SET @c = CONCAT('call create_update_role ("add","' , LOWER(privilegerole) , '","' , LOWER(privilegerole) , '")');
 
                PREPARE rolecreatecom FROM @c;
                EXECUTE rolecreatecom;
-            
+
             END IF;
 
             END WHILE cur_role_loop;
 
          CLOSE cur_role;
-            
+
          OPEN cur_user;
 
             cur_user_loop:WHILE(done=0) DO
 
-            FETCH cur_user INTO usernameinathostnamein, tableschema, tablename, role, objecttype;
+            FETCH cur_user INTO SYSTEMPARAM, usernameinathostnamein, tableschema, tablename, role, objecttype;
 
             IF done=1 THEN
                SET done=0;
@@ -311,28 +314,41 @@ CREATE PROCEDURE `securich`.`mysql_reconciliation`()
             ELSEIF objecttype = 's' THEN
                SET defobjecttype = 'storedprocedure';
             END IF;
-            
+
             IF tablename IS NULL THEN
                SET tablename = '';
             END IF;
-            
+
             SET roletype=(select type from sec_privileges where PRIVILEGE=role);
-            
+
             IF tableschema IS NULL THEN
-            
+
             /* If roletype is global just grant the privilege on a single database */
-            
+
                IF roletype > 2 THEN
-               
+
                   SET dbnamein=(SELECT DATABASENAME FROM sec_databases WHERE DATABASENAME <> '' limit 1);
-               
-                  SET @g=CONCAT('call grant_privileges_reverse_reconciliation("' , TRIM(BOTH '\'' FROM SUBSTRING_INDEX(usernameinathostnamein, '@', 1)) , '","' , TRIM(BOTH '\'' FROM SUBSTRING_INDEX(usernameinathostnamein, '@', -1)) , '","' , dbnamein , '","' , tablename , '","' , defobjecttype , '","' , role , '","");');
+
+                  IF SYSTEMPARAM = 'MySQL' THEN
+
+                     SET @g = CONCAT('call grant_privileges_reverse_reconciliation("' , TRIM(BOTH '\'' FROM SUBSTRING_INDEX(usernameinathostnamein, '@', 1)) , '","' , TRIM(BOTH '\'' FROM SUBSTRING_INDEX(usernameinathostnamein, '@', -1)) , '","' , dbnamein , '","' , tablename , '","' , defobjecttype , '","' , role , '","");');
+
+                  ELSE
+
+                     IF command_mysqlrecon= 'mysqlsync' THEN
+
+                        SET @g = CONCAT('call revoke_privileges("' , TRIM(BOTH '\'' FROM SUBSTRING_INDEX(usernameinathostnamein, '@', 1)) , '","' , TRIM(BOTH '\'' FROM SUBSTRING_INDEX(usernameinathostnamein, '@', -1)) , '","' , dbnamein , '","' , tablename , '","' , defobjecttype , '","' , role , '","");');
+
+                     END IF;
+
+                  END IF;
+
 
                   PREPARE grantcomrecon FROM @g;
                   EXECUTE grantcomrecon;
-               
+
                ELSE
-               
+
                   OPEN cur_databases;
 
                      cur_databases_loop:WHILE(done=0) DO
@@ -343,34 +359,58 @@ CREATE PROCEDURE `securich`.`mysql_reconciliation`()
                         SET done=0;
                         LEAVE cur_databases_loop;
                      END IF;
-           
+
+                     IF SYSTEMPARAM = 'MySQL' THEN
+
                         SET @h=CONCAT('call grant_privileges_reverse_reconciliation("' , TRIM(BOTH '\'' FROM SUBSTRING_INDEX(usernameinathostnamein, '@', 1)) , '","' , TRIM(BOTH '\'' FROM SUBSTRING_INDEX(usernameinathostnamein, '@', -1)) , '","' , dbnamein , '","' , tablename , '","' , defobjecttype , '","' , role , '","");');
+
+                     ELSE
+
+                        IF command_mysqlrecon= 'mysqlsync' THEN
+
+                           SET @h=CONCAT('call revoke_privileges("' , TRIM(BOTH '\'' FROM SUBSTRING_INDEX(usernameinathostnamein, '@', 1)) , '","' , TRIM(BOTH '\'' FROM SUBSTRING_INDEX(usernameinathostnamein, '@', -1)) , '","' , dbnamein , '","' , tablename , '","' , defobjecttype , '","' , role , '","");');
+
+                        END IF;
+
+                     END IF;
 
                         PREPARE grantcomrecon FROM @h;
                         EXECUTE grantcomrecon;
-                        
-                        
+
+
                      END WHILE cur_databases_loop;
 
                   CLOSE cur_databases;
-               
+
                END IF;
-  
+
             ELSE
-         
-               SET @i=CONCAT('call grant_privileges_reverse_reconciliation("' , TRIM(BOTH '\'' FROM SUBSTRING_INDEX(usernameinathostnamein, '@', 1)) , '","' , TRIM(BOTH '\'' FROM SUBSTRING_INDEX(usernameinathostnamein, '@', -1)) , '","' , tableschema , '","' , tablename , '","' , defobjecttype , '","' , role , '","");');
+
+               IF SYSTEMPARAM = 'MySQL' THEN
+
+                  SET @i=CONCAT('call grant_privileges_reverse_reconciliation("' , TRIM(BOTH '\'' FROM SUBSTRING_INDEX(usernameinathostnamein, '@', 1)) , '","' , TRIM(BOTH '\'' FROM SUBSTRING_INDEX(usernameinathostnamein, '@', -1)) , '","' , tableschema , '","' , tablename , '","' , defobjecttype , '","' , role , '","");');
+
+               ELSE
+
+                  IF command_mysqlrecon= 'mysqlsync' THEN
+
+                     SET @i=CONCAT('call revoke_privileges("' , TRIM(BOTH '\'' FROM SUBSTRING_INDEX(usernameinathostnamein, '@', 1)) , '","' , TRIM(BOTH '\'' FROM SUBSTRING_INDEX(usernameinathostnamein, '@', -1)) , '","' , tableschema , '","' , tablename , '","' , defobjecttype , '","' , role , '","");');
+
+                  END IF;
+
+               END IF;
 
                PREPARE grantcomrecon FROM @i;
-               EXECUTE grantcomrecon; 
-               
+               EXECUTE grantcomrecon;
+
             END IF;
-                        
+
             END WHILE cur_user_loop;
 
          CLOSE cur_user;
-         
-         update sec_config set VALUE = '0' where PROPERTY = 'reverse_reconciliation_in_progress';
-                  
+
+         update sec_config set VALUE = '0' where PROPERTY = 'mysql_to_securich_reconciliation_in_progress';
+
   END$$
 
 DELIMITER ;

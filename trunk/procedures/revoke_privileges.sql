@@ -280,8 +280,8 @@ CREATE PROCEDURE `securich`.`revoke_privileges`( usernamein varchar(16), hostnam
           delete sec_us_ho_db_sp_ro.* from sec_us_ho_db_sp_ro inner join (select ID from sec_us_ho_db_sp where STATE='R') removed where sec_us_ho_db_sp_ro.US_HO_DB_SP_ID = removed.ID and RO_ID like roidvalue;
 
           SET @d = CONCAT('drop user "', usernamein , '"@"' , hostnamein , '"');
-	        PREPARE dropcom FROM @d;
-		      EXECUTE dropcom;
+	        PREPARE dropcommand FROM @d;
+		      EXECUTE dropcommand;
 
        ELSEIF tbnamein = '' and tabletype = '' THEN
 
@@ -291,7 +291,12 @@ CREATE PROCEDURE `securich`.`revoke_privileges`( usernamein varchar(16), hostnam
           delete sec_us_ho_db_sp_ro.* from sec_us_ho_db_sp_ro inner join (select ID from sec_us_ho_db_sp where STATE='R') removed where sec_us_ho_db_sp_ro.US_HO_DB_SP_ID = removed.ID and RO_ID like roidvalue;
 
        ELSE
-          IF tabletype='table' OR tabletype ='regexp' THEN
+          IF tabletype='all' THEN
+
+             set ushodbtbid=(select ID from sec_us_ho_db_tb where US_ID=usidvalue and HO_ID=hoidvalue and DB_ID=dbidvalue and TB_ID=1);
+           	 update sec_us_ho_db_tb_ro set STATE='R' where US_HO_DB_TB_ID=ushodbtbid and RO_ID=roidvalue;
+
+          ELSEIF tabletype='table' OR tabletype ='regexp' THEN
 
              drop table if exists sec_tmp_tables;
 
@@ -302,9 +307,9 @@ CREATE PROCEDURE `securich`.`revoke_privileges`( usernamein varchar(16), hostnam
                   PRIMARY KEY (`ID`)
                 ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
 
-						 IF tabletype='table' THEN
-						    insert into sec_tmp_tables select ID,TABLENAME from sec_tables where TABLENAME like tbnamein;
-						 ELSEIF tabletype='regexp' THEN
+			 IF tabletype='table' THEN
+				insert into sec_tmp_tables select ID,TABLENAME from sec_tables where TABLENAME like tbnamein;
+			 ELSEIF tabletype='regexp' THEN
                 insert into sec_tmp_tables select ID,TABLENAME from sec_tables where TABLENAME regexp tbnamein;
              ELSE
                 select "this is an error you should not have seen!!! something is wrong in this procedgure BIGTIME";
@@ -360,7 +365,9 @@ CREATE PROCEDURE `securich`.`revoke_privileges`( usernamein varchar(16), hostnam
 
 
 /*If the role revoked was the last role, thus user ended up without roles, then user is dropped*/
-       call reconciliation('sync');
+       IF (select value from sec_config where PROPERTY = 'mysql_to_securich_reconciliation_in_progress') = '0' THEN
+          call reconciliation('sync');
+       END IF;
 
        SET tb_rolecount = (
           select count(*)
@@ -382,7 +389,7 @@ CREATE PROCEDURE `securich`.`revoke_privileges`( usernamein varchar(16), hostnam
           where r.ID=uhdr.RO_ID and
           ids.ID=uhdr.US_HO_DB_TB_ID
           );
-          
+
        SET sp_rolecount = (
           select count(*)
           from sec_roles as r join (
@@ -403,28 +410,28 @@ CREATE PROCEDURE `securich`.`revoke_privileges`( usernamein varchar(16), hostnam
           where r.ID=uhdr.RO_ID and
           ids.ID=uhdr.US_HO_DB_SP_ID
           );
-       
+
        SET rolecount = sp_rolecount + tb_rolecount;
 
        IF rolecount < 1 AND (rolein != 'ALL' or rolein != 'all') THEN
 
              SET @d = CONCAT('drop user "', usernamein , '"@"' , hostnamein , '"');
 
-	         PREPARE dropcom FROM @d;
-		     EXECUTE dropcom;
-		     
+	         PREPARE dropcommand FROM @d;
+		     EXECUTE dropcommand;
+
 		     SET @USID = (select ID from sec_users where USERNAME=usernamein);
 		     SET @HOID = (select ID from sec_hosts where HOSTNAME=hostnamein);
 		     SET @USHOID = (select ID from sec_us_ho where US_ID=@USID and HO_ID=@HOID);
-		     
+
 		     delete from sec_users where ID=@USID;
 		     delete from sec_us_ho where ID=@USHOID;
 		     delete from sec_us_ho_profile where US_HO_ID=@USHOID;
 		     delete from sec_us_ho_db_sp where US_ID=@USID and HO_ID=@HOID;
 		     delete from sec_us_ho_db_tb where US_ID=@USID and HO_ID=@HOID;
-		     
+
              SET @g = CONCAT('User "', usernamein , '"@"' , hostnamein , '" completely dropped from securich');
-		     
+
 		     SET @un=(SELECT SUBSTRING_INDEX(USER(),'@',1));
              SET @hn=(SELECT SUBSTRING_INDEX(USER(),'@',-1));
              INSERT INTO aud_grant_revoke (USERNAME,HOSTNAME,COMMAND,TIMESTAMP) VALUES (@un,@hn,@g,NOW());
@@ -440,8 +447,8 @@ CREATE PROCEDURE `securich`.`revoke_privileges`( usernamein varchar(16), hostnam
           IF (@mysmallversion RLIKE '[[:lower:]]') || (@mysmallversion  RLIKE '[[:punct:]]') THEN
              set @mysmallversion=(select left(@mysmallversion,1));
           END IF;
-       END IF;        
-       
+       END IF;
+
        /* If mysql version is 5.1.7 or above then processlist view is available on information_schema */
 
        IF terminateconnections = 'Y' or terminateconnections='y' and ( mybigversion > '4' AND mymidversion > 0 AND mysmallversion > 6  ) or ( mybigversion > '4' AND mymidversion > 1 ) THEN
@@ -465,20 +472,20 @@ CREATE PROCEDURE `securich`.`revoke_privileges`( usernamein varchar(16), hostnam
                  );
 
               SET @k = CONCAT('kill ' , @TID);
-              PREPARE killcom FROM @k;
-              EXECUTE killcom;
+              PREPARE killcommand FROM @k;
+              EXECUTE killcommand;
               set @k=NULL;
 
               SET @VAR=@VAR+1;
 
           END WHILE;
-          
+
           IF ((hostnamein='127.0.0.1') or (hostnamein='localhost')) THEN
-            
+
              IF hostnamein='127.0.0.1' then
                 set hostnamein='localhost';
              ELSEIF hostnamein='localhost' then
-                set hostnamein='127.0.0.1';             
+                set hostnamein='127.0.0.1';
              END IF;
 
              SET @CNT = (
@@ -487,32 +494,32 @@ CREATE PROCEDURE `securich`.`revoke_privileges`( usernamein varchar(16), hostnam
                 where USER=usernamein and
                 HOST like CONCAT(hostnamein ,'%')
              );
-   
+
              SET @VAR=1;
-   
+
              WHILE ( @VAR <= @CNT) DO
-   
+
                 SET @TID = (
                    select id
                    from information_schema.processlist
                    where USER=usernamein and
                    HOST like CONCAT(hostnamein ,'%') limit 1
                 );
-   
+
                 SET @k = CONCAT('kill ' , @TID);
                 PREPARE killcom FROM @k;
                 EXECUTE killcom;
                 set @k=NULL;
-   
+
                 SET @VAR=@VAR+1;
 
              END WHILE;
-          
+
           END IF;
-          
+
        ELSEIF terminateconnections = 'Y' or terminateconnections='y' THEN
-          
-          SELECT "Current version of MySQL doesn't allow terminating connections, please upgrade to 5.1.7 or later (latest GA version is suggested)" as Warning;          
+
+          SELECT "Current version of MySQL doesn't allow terminating connections, please upgrade to 5.1.7 or later (latest GA version is suggested)" as Warning;
           SELECT "Privileges were revoked despite the above warning." as Note;
 
        END IF;
