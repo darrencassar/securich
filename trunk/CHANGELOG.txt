@@ -93,8 +93,15 @@ SecuRich Changelog:
    * Grants on the 'mysql' database are now possible by setting configuration value to 'lenient' where configuration parameter mode exists in sec_configuration table. By default the value is 'strict' disabling such power.
    * Removes all users apart from `root` or the `installation user`
    * Urges users to take backup of the `mysql` database before installing
-   * Keeps a copy of securich.X.X.X.tar.gz for further installation
    
-2011-02-01: version 0.5.0
+2011-01-10: version 0.5.0
 
-   * 
+   * MySQL to securich reconciliation enabled
+   * Keeps a copy of securich.X.X.X.tar.gz for further installation
+   * Create update role checks if privilege actually exists before creating role
+   * Installation script optimized, code cleaned and enabled custom superuser
+   * Version check is enhanced to cater for non standard releases like perconas and custom builds (to a certain extent)
+   * Installation script socket installation fixed
+   * Added configuration parameter priv_mode
+   * Fixed password case sensitivity bug 
+   * Create groups 
