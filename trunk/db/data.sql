@@ -7,7 +7,7 @@ flush privileges;
 
 USE securich;
 
-INSERT INTO `sec_config` (`PROPERTY`,`VALUE`) VALUES ('reverse_reconciliation_in_progress','0');
+INSERT INTO `sec_config` (`PROPERTY`,`VALUE`) VALUES ('mysql_to_securich_reconciliation_in_progress','0');
 INSERT INTO `sec_config` (`PROPERTY`,`VALUE`) VALUES ('password_length','10');
 INSERT INTO `sec_config` (`PROPERTY`,`VALUE`) VALUES ('password_length_check','1');
 INSERT INTO `sec_config` (`PROPERTY`,`VALUE`) VALUES ('password_dictionary_check','1');
@@ -17,7 +17,7 @@ INSERT INTO `sec_config` (`PROPERTY`,`VALUE`) VALUES ('password_number_check','1
 INSERT INTO `sec_config` (`PROPERTY`,`VALUE`) VALUES ('password_special_character_check','1');
 INSERT INTO `sec_config` (`PROPERTY`,`VALUE`) VALUES ('password_username_check','1');
 INSERT INTO `sec_config` (`PROPERTY`,`VALUE`) VALUES ('mode','strict');
-INSERT INTO `sec_config` (`PROPERTY`,`VALUE`) VALUES ('prive_mode','safe');
+INSERT INTO `sec_config` (`PROPERTY`,`VALUE`) VALUES ('priv_mode','safe');
 INSERT INTO `sec_config` (`PROPERTY`,`VALUE`) VALUES ('admin_user',(select substring_index(user(),'@',1)));
 
 INSERT INTO `sec_databases` (`ID`,`DATABASENAME`) VALUES
