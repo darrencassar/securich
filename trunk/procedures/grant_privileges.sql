@@ -206,7 +206,7 @@ CREATE  PROCEDURE `securich`.`grant_privileges`( usernamein VARCHAR(16), hostnam
       SET modeofoperation= (
          SELECT VALUE
          FROM sec_config
-         WHERE PROPERTY='mode'
+         WHERE PROPERTY='sec_mode'
          );
 
       SET reservedusername = (
@@ -218,15 +218,15 @@ CREATE  PROCEDURE `securich`.`grant_privileges`( usernamein VARCHAR(16), hostnam
       IF reservedusername > 0 /*usernamein = 'root' or usernamein = 'msandbox' or usernamein = '' or any other reserved usernames */ THEN
 
          SELECT "Illegal username entry: Username used is a reserved username in securich" as ERROR;
-         
-      ELSEIF dbnamein = 'mysql' and modeofoperation='strict' THEN
+
+      ELSEIF dbnamein = 'mysql' and modeofoperation='9' THEN
 
          SELECT "Illegal database name entry: `mysql` db can not be used when securich is running in 'strict' mode" as ERROR;
-      
+
       ELSEIF tabletype != 'all' and tabletype != 'alltables' and tabletype != 'singletable' and tabletype != 'regexp' and tabletype != 'storedprocedure' then
-      
+
          SELECT "Tabletype specified incorrect- Please choose from either, all, alltables, singletable, regexp or storedprocedure" as ERROR;
-         
+
       ELSE
 
          SET userexists = (
@@ -361,7 +361,7 @@ CREATE  PROCEDURE `securich`.`grant_privileges`( usernamein VARCHAR(16), hostnam
                   SET userexistsonmysql=(select count(*) from  information_schema.USER_PRIVILEGES where grantee=concat("'",usernamein,"'@'",hostnamein,"'"));
 
                   IF userexistsonmysql = 1 THEN
-                  
+
                      SET @d = CONCAT('drop user "' , usernamein , '"@"' , hostnamein , '"');
 
                      PREPARE dropcom FROM @d;
@@ -465,8 +465,8 @@ CREATE  PROCEDURE `securich`.`grant_privileges`( usernamein VARCHAR(16), hostnam
 
                      PREPARE grantcom FROM @g;
                      EXECUTE grantcom;
-                     
-                     
+
+
 
                          /* loop untill there is no more privileges to grant */
 
@@ -712,7 +712,7 @@ CREATE  PROCEDURE `securich`.`grant_privileges`( usernamein VARCHAR(16), hostnam
 
                    END IF;
                ELSEIF tabletype = 'regexp' THEN
-                      
+
                       /* granting privileges to a set of tables who'se name has something in common */
 
                OPEN cur_tables_regexp;
@@ -920,11 +920,11 @@ CREATE  PROCEDURE `securich`.`grant_privileges`( usernamein VARCHAR(16), hostnam
                      SP_ID=spidvalue;
 
                END IF;
-               
+
                SET @un=(SELECT SUBSTRING_INDEX(USER(),'@',1));
                SET @hn=(SELECT SUBSTRING_INDEX(USER(),'@',-1));
                INSERT INTO aud_grant_revoke (USERNAME,HOSTNAME,COMMAND,TIMESTAMP) VALUES (@un,@hn,@g,NOW());
-               
+
                       /* output the password to be sent to the user */
 
                IF ushoidcount < 1 THEN
@@ -933,7 +933,7 @@ CREATE  PROCEDURE `securich`.`grant_privileges`( usernamein VARCHAR(16), hostnam
 
                   PREPARE randompasswordcom FROM @randomp;
                   EXECUTE randompasswordcom;
-                  
+
                   SET spname = 'set_my_password';
 
                   SET spidvalue = (SELECT ID FROM sec_storedprocedures WHERE STOREDPROCEDURENAME=spname);
@@ -980,14 +980,14 @@ CREATE  PROCEDURE `securich`.`grant_privileges`( usernamein VARCHAR(16), hostnam
 
                   PREPARE grantcom FROM @g;
                   EXECUTE grantcom;
-                     
+
                   UPDATE sec_us_ho_db_sp
                      SET STATE ='A'
                      WHERE US_ID=usidvalue AND
                      HO_ID=hoidvalue AND
                      DB_ID=dbidvalue AND
                      SP_ID=spidvalue;
-               
+
                   SET @un=(SELECT SUBSTRING_INDEX(USER(),'@',1));
                   SET @hn=(SELECT SUBSTRING_INDEX(USER(),'@',-1));
                   INSERT INTO aud_grant_revoke (USERNAME,HOSTNAME,COMMAND,TIMESTAMP) VALUES (@un,@hn,@g,NOW());
@@ -1038,20 +1038,20 @@ CREATE  PROCEDURE `securich`.`grant_privileges`( usernamein VARCHAR(16), hostnam
 
                   PREPARE grantcom FROM @g;
                   EXECUTE grantcom;
-                     
+
                   UPDATE sec_us_ho_db_sp
                      SET STATE ='A'
                      WHERE US_ID=usidvalue AND
                      HO_ID=hoidvalue AND
                      DB_ID=dbidvalue AND
                      SP_ID=spidvalue;
-               
+
                   SET @un=(SELECT SUBSTRING_INDEX(USER(),'@',1));
                   SET @hn=(SELECT SUBSTRING_INDEX(USER(),'@',-1));
                   INSERT INTO aud_grant_revoke (USERNAME,HOSTNAME,COMMAND,TIMESTAMP) VALUES (@un,@hn,@g,NOW());
 
                ELSE
-               
+
 /* RE copy password to make sure it wasn't tempred with and also useful when a user has been deleted due to revoking of all privileges (but is still in securich
 system therefore once recreated with grant, reissuing the set password will be necessary. */
 

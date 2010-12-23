@@ -1,7 +1,7 @@
 #######################################################################################
 ##                                                                                   ##
-##   This is show_privileges_in_roles, a script used to find out the list of privilegs  ##
-##   a particular role is populated with.                                            ##
+##   This is show_privileges_in_role, a script used to find out the list of          ##
+##   privilegs a particular role is populated with.                                  ##
 ##                                                                                   ##
 ##   This program was originally sponsored by TradingScreen Inc                      ##
 ##   Information about TS is found at www.tradingscreen.com                          ##
@@ -26,11 +26,11 @@
 
 USE securich;
 
-DROP PROCEDURE IF EXISTS show_privileges_in_roles;
+DROP PROCEDURE IF EXISTS show_privileges_in_role;
 
 DELIMITER $$
 
-CREATE PROCEDURE `securich`.`show_privileges_in_roles`( rolein varchar(64))
+CREATE PROCEDURE `securich`.`show_privileges_in_role`( rolein varchar(64))
   BEGIN
 
     select distinct PRIVILEGE

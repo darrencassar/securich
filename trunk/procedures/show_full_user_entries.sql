@@ -98,8 +98,7 @@ CREATE PROCEDURE `securich`.`show_full_user_entries`( usernamein VARCHAR(16))
        sec_hosts.ID=ids.HO_ID AND
        sec_databases.ID=ids.DB_ID AND
        sec_storedprocedures.ID=ids.SP_ID;
-       
-       
+
 # Table section
 
        DROP TABLE IF EXISTS temp_tbl_1;
@@ -138,17 +137,17 @@ CREATE PROCEDURE `securich`.`show_full_user_entries`( usernamein VARCHAR(16))
        WHERE rids.ID=ushodbro.US_HO_DB_SP_ID AND
        ushodbro.RO_ID=ro.ID;
 
-       
+
 # Table section
-       
+
        DROP TABLE IF EXISTS temp_tbl_3;
        CREATE TEMPORARY TABLE temp_tbl_3
        (  `RO_ID` INT,
           `US_HO_DB_TB_ID` INT
-       );       
-       
+       );
+
 # Stored Procedure section
-       
+
        DROP TABLE IF EXISTS temp_tbl_13;
        CREATE TEMPORARY TABLE temp_tbl_13
        (  `RO_ID` INT,
@@ -159,7 +158,7 @@ CREATE PROCEDURE `securich`.`show_full_user_entries`( usernamein VARCHAR(16))
        SELECT DISTINCT c.RO_ID AS roid, c.US_HO_DB_TB_ID AS ushodbid
        FROM sec_us_ho_db_tb_ro c JOIN temp_tbl_2 d
        WHERE c.US_HO_DB_TB_ID=d.ID;
-       
+
        INSERT INTO temp_tbl_13
        SELECT DISTINCT c.RO_ID AS roid, c.US_HO_DB_SP_ID AS ushodbid
        FROM sec_us_ho_db_sp_ro c JOIN temp_tbl_12 d
@@ -170,7 +169,7 @@ CREATE PROCEDURE `securich`.`show_full_user_entries`( usernamein VARCHAR(16))
 
        DROP TABLE IF EXISTS temp_tbl_4;
        CREATE TEMPORARY TABLE temp_tbl_4
-       ( 
+       (
          `USERNAME` VARCHAR(16),
          `HOSTNAME` VARCHAR (60),
          `DATABASENAME` VARCHAR(64),
@@ -178,27 +177,27 @@ CREATE PROCEDURE `securich`.`show_full_user_entries`( usernamein VARCHAR(16))
          `ROLE` VARCHAR(65),
          `PRIVILEGE` varchar(64),
          `TYPE` CHAR(2),
-         `STATE` CHAR(1)         
+         `STATE` CHAR(1)
        );
-       
-       
-       INSERT INTO temp_tbl_4 
+
+
+       INSERT INTO temp_tbl_4
        SELECT b.USERNAME, b.HOSTNAME, b.DATABASENAME, b.TABLENAME, a.ROLE, pr.PRIVILEGE, b.TYPE, b.STATE
        FROM temp_tbl_2 b, temp_tbl_1 a JOIN temp_tbl_3 c join sec_privileges pr join sec_ro_pr ropr
        WHERE b.ID=c.US_HO_DB_TB_ID AND
        a.ID=c.RO_ID  and
        c.RO_ID=ropr.RO_ID and
        pr.ID=ropr.PR_ID;
-       
-       INSERT INTO temp_tbl_4 
+
+       INSERT INTO temp_tbl_4
        SELECT b.USERNAME, b.HOSTNAME, b.DATABASENAME, b.STOREDPROCEDURENAME, a.ROLE, pr.PRIVILEGE, b.TYPE, b.STATE
        FROM temp_tbl_12 b, temp_tbl_11 a JOIN temp_tbl_13 c join sec_privileges pr join sec_ro_pr ropr
        WHERE b.ID=c.US_HO_DB_SP_ID AND
        a.ID=c.RO_ID  and
        c.RO_ID=ropr.RO_ID and
        pr.ID=ropr.PR_ID;
-             
-       
+
+
        update temp_tbl_4 tbl4 join sec_privileges pr on tbl4.PRIVILEGE=pr.PRIVILEGE
           set OBJECT=''
           where pr.TYPE='2';
@@ -208,7 +207,7 @@ CREATE PROCEDURE `securich`.`show_full_user_entries`( usernamein VARCHAR(16))
           where pr.TYPE='3' OR DATABASENAME='*';
 
        select * from temp_tbl_4 GROUP BY USERNAME, HOSTNAME, DATABASENAME, OBJECT, ROLE, PRIVILEGE, STATE order by 2,3,4,5,6,7 asc;
-       
+
        END IF;
 
   END$$

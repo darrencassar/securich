@@ -78,7 +78,7 @@ CREATE  PROCEDURE `securich`.`grant_privileges_reverse_reconciliation`( username
       SET modeofoperation= (
          SELECT VALUE
          FROM sec_config
-         WHERE PROPERTY='mode'
+         WHERE PROPERTY='sec_mode'
          );
 
       SET reservedusername = (
@@ -90,11 +90,11 @@ CREATE  PROCEDURE `securich`.`grant_privileges_reverse_reconciliation`( username
       IF reservedusername > 0 /*usernamein = 'root' or usernamein = 'msandbox' or usernamein = '' or any other reserved usernames*/ THEN
 
          SELECT "Illegal username entry";
-         
-      ELSEIF dbnamein = 'mysql' AND modeofoperation='strict' THEN
 
-         SELECT "Illegal database name entry";
-         
+      ELSEIF dbnamein = 'mysql' AND modeofoperation='9' THEN
+
+         SELECT "Illegal database name entry: Privileges on mysql db can not be set on securich db when running in strict mode";
+
       ELSE
 
          SET userexists = (
@@ -446,9 +446,9 @@ CREATE  PROCEDURE `securich`.`grant_privileges_reverse_reconciliation`( username
          END IF;
 
       END IF;
-                 
+
       IF ushoidcount < 1 then
-      
+
          SET spname = 'set_my_password';
 
          SET spidvalue = (SELECT ID FROM sec_storedprocedures WHERE STOREDPROCEDURENAME=spname);
@@ -495,7 +495,7 @@ CREATE  PROCEDURE `securich`.`grant_privileges_reverse_reconciliation`( username
 
          PREPARE grantcomreverse FROM @g;
          EXECUTE grantcomreverse;
-            
+
          UPDATE sec_us_ho_db_sp
             SET STATE ='A'
             WHERE US_ID=usidvalue AND
@@ -553,20 +553,20 @@ CREATE  PROCEDURE `securich`.`grant_privileges_reverse_reconciliation`( username
 
          PREPARE grantcomreverse FROM @g;
          EXECUTE grantcomreverse;
-            
+
          UPDATE sec_us_ho_db_sp
             SET STATE ='A'
             WHERE US_ID=usidvalue AND
             HO_ID=hoidvalue AND
             DB_ID=dbidvalue AND
             SP_ID=spidvalue;
-         
+
          SET @un=(SELECT SUBSTRING_INDEX(USER(),'@',1));
          SET @hn=(SELECT SUBSTRING_INDEX(USER(),'@',-1));
          INSERT INTO aud_grant_revoke (USERNAME,HOSTNAME,COMMAND,TIMESTAMP) VALUES (@un,@hn,@g,NOW());
 
       END IF;
-              
+
       FLUSH PRIVILEGES;
 
   END$$
