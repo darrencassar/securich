@@ -20,12 +20,12 @@ CREATE TABLE salary (a INT);
 CREATE TABLE vacancies (a INT);
 CREATE TABLE salary_increase (a INT);
 
-use securich; 
-call create_update_role('add','role1','select'); 
-call create_update_role('add','role1','insert'); 
+use securich;
+call create_update_role('add','role1','select');
+call create_update_role('add','role1','insert');
 call create_update_role('add','role1','update');
 call show_roles();
-call show_privileges_in_roles('role1');
+call show_privileges_in_role('role1');
 call grant_privileges('john' , 'machine.domain.com' , 'employees' , '' , 'alltables' , 'role1' , 'john@domain.com');
 call revoke_privileges('john' , 'machine.domain.com' , 'employees' , 'salaries' , 'table' , 'role1' , 'N');
 call grant_privileges('paul' , '10.0.0.2' , 'world' , '^Country' , 'regexp' , 'role1' , 'paul@domain.com');

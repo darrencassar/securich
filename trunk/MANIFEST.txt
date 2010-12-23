@@ -27,7 +27,7 @@
 |     |_________revoke_privileges.sql
 |     |_________set_password.sql
 |     |_________show_full_user_entries.sql
-|     |_________show_privileges_in_roles.sql
+|     |_________show_privileges_in_role.sql
 |     |_________show_roles.sql
 |     |_________show_user_entries.sql
 |     |_________show_user_list.sql

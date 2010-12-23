@@ -38,13 +38,13 @@ SecuRich Changelog:
    * Password length is now configurable thorough sec_config
    * Enhanced install script to include reverse reconciliation and do other checks
    * Stored proc check_roles was renamed to show_roles
-   * Stored proc check_role_privileges was renamed to show_privileges_in_roles
+   * Stored proc check_role_privileges was renamed to show_privileges_in_role
    * Stored proc check_user_privileges was renamed to show_user_privileges
    * Stored proc check_privilege_users was renamed to show_users_with_privilege
    * Stored proc check_user_list was renamed to show_user_list
    * Stored proc check_user_entries was renamed to show_user_entries
    * Stored proc check_full_user_entries was renamed to show_full_user_entries
-   
+
 2009-12-30: version 0.2.1
 
    * Added enable/disable password complexity configuration
@@ -57,11 +57,11 @@ SecuRich Changelog:
    * Added show_reserved_usernames stored procedure
    * Added testing scripts for developers to test
    * Fixed some typos in the install script
-   
+
 2010-01-22: version 0.2.2
 
    * Created SAM-My - http://code.google.com/p/sam-my
-   
+
    * Added show_privileges stored procedure
    * Added rep_user to reserved_usernames list
    * Granting rights on set_my_password to new users immediately
@@ -72,13 +72,13 @@ SecuRich Changelog:
    * Fixed show_full_user_entries to include stored procedures
 
 2010-02-19: version 0.2.3
-   
+
    * Added password expirable setting (per user)
    * Added set_password_expirable
    * Added rename_user_at_host
 
 2010-02-24: version 0.2.4
-   
+
    * Fixed grant_privileges_reverse_reconciliation - was calling reconciliation during every run
    * Fixed revoke_reconciliation - bug with users existing in db, tables_priv, columns_priv, procs_priv but not in user table (wrongly removed)
 
@@ -90,18 +90,28 @@ SecuRich Changelog:
 2010-08-05: version 0.3.0
 
    * Any user with sufficient privileges can now be used to install securich. For installations where the root user has been dropped and another user with same kind of privileges exist this is a must
-   * Grants on the 'mysql' database are now possible by setting configuration value to 'lenient' where configuration parameter mode exists in sec_configuration table. By default the value is 'strict' disabling such power.
+   * Grants on the 'mysql' database are now possible by setting configuration value to 'lenient' where configuration parameter mode exists in sec_config table. By default the value is 'strict' disabling such power.
    * Removes all users apart from `root` or the `installation user`
    * Urges users to take backup of the `mysql` database before installing
-   
+
 2011-01-10: version 0.5.0
 
    * MySQL to securich reconciliation enabled
+   * Introduced 2 new modes in reconciliation:
+   		List: shows the list of discrepancies
+   		Sync: reconciles both ways adding all but removing none
+   		MySQLSync: reconciles from MySQL to Securich making Securich in sync with MySQL removing all privs in Securich in excess
+   		SecurichSync: reconciles from Securich to MySQL making MySQL in sync with Securich removing all privs in MySQL in excess
    * Keeps a copy of securich.X.X.X.tar.gz for further installation
    * Create update role checks if privilege actually exists before creating role
    * Installation script optimized, code cleaned and enabled custom superuser
    * Version check is enhanced to cater for non standard releases like perconas and custom builds (to a certain extent)
    * Installation script socket installation fixed
    * Added configuration parameter priv_mode
-   * Fixed password case sensitivity bug 
-   * Create groups 
+   * Fixed password case sensitivity bug
+   * Reset sec_mode from strict (9) to most basic (0) meaning by default securich now permits grant on any database including MySQL.
+   * Renamed show_privileges_in_roles to show_privileges_in_role.
+
+
+
+
