@@ -87,8 +87,8 @@ then
   echo " brought to you by Darren Cassar "
   echo " http://www.mysqlpreacher.com "
   echo ""
-  echo " installer version 3.0"
-  echo " release date 19th August 2010"
+  echo " installer version 4.0"
+  echo " release date 15th January 2011"
   echo ""
   echo ""
   echo "Anytime you need to cancel installation just press ( Ctrl + C )"
@@ -97,7 +97,7 @@ then
 fi
 
 ## Checking if mysql binary is available
- 
+
  MYSQLBIN=`which mysql 2> /dev/null`
  if [ "$MYSQLBIN" = "" -o ! -x "$MYSQLBIN" ]
  then
@@ -105,9 +105,9 @@ fi
    echo "Please make sure it is in your system by running 'mysql --version'"
    exit 1
  fi
- 
+
 ## Checking if gunzip is available
- 
+
  GUNZIPBIN=`which gunzip 2> /dev/null`
  if [ "$GUNZIPBIN" = "" -o ! -x "$GUNZIPBIN" ]
  then
@@ -115,9 +115,9 @@ fi
    echo "Please make sure it is in your system by running 'gunzip --version'"
    exit 1
  fi
- 
+
 ## Checking if tar is available
- 
+
  TARBIN=`which tar 2> /dev/null`
  if [ "$TARBIN" = "" -o ! -x "$TARBIN" ]
  then
@@ -130,7 +130,7 @@ fi
 
  LV=`tail -1 version`                                                  ## LV = Latest Version
  BASEDIR=`pwd`
- 
+
 ## Create logs folder to keep logs of the installation.
 
  if [ ! -d logs ]
@@ -173,12 +173,12 @@ fi
  echo "2. Download and install (recommended) "
  echo -n "Enter choice (default 2): "
  read -e TOI                                                                  ## TOI = Type of Installation
- 
+
  if [ "$TOI" == "" ]
   then
     TOI=2
  fi
- 
+
  while [ "$TOI" -lt "1" ] && [ "$TOI" -gt "2" ]
  do
     echo -n "Wrong value, please re-enter choice (default 2 i.e. Download and install): "
@@ -294,7 +294,7 @@ fi
         FOU=1
       fi
  done
- 
+
 
  echo ""
  echo -n "Enter mysql installation user username (default 'root'): "
@@ -304,7 +304,7 @@ fi
    then
    SUPERUSER=root
  fi
- 
+
 ## Enter password (masked for security)
 
  echo ""
@@ -340,7 +340,7 @@ fi
         CH=1
       fi
  done
- 
+
  if [ "$CH" == "" ] || [ "$CH" == "1"  ]
  then
     echo -n "Enter mysql Hostname/IP (default '127.0.0.1'): "
@@ -355,9 +355,9 @@ fi
     then
        PORT=3306
     fi
-    
+
     COMM_MEANS=`echo "--host=$HOST --port=$PORT "`
-    
+
  elif [ "$CH" == "2" ]
  then
     SOCK=inexisting_file
@@ -368,20 +368,21 @@ fi
        read -e SOCK
        if [ "$SOCK" == "" ]
        then
-          SOCK=/tmp/mysql.sock       
+          SOCK=/tmp/mysql.sock
        fi
-    
+
     COMM_MEANS=`echo " --socket=$SOCK "`
 
     done
- fi       
-            
+ fi
+
  if [ "$FOU" == 1 ]
  then
 
 ## Import securich db into the instance
 
           mysql --user=$SUPERUSER --password=$PASS $COMM_MEANS --execute="drop database if exists securich"
+          innodbyes=`mysql -u $SUPERUSER --password=$PASS -s -B $COMM_MEANS --execute="show engines" | cut -f 1,2 | grep InnoDB | cut -f 2`
 
           if [ "$innodbyes" = 'YES' ]; then
           {
@@ -392,7 +393,7 @@ fi
              mysql --user=$SUPERUSER --password=$PASS $COMM_MEANS < db/securich_noinnodb.sql
           }
           fi
-          
+
           if [ $? != 0 ]; then
            {
              echo "Problem creating securich db"
@@ -437,7 +438,7 @@ fi
 
 ## Run reconciliation to populate securich database
 
-          mysql --user=$SUPERUSER --password=$PASS $COMM_MEANS securich --execute="call reconciliation('sync')"
+          mysql --user=$SUPERUSER --password=$PASS $COMM_MEANS securich --execute="call mysql_reconciliation('')"
 
 ## If upgrading, run upgrade scripts
 
@@ -502,7 +503,7 @@ fi
              exit 1
            }
           fi
-        
+
           for proc in `ls procedures/`
            do
             mysql --user=$SUPERUSER --password=$PASS $COMM_MEANS securich < procedures/$proc
