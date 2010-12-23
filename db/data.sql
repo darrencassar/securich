@@ -16,7 +16,7 @@ INSERT INTO `sec_config` (`PROPERTY`,`VALUE`) VALUES ('password_uppercase_check'
 INSERT INTO `sec_config` (`PROPERTY`,`VALUE`) VALUES ('password_number_check','1');
 INSERT INTO `sec_config` (`PROPERTY`,`VALUE`) VALUES ('password_special_character_check','1');
 INSERT INTO `sec_config` (`PROPERTY`,`VALUE`) VALUES ('password_username_check','1');
-INSERT INTO `sec_config` (`PROPERTY`,`VALUE`) VALUES ('mode','strict');
+INSERT INTO `sec_config` (`PROPERTY`,`VALUE`) VALUES ('sec_mode','0');
 INSERT INTO `sec_config` (`PROPERTY`,`VALUE`) VALUES ('priv_mode','safe');
 INSERT INTO `sec_config` (`PROPERTY`,`VALUE`) VALUES ('admin_user',(select substring_index(user(),'@',1)));
 
@@ -80,7 +80,7 @@ INSERT  INTO `securich`.`sec_help`(`ID`,`STOREDPROCEDURE`,`DESCRIPTION`) VALUES 
 INSERT  INTO `securich`.`sec_help`(`ID`,`STOREDPROCEDURE`,`DESCRIPTION`) VALUES (3,'block_user','block_user(\'usernamein\',\'hostnamein\',\'dbnamein\',\'terminateconnections\'); (version 0.1.4)\r\n-- Used to block a particular user, terminating his/her connections if necessary and leave the account around to be unblocked if necessary. This is a useful feature for when a user needs temporary rights.');
 INSERT  INTO `securich`.`sec_help`(`ID`,`STOREDPROCEDURE`,`DESCRIPTION`) VALUES (4,'show_full_user_entries','show_full_user_entries(\'username\'); (version 0.1.1)\r\n-- Checks the roles assigned to a particular user and on which database, table and from which host those privileges can be used');
 INSERT  INTO `securich`.`sec_help`(`ID`,`STOREDPROCEDURE`,`DESCRIPTION`) VALUES (5,'show_users_with_privilege','show_users_with_privilege(\'privilege\'); (version 0.1.1)\r\n-- Shows a list of users who have been granted a particular privilege\r\n    show_users_with_privilege(\'privilege\',\'databasename\',\'tablename\') (version 0.1.2);\r\n-- Shows a list of users who have been granted a particular privilege on a particular table in a particular database.');
-INSERT  INTO `securich`.`sec_help`(`ID`,`STOREDPROCEDURE`,`DESCRIPTION`) VALUES (6,'show_privileges_in_roles','show_privileges_in_roles(\'rolename\'); (version 0.1.1)\r\n-- Shows a list of privileges belonging to a particular role');
+INSERT  INTO `securich`.`sec_help`(`ID`,`STOREDPROCEDURE`,`DESCRIPTION`) VALUES (6,'show_privileges_in_role','show_privileges_in_role(\'rolename\'); (version 0.1.1)\r\n-- Shows a list of privileges belonging to a particular role');
 INSERT  INTO `securich`.`sec_help`(`ID`,`STOREDPROCEDURE`,`DESCRIPTION`) VALUES (7,'show_roles','show_roles(); (version 0.1.1)\r\n-- Run the above in order to check which roles are available');
 INSERT  INTO `securich`.`sec_help`(`ID`,`STOREDPROCEDURE`,`DESCRIPTION`) VALUES (8,'show_user_entries','show_user_entries(\'username\'); (version 0.1.1)\r\n-- Checks the roles assigned to a particular user and on which database and from which host those privileges can be used');
 INSERT  INTO `securich`.`sec_help`(`ID`,`STOREDPROCEDURE`,`DESCRIPTION`) VALUES (9,'show_user_list','show_user_list(); (version 0.1.1)\r\n-- Run the above in order to obtain a list of user@host present in the system');
