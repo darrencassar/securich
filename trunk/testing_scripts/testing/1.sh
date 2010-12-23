@@ -69,7 +69,7 @@ if [ $? != 0 ]; then
 TESTUSER=`cat securich_test.log | tr -s "-" | sed 's/ //g' | cut -d "-" -f 2 | tail -1`
 TESTPASS=`cat securich_test.log | tr -s "-" | sed 's/ //g' | cut -d "-" -f 6 | tail -1`
 
-echo "" 
+echo ""
 echo ""
 echo -e `date` - "\033[1mINFO - Testing new user access\033[0m"
 echo ""
@@ -80,7 +80,7 @@ if [ $? != 0 ]; then
     echo -e "\033[1mERROR - show databases\033[0m"
 } fi
 
-echo "" 
+echo ""
 echo ""
 echo -e `date` - "\033[1mINFO - Testing select now()\033[0m"
 echo ""
@@ -95,7 +95,7 @@ echo ""
 echo ""
 echo ""
 
-# Test2 
+# Test2
 #============
 
 echo -e `date` - "\033[1mINFO - TEST CREATE ROLE\033[0m"
@@ -119,7 +119,7 @@ if [ $? != 0 ]; then
     echo -e "\033[1mERROR - role create with priv update\033[0m"
 } fi
 
-echo "" 
+echo ""
 echo ""
 echo -e `date` - "\033[1mINFO - Showing roles available\033[0m"
 
@@ -128,18 +128,18 @@ if [ $? != 0 ]; then
 {
     echo -e "\033[1mERROR - show_roles\033[0m"
 } fi
- 
-echo "" 
+
+echo ""
 echo ""
 echo -e `date` - "\033[1mINFO - Showing roles\033[0m"
 
-mysql -u $USER --password=$PASSWORD -h $HOST -P $PORT $DB --execute="CALL show_privileges_in_roles('$ROLENAME');"
+mysql -u $USER --password=$PASSWORD -h $HOST -P $PORT $DB --execute="CALL show_privileges_in_role('$ROLENAME');"
 if [ $? != 0 ]; then
 {
-    echo -e "\033[1mERROR - show_privileges_in_roles\033[0m"
+    echo -e "\033[1mERROR - show_privileges_in_role\033[0m"
 } fi
 
-echo "" 
+echo ""
 echo ""
 echo -e `date` - "\033[1mINFO - Showing privileges belonging to role $ROLENAME\033[0m"
 
@@ -158,7 +158,7 @@ call create_update_role('role1','select');
 call create_update_role('role1','insert');
 call create_update_role('role1','update');
 call show_roles();
-call show_privileges_in_roles('role1');
+call show_privileges_in_role('role1');
 call grant_privileges('john' , 'machine.domain.com' , 'employees' , '' , 'alltables' , 'role1' , 'john@domain.com');
 call revoke_privileges('john' , 'machine.domain.com' , 'employees' , 'salaries' , 'table' , 'role1' , 'N');
 call grant_privileges('paul' , '10.0.0.2' , 'world' , '^Country' , 'regexp' , 'role1' , 'paul@domain.com');

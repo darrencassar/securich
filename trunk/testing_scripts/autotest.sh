@@ -66,7 +66,7 @@ if [ $? != 0 ]; then
     echo -e "ERROR - Test1 - create_update_role"
 } fi
 
-echo "" 
+echo ""
 echo ""
 echo -e `date` - "INFO - Test1 - Updating role - role1, adding privilege select"
 
@@ -79,7 +79,7 @@ if [ $? != 0 ]; then
 TESTUSER=`cat $LOGFILE | grep 'Password for user' | tr -s "-" | sed 's/ //g' | cut -d "-" -f 2 | tail -1`
 TESTPASS=`cat $LOGFILE | grep 'Password for user' | tr -s "-" | sed 's/ //g' | cut -d "-" -f 6 | tail -1`
 
-echo "" 
+echo ""
 echo ""
 echo "TESTUSER=$TESTUSER - TESTPASS=$TESTPASS"
 echo ""
@@ -92,7 +92,7 @@ if [ $? != 0 ]; then
     echo -e "ERROR - show databases"
 } fi
 
-echo "" 
+echo ""
 echo ""
 echo -e `date` - "INFO - Testing select now()"
 echo ""
@@ -107,7 +107,7 @@ echo ""
 echo ""
 echo ""
 
-# Test2 
+# Test2
 #============
 
 echo -e `date` - "INFO - Test2 - TEST CREATE ROLE"
@@ -118,7 +118,7 @@ if [ $? != 0 ]; then
     echo -e "ERROR - Test2 - role create with priv insert"
 } fi
 
-echo "" 
+echo ""
 echo ""
 echo -e `date` - "INFO - Test2 - Role creating with insert privilege"
 
@@ -128,7 +128,7 @@ if [ $? != 0 ]; then
     echo -e "ERROR - Test2 - role create with priv update"
 } fi
 
-echo "" 
+echo ""
 echo ""
 echo -e `date` - "INFO - Test2 - Showing roles available"
 
@@ -137,18 +137,18 @@ if [ $? != 0 ]; then
 {
     echo -e "ERROR - Test2 - show_roles"
 } fi
- 
-echo "" 
+
+echo ""
 echo ""
 echo -e `date` - "INFO - Test2 - Showing roles"
 
-mysql -u $USER --password=$PASSWORD -h $HOST -P $PORT $DB --execute="CALL show_privileges_in_roles('role1');"
+mysql -u $USER --password=$PASSWORD -h $HOST -P $PORT $DB --execute="CALL show_privileges_in_role('role1');"
 if [ $? != 0 ]; then
 {
-    echo -e "ERROR - Test2 - show_privileges_in_roles"
+    echo -e "ERROR - Test2 - show_privileges_in_role"
 } fi
 
-echo "" 
+echo ""
 echo ""
 echo -e `date` - "INFO - Test2 - Showing privileges belonging to role role1"
 
@@ -180,7 +180,7 @@ if [ $? != 0 ]; then
 TESTUSER=`cat $LOGFILE | grep 'Password for user' | tr -s "-" | sed 's/ //g' | cut -d "-" -f 2 | tail -1`
 TESTPASS=`cat $LOGFILE | grep 'Password for user' | tr -s "-" | sed 's/ //g' | cut -d "-" -f 6 | tail -1`
 
-echo "" 
+echo ""
 echo "TESTUSER=$TESTUSER - TESTPASS=$TESTPASS"
 echo ""
 echo -e `date` - "INFO - Test3 - Testing new user access"
@@ -193,7 +193,7 @@ if [ $? != 0 ]; then
     echo -e "ERROR - Test3 - revoke_privileges"
 } fi
 
-echo "" 
+echo ""
 echo ""
 echo -e `date` - "INFO - Test3 - Testing revoke privileges on user"
 echo ""
@@ -207,7 +207,7 @@ if [ $? != 0 ]; then
 TESTUSER=`cat $LOGFILE | grep 'Password for user' | tr -s "-" | sed 's/ //g' | cut -d "-" -f 2 | tail -1`
 TESTPASS=`cat $LOGFILE | grep 'Password for user' | tr -s "-" | sed 's/ //g' | cut -d "-" -f 6 | tail -1`
 
-echo "" 
+echo ""
 echo "TESTUSER=$TESTUSER - TESTPASS=$TESTPASS"
 echo ""
 echo -e `date` - "INFO - Test3 - Testing new user access"
@@ -219,7 +219,7 @@ if [ $? != 0 ]; then
     echo -e "ERROR - Test3 - show_full_user_entries"
 } fi
 
-echo "" 
+echo ""
 echo ""
 echo -e `date` - "INFO - Test3 - Showing full user entries"
 
@@ -229,7 +229,7 @@ if [ $? != 0 ]; then
     echo -e "ERROR - Test3 - create_update_role"
 } fi
 
-echo "" 
+echo ""
 echo ""
 echo -e `date` - "INFO - Test3 - Updating role - role1, adding privilege DELETE"
 
@@ -239,7 +239,7 @@ if [ $? != 0 ]; then
     echo -e "ERROR - Test3 - show_full_user_entries"
 } fi
 
-echo "" 
+echo ""
 echo ""
 echo -e `date` - "INFO - Test3 - Showing full user entries"
 
@@ -252,7 +252,7 @@ if [ $? != 0 ]; then
 TESTUSER=`cat $LOGFILE | grep 'Password for user' | tr -s "-" | sed 's/ //g' | cut -d "-" -f 2 | tail -1`
 TESTPASS=`cat $LOGFILE | grep 'Password for user' | tr -s "-" | sed 's/ //g' | cut -d "-" -f 6 | tail -1`
 
-echo "" 
+echo ""
 echo "TESTUSER=$TESTUSER - TESTPASS=$TESTPASS"
 echo ""
 echo -e `date` - "INFO - Test3 - Cloning user TOM to user JUDAS"
@@ -263,7 +263,7 @@ if [ $? != 0 ]; then
     echo -e "ERROR - Test3 - show_full_user_entries"
 } fi
 
-echo "" 
+echo ""
 echo ""
 echo -e `date` - "INFO - Test3 - Showing full user entries"
 
@@ -273,7 +273,7 @@ if [ $? != 0 ]; then
     echo -e "ERROR - Test3 - show_full_user_privileges"
 } fi
 
-echo "" 
+echo ""
 echo ""
 echo -e `date` - "INFO - Test3 - Showing full user privileges for JUDAS"
 
@@ -283,7 +283,7 @@ echo -e `date` - "INFO - Test3 - Showing full user privileges for JUDAS"
 #    echo -e "ERROR - Test3 - rename_user"
 #} fi
 #
-#echo "" 
+#echo ""
 #echo ""
 #echo -e `date` - "INFO - Test3 - Renaming User"
 
@@ -292,7 +292,7 @@ if [ $? != 0 ]; then
 {
     echo -e "ERROR - Test3 - create_update_role"
 } fi
- 
+
 echo ""
 echo ""
 echo -e `date` - "INFO - Test3 - Create Update Role"
@@ -326,7 +326,7 @@ if [ $? != 0 ]; then
 TESTUSER=`cat $LOGFILE | grep 'Password for user' | tr -s "-" | sed 's/ //g' | cut -d "-" -f 2 | tail -1`
 TESTPASS=`cat $LOGFILE | grep 'Password for user' | tr -s "-" | sed 's/ //g' | cut -d "-" -f 6 | tail -1`
 
-echo "" 
+echo ""
 echo "TESTUSER=$TESTUSER - TESTPASS=$TESTPASS"
 echo ""
 echo -e `date` - "INFO - Test3 - Testing new user access"
@@ -338,7 +338,7 @@ if [ $? != 0 ]; then
     echo -e "ERROR - Test4 - grant_privileges"
 } fi
 
-echo "" 
+echo ""
 echo "TESTUSER=$TESTUSER - TESTPASS=$TESTPASS"
 echo ""
 echo -e `date` - "INFO - Test4 - Testing new user access"
@@ -389,7 +389,7 @@ if [ $? != 0 ]; then
     echo -e "ERROR - Test4 - revoke_privileges"
 } fi
 
-echo "" 
+echo ""
 echo ""
 echo -e `date` - "INFO - Test4 - Testing revoke privileges on user"
 echo ""
