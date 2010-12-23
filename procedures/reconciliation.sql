@@ -86,7 +86,7 @@ CREATE PROCEDURE `securich`.`reconciliation`(command varchar(50))
 
          IF command = 'sync' THEN
 
-            IF (select `value` from sec_config where property='prive_mode') = 'safe' THEN
+            IF (select `value` from sec_config where property='priv_mode') = 'safe' THEN
 
                call mysql_reconciliation('');
 
