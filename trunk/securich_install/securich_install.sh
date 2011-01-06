@@ -5,8 +5,8 @@
 ##  Securich install script containing selection of kind of installation such   ##
 ##  as through download or from file, version control, upgrade facility,        ##
 ##  socket or tcp/ip connection etc                                             ##
-##  v 3.0                                                                       ##
-##  19th August 2010                                                            ##
+##  v 4.0                                                                       ##
+##  7 th January 2011                                                           ##
 ##                                                                              ##
 ##################################################################################
 
@@ -14,54 +14,29 @@
 
 terminate () {
 
-   if [ "$CH" == "" ] || [ "$CH" == "1"  ]
-    then
-     mysql --user=$SUPERUSER --password=$PASS -h $HOST -P $PORT --execute="drop database if exists securich"
-     mysql --user=$SUPERUSER --password=$PASS -h $HOST -P $PORT --execute="create database securich"
+     mysql --user=$SUPERUSER --password=$PASS $COMM_MEANS --execute="drop database if exists securich"
+     mysql --user=$SUPERUSER --password=$PASS $COMM_MEANS --execute="create database securich"
 
 ## If the choice was to update, then a rollback involves reloading old securich database
 
-       if [ "$FOU" == "2" ]
-       then
+     if [ "$FOU" == "2" ]
+     then
 
 ## load backup
 
-         mysql --user=$SUPERUSER --password=$PASS -h $HOST -P $PORT securich < backup/securich_`/bin/date +%Y%m%d`.sql
-         if [ $? != 0 ]
-          then
+       mysql --user=$SUPERUSER --password=$PASS $COMM_MEANS securich < backup/securich_`/bin/date +%Y%m%d`.sql
+       if [ $? != 0 ]
+       then
 
 ## backup failed .... needs manual fixing
 
-           echo "***** MAJOR PROBLEM - Rollback not possible. Backup file is in backup folder, please import manually."
-           exit 1
-         fi
+         echo "***** MAJOR PROBLEM - Rollback not possible. Backup file is in backup folder, please import manually."
+         exit 1
        fi
+     fi
+
      echo "Installation terminated abruptly and installation reversed"
      exit 0
-
-## Same as above but for sockets rather than for tcp/ip connectivity
-
-   elif [ "$CH" == "2" ]
-    then
-     mysql --user=$SUPERUSER --password=$PASS --socket=$SOCK --execute="drop database if exists securich"
-     mysql --user=$SUPERUSER --password=$PASS --socket=$SOCK --execute="create database securich"
-
-       if [ "$FOU" == "2" ]
-       then
-         ##load backup
-         mysql --user=$SUPERUSER --password=$PASS --socket=$SOCK securich < backup/securich_`/bin/date +%Y%m%d`.sql
-         if [ $? != 0 ]
-          then
-           echo "***** MAJOR PROBLEM - Rollback not possible. Backup file is in backup folder, please import manually."
-           exit 1
-         fi
-       fi
-     echo "Installation terminated abruptly and installation reversed"
-     exit 0
-   else
-     echo "Installation terminated abruptly and installation reversed"
-    exit 0
-   fi
 
 }
 

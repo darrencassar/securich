@@ -1,9 +1,6 @@
 INSTALLATION
 
-   Drop all users apart from root and the installation user.
    Install using ./securich_install.sh
-
-WEB
 
    http://www.securich.com
    http://code.google.com/p/securich/
@@ -21,7 +18,7 @@ DOCUMENTATION
 ##                                                                                       ##
 ## GRANTING PRIVILEGES ON ANY OF MYSQL OR SECURITY DATABASES IS A SECURITY RISK.         ##
 ## THIS SHOULD BE AVOIDED AT ALL COSTS BUT IS STILL PERMITTED THROUGH THE STORED         ##
-## PROCEDURES JUST IN CASE ANYONE NEEDS THAT FUNCTIONALITY.                              ##
+## PROCEDURES IN CASE ANYONE NEEDS THAT FUNCTIONALITY.                                   ##
 ##                                                                                       ##
 ## FURTHER INFORMATION ABOUT MYSQL PRIVILEGES CAN BE FOUND AT:                           ##
 ## http://dev.mysql.com/doc/refman/5.1/en/privileges-provided.html#priv_show-databases   ##
@@ -107,7 +104,7 @@ The stored procedures currently included are:
   Renames an old user to the new username leaving all privileges intact and changing only the password and the email address.
 
 * revoke_privileges('username','hostname','databasename','tablename','tabletype','rolename','terminateconnections');
-  Revokes a privilege for a particular combination of username / hostname / databasename / tablename / role. The terminateconnectionsy is there to kill all threads for a particular user if set to Y which is revoked. Should you not want to cut off the user, just substitute it with n and the user won't be able to connect next time round but current connections remain intact. - tabletype should either be table (for a table) and storedprocedure (for a stored proc).
+  Revokes a privilege for a particular combination of username / hostname / databasename / tablename / role. The terminateconnectionsy is there to kill all threads for a particular user if set to Y which is revoked. Should you not want to cut off the user, just substitute it with n and the user won't be able to connect next time round but current connections remain intact. - tabletype should either be `table` (for a table), `storedprocedure` (for a stored proc) or `all` for the whole database.
 
 * set_my_password(oldpasswordin, newpasswordin);
   Used by users to set their own password.
@@ -162,6 +159,27 @@ The stored procedures currently included are:
 * update_databases_tables_storedprocedures_list();
   Updates the tables and databases tables (sec_tables, sec_databases, sec_storecprocedures and their relationship table sec_db_tb and sec_db_sp) with the full list of tables / databases / storedprocedures.
 
+
+sec_config:
+   +----------------------------------------------+-------+
+   | PROPERTY                                     | VALUE |
+   +----------------------------------------------+-------+
+   | mysql_to_securich_reconciliation_in_progress | 0     | - used by the system
+   | password_length                              | 10    | - set by user for password complexity checks
+   | password_length_check                        | 1     | - set by user for password complexity checks
+   | password_dictionary_check                    | 1     | - set by user for password complexity checks
+   | password_lowercase_check                     | 1     | - set by user for password complexity checks
+   | password_uppercase_check                     | 1     | - set by user for password complexity checks
+   | password_number_check                        | 1     | - set by user for password complexity checks
+   | password_special_character_check             | 1     | - set by user for password complexity checks
+   | password_username_check                      | 1     | - set by user for password complexity checks
+   | sec_mode                                     | 0     | - security mode is 0 (lenient) or 9 (strict)
+   | priv_mode                                    | safe  | - privilege mode is safe in order to not loose any privileges when syncing
+   | admin_user                                   | root  | - admin user set by system
+   +----------------------------------------------+-------+
+
+sec_mode 0 permits granting of privileges on any object / database, 9 prohibits granting of privileges on mysql database.
+priv_mode safe is used to sync securich to mysql and vice versa without loosing any privileges. If safe is changed then calling reconciliation('sync') would just sync mysql with securich loosing any privs granted via MySQL.
 
 
 Note that the `mysql` database is a VERY SENSITIVE database and no one should have direct privileges to that database apart from root and any user used to install securich and other sensitive accounts (preferibly kept to a minimum)

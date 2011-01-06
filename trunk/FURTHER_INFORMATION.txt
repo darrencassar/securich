@@ -1,0 +1,62 @@
+ALL [PRIVILEGES]		Sets all simple privileges except GRANT OPTION
+ALTER					Enable the use of ALTER TABLE statement
+ALTER ROUTINE			Enable stored routines to be altered or dropped
+CREATE					Enable the use of CREATE TABLE statement
+CREATE ROUTINE			Enable creation of stored routines
+CREATE TEMPORARY TABLES	Enable the use of CREATE TEMPORARY TABLE statement
+CREATE USER				Enable the use of CREATE USER, DROP USER, RENAME USER, and REVOKE ALL PRIVILEGES.
+CREATE VIEW				Enable the use of CREATE VIEW statement
+DELETE					Enable the use of DELETE statement
+DROP					Enable the use of DROP TABLE statement
+EXECUTE					Enable the user to execute stored routines
+EVENT					Enable the creation, drop and execution of an event
+FILE					Enable the use of SELECT INTO OUTFILE and LOAD DATA INFILE
+INDEX					Enable the use of CREATE INDEX and DROP INDEX statements
+INSERT					Enable the use of INSERT
+LOCK TABLES				Enable the use of LOCK TABLES on tables for which the user has the SELECT privilege
+PROCESS					Enable the user to see all processes with SHOW PROCESSLIST
+RELOAD					Enable the use of the FLUSH statement
+REPLICATION CLIENT		Enable the user to ask for slave or master server locations
+REPLICATION SLAVE		Needed for replication slaves (reads binary log events from the master)
+SELECT					Enable the use of SELECT
+SHOW DATABASES	 		Shows all databases
+SHOW VIEW				Enable the use of SHOW CREATE VIEW
+SHUTDOWN				Enable the use of mysqladmin shutdown
+SUPER					Enable the use of CHANGE MASTER, KILL, PURGE MASTER LOGS, and SET GLOBAL statements, the mysqladmin debug command; allows single connection if max_connections is reached
+TRIGGER               	Enable the creation, drop ane execution of a trigger on a table
+UPDATE					Enable the use of UPDATE
+USAGE					Synonym for no privileges
+GRANT OPTION			Enable privileges to be granted
+
+
++-------------------------+------------------------+
+| PRIVILEGE               | TYPE_OF_PRIV           |
++-------------------------+------------------------+
+| SELECT                  | Column Level           |	Enable the use of SELECT
+| INSERT                  | Column Level           |	Enable the use of INSERT
+| UPDATE                  | Column Level           |	Enable the use of UPDATE
+| REFERENCES              | Column Level           |	Currently unused as at 2011-01
+| INDEX                   | Table Level            |	Enable the use of CREATE INDEX and DROP INDEX statements
+| DROP                    | Table Level            |	Enable the use of DROP TABLE statement
+| CREATE                  | Table Level            |	Enable the use of CREATE TABLE statement
+| ALTER                   | Table Level            |	Enable the use of ALTER TABLE statement
+| DELETE                  | Table Level            |	Enable the use of DELETE statement
+| EXECUTE                 | Stored Procedure Level |	Enable the user to execute stored routines
+| ALTER ROUTINE           | Stored Procedure Level |	Enable stored routines to be altered or dropped
+| SHOW VIEW               | Stored Procedure Level |	Enable the use of SHOW CREATE VIEW
+| CREATE VIEW             | Stored Procedure Level |	Enable the use of CREATE VIEW statement
+| TRIGGER                 | Stored Procedure Level |	Enable the creation, drop ane execution of a trigger on a table
+| LOCK TABLES             | Database Level         |	Enable the use of LOCK TABLES on tables for which the user has the SELECT privilege
+| CREATE ROUTINE          | Database Level         |	Enable creation of stored routines
+| CREATE TEMPORARY TABLES | Database Level         |	Enable the use of CREATE TEMPORARY TABLE statement
+| EVENT                   | Database Level         |	Enable the creation, drop and execution of an event
+| SUPER                   | Administration Level   |	Enable the use of CHANGE MASTER, KILL, PURGE MASTER LOGS, and SET GLOBAL statements, the mysqladmin debug command; allows single connection if max_connections is reached
+| SHUTDOWN                | Administration Level   |	Enable the use of mysqladmin shutdown
+| SHOW DATABASES          | Administration Level   |	Shows all databases
+| REPLICATION SLAVE       | Administration Level   |	Needed for replication slaves (reads binary log events from the master)
+| REPLICATION CLIENT      | Administration Level   |	Enable the user to ask for slave or master server locations
+| RELOAD                  | Administration Level   |	Enable the use of the FLUSH statement
+| PROCESS                 | Administration Level   |	Enable the user to see all processes with SHOW PROCESSLIST
+| CREATE USER             | Administration Level   |	Enable the use of CREATE USER, DROP USER, RENAME USER, and REVOKE ALL PRIVILEGES.
+| FILE                    | Administration Level   |	Enable the use of SELECT INTO OUTFILE and LOAD DATA INFILE
++-------------------------+------------------------+
