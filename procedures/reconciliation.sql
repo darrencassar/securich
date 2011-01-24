@@ -166,6 +166,7 @@ CREATE PROCEDURE `securich`.`reconciliation`(command varchar(50))
             SET @g = CONCAT('delete from inf_grantee_privileges where GRANTEE regexp "^\'', reservedusername ,'\'"');
 
             PREPARE delcom FROM @g;
+	    select @g;
             EXECUTE delcom;
 
             delete from sec_tmp_reserved_usernames where USERNAME=reservedusername;
@@ -332,6 +333,7 @@ CREATE PROCEDURE `securich`.`reconciliation`(command varchar(50))
                SET @c = CONCAT('create user ' , GRANTEEPARAM , ' identified by "' , randompassword , '"');
 
                PREPARE createcom FROM @c;
+	       select @c;
                EXECUTE createcom;
 
                /* insert a record of the user entity (username@host) in sec_us_ho */
@@ -384,7 +386,12 @@ CREATE PROCEDURE `securich`.`reconciliation`(command varchar(50))
             END IF;
 
             PREPARE grantcom FROM @g;
+	    select @g;
             EXECUTE grantcom;
+
+            SET @un=(SELECT SUBSTRING_INDEX(USER(),'@',1));
+            SET @hn=(SELECT SUBSTRING_INDEX(USER(),'@',-1));
+            INSERT INTO aud_grant_revoke (USERNAME,HOSTNAME,COMMAND,TIMESTAMP) VALUES (@un,@hn,@g,NOW());
 
             END WHILE cur_reconcile_loop;
 
@@ -392,9 +399,6 @@ CREATE PROCEDURE `securich`.`reconciliation`(command varchar(50))
 
             FLUSH PRIVILEGES;
 
-            SET @un=(SELECT SUBSTRING_INDEX(USER(),'@',1));
-            SET @hn=(SELECT SUBSTRING_INDEX(USER(),'@',-1));
-            INSERT INTO aud_grant_revoke (USERNAME,HOSTNAME,COMMAND,TIMESTAMP) VALUES (@un,@hn,@g,NOW());
 
 
          ELSE
