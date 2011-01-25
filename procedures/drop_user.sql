@@ -1,6 +1,6 @@
 #######################################################################################
 ##                                                                                   ##
-##   This is reconciliation, a script used to check and repair any differences       ##
+##   This is drop_user, a script used to check and repair any differences            ##
 ##   between the mysql privileges tables and securich db.                            ##
 ##                                                                                   ##
 ##   This program was written by Darren Cassar 2010.                                 ##
@@ -77,7 +77,7 @@ CREATE PROCEDURE `securich`.`drop_user`( usernamein varchar(16), hostnamein varc
 		delete from sec_us_ho_db_sp where US_ID=@USID and HO_ID=@HOID;
 		delete from sec_us_ho_db_tb where US_ID=@USID and HO_ID=@HOID;
 		
-		call reconciliation('sync');  /* Run reconciliation in order to audit the revokes of privileges! */
+		call reconciliation('securichsync');  /* Run reconciliation in order to audit the revokes of privileges! */
 
 		SET @d = CONCAT('drop user "', usernamein , '"@"' , hostnamein , '"'); /* Drop since the user doesn't have any privileges at all! */
 
