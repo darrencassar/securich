@@ -366,7 +366,7 @@ CREATE PROCEDURE `securich`.`revoke_privileges`( usernamein varchar(16), hostnam
 
 /*If the role revoked was the last role, thus user ended up without roles, then user is dropped*/
        IF (select value from sec_config where PROPERTY = 'mysql_to_securich_reconciliation_in_progress') = '0' THEN
-          call reconciliation('securichsync');
+          call reconciliation('sync');
        END IF;
 
        SET tb_rolecount = (
