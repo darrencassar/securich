@@ -77,7 +77,7 @@ CREATE PROCEDURE `securich`.`drop_user`( usernamein varchar(16), hostnamein varc
 		delete from sec_us_ho_db_sp where US_ID=@USID and HO_ID=@HOID;
 		delete from sec_us_ho_db_tb where US_ID=@USID and HO_ID=@HOID;
 		
-		call reconciliation('securichsync');  /* Run reconciliation in order to audit the revokes of privileges! */
+		call reconciliation('sync');  /* Run reconciliation in order to audit the revokes of privileges! */
 
 		SET @d = CONCAT('drop user "', usernamein , '"@"' , hostnamein , '"'); /* Drop since the user doesn't have any privileges at all! */
 
