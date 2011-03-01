@@ -27,8 +27,9 @@ DROP PROCEDURE IF EXISTS mysql_reconciliation;
 
 DELIMITER $$
 
-CREATE PROCEDURE `securich`.`mysql_reconciliation`(command_mysqlrecon varchar(50))
-  BEGIN
+
+CREATE PROCEDURE `mysql_reconciliation`(command_mysqlrecon VARCHAR(50))
+BEGIN
 
       DECLARE dbnamein VARCHAR(60);
       DECLARE rowcount INT;
@@ -54,26 +55,40 @@ CREATE PROCEDURE `securich`.`mysql_reconciliation`(command_mysqlrecon varchar(50
          SELECT SYSTEM, GRANTEE, TABLE_SCHEMA, TABLE_NAME, PRIVILEGE, TYPE
          FROM sec_two_grantee_privileges_reconcile;
 
+/*    
       DECLARE cur_databases CURSOR FOR
          SELECT DATABASENAME
          FROM sec_databases
          WHERE DATABASENAME <> '';
 
+
+      DECLARE cur_databases CURSOR FOR
+         SELECT DISTINCT(schema_name)
+         FROM information_schema.SCHEMATA
+         WHERE schemata != 'information_schema';
+*/ 
+      DECLARE cur_databases CURSOR FOR
+         SELECT DISTINCT(db)
+         FROM dbnames;
+
       DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
 
-
-      /*DECLARE EXIT HANDLER FOR SQLEXCEPTION
-      BEGIN
-         ROLLBACK;
-      END;*/
-
-         update sec_config set VALUE = '1' where PROPERTY = 'mysql_to_securich_reconciliation_in_progress';
+      UPDATE sec_config SET VALUE = '1' WHERE PROPERTY = 'mysql_to_securich_reconciliation_in_progress';
 
          FLUSH PRIVILEGES;
+       
+         DROP TABLE IF EXISTS dbnames;
+         CREATE TEMPORARY TABLE dbnames 
+         (
+           DB VARCHAR(50)
+         ) ENGINE=MYISAM; 
+
+         insert into dbnames select distinct(db) from mysql.db;
+         insert into dbnames select distinct(db) from mysql.tables_priv;
+         insert into dbnames select distinct(db) from mysql.procs_priv;
+         insert into dbnames select distinct(SCHEMA_NAME) from information_schema.SCHEMATA;
 
          DROP TABLE IF EXISTS inf_grantee_privileges;
-
-/* Tables used to hold mysql privs */
 
          CREATE TEMPORARY TABLE inf_grantee_privileges
          (
@@ -86,16 +101,23 @@ CREATE PROCEDURE `securich`.`mysql_reconciliation`(command_mysqlrecon varchar(50
            PRIMARY KEY (`ID`)
          ) ENGINE=MYISAM AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
 
-/* Build up a list of privileges mysql ownes in order to be compared later (in the same stored proc) with privileges owned by securich */
 
-         INSERT INTO inf_grantee_privileges (GRANTEE,PRIVILEGE,TYPE)
-            SELECT GRANTEE,PRIVILEGE_TYPE,'t'
-            FROM information_schema.USER_PRIVILEGES
-               WHERE grantee IN (
-                  SELECT DISTINCT(grantee)
-                  FROM information_schema.user_privileges
-               );
-
+         INSERT INTO inf_grantee_privileges  (GRANTEE,TABLE_SCHEMA,PRIVILEGE,TYPE) 
+         SELECT GRANTEE,sch.SCHEMA_NAME,PRIVILEGE_TYPE,'t' 
+         FROM information_schema.USER_PRIVILEGES JOIN information_schema.SCHEMATA sch
+            WHERE grantee IN (
+               SELECT DISTINCT(grantee) 
+               FROM information_schema.user_privileges
+            ) AND sch.SCHEMA_NAME != 'information_schema' ;
+/*           
+         INSERT INTO inf_grantee_privileges  (GRANTEE,TABLE_SCHEMA,PRIVILEGE,TYPE) 
+         SELECT GRANTEE,dbn.db,PRIVILEGE_TYPE,'t' 
+         FROM information_schema.USER_PRIVILEGES JOIN (select distinct(db) from dbnames) dbn
+            WHERE grantee IN (
+               SELECT DISTINCT(grantee) 
+               FROM information_schema.user_privileges
+            );            
+*/ 
 
          INSERT INTO inf_grantee_privileges (GRANTEE,TABLE_SCHEMA,PRIVILEGE,TYPE)
             SELECT GRANTEE, TABLE_SCHEMA, PRIVILEGE_TYPE,'t'
@@ -114,7 +136,7 @@ CREATE PROCEDURE `securich`.`mysql_reconciliation`(command_mysqlrecon varchar(50
                   FROM information_schema.user_privileges
                );
 
-/* Adding stored procedures privileges to the list */
+
          DROP TABLE IF EXISTS temp_tbl_PROCS_PRIVILEGES;
 
          CREATE TEMPORARY TABLE temp_tbl_PROCS_PRIVILEGES (
@@ -147,7 +169,7 @@ CREATE PROCEDURE `securich`.`mysql_reconciliation`(command_mysqlrecon varchar(50
 
          INSERT INTO sec_tmp_reserved_usernames SELECT ID,USERNAME FROM sec_reserved_usernames;
 
-         /* Remove any records of privileges for reserved usernames inside of the above tables */
+         
 
          SET rowcount = (SELECT COUNT(*) FROM sec_tmp_reserved_usernames);
 
@@ -167,99 +189,135 @@ CREATE PROCEDURE `securich`.`mysql_reconciliation`(command_mysqlrecon varchar(50
 
          DELETE
          FROM inf_grantee_privileges
+         WHERE GRANTEE like '\'\'@%';
+
+         DELETE
+         FROM inf_grantee_privileges
          WHERE PRIVILEGE='USAGE';
 
-         drop table if exists sec_two_grantee_privileges;
-
-/* Tables used to hold securich privs */
-
-         create temporary table sec_two_grantee_privileges
+         UPDATE 
+            inf_grantee_privileges grpr 
+            JOIN
+            sec_privileges pr 
+            ON grpr.PRIVILEGE = pr.PRIVILEGE 
+         SET
+            TABLE_NAME = NULL 
+         WHERE pr.TYPE = '2' 
+            OR TABLE_NAME = '' ;
+          
+          
+         UPDATE 
+            inf_grantee_privileges grpr 
+            JOIN
+            sec_privileges pr 
+            ON grpr.PRIVILEGE = pr.PRIVILEGE 
+         SET
+            TABLE_NAME = NULL 
+         WHERE (pr.TYPE = '1' 
+               OR TABLE_NAME = '') 
+            AND grpr.TYPE = 't' ;
+          
+          
+         UPDATE 
+            inf_grantee_privileges grpr 
+            JOIN
+            sec_privileges pr 
+            ON grpr.PRIVILEGE = pr.PRIVILEGE 
+         SET
+            TABLE_SCHEMA = NULL,
+            TABLE_NAME = NULL 
+         WHERE pr.TYPE = '3' 
+            OR TABLE_SCHEMA = '*' ;
+ 
+ 
+         DROP TABLE IF EXISTS sec_two_grantee_privileges;
+         CREATE TEMPORARY TABLE sec_two_grantee_privileges
          (
-           ID int(10) unsigned NOT NULL AUTO_INCREMENT,
-           GRANTEE varchar(81),
-           TABLE_SCHEMA varchar (64) DEFAULT NULL,
-           TABLE_NAME varchar(64) DEFAULT NULL,
-           PRIVILEGE varchar (30),
-           TYPE char(1),
+           ID INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+           GRANTEE VARCHAR(81),
+           TABLE_SCHEMA VARCHAR (64) DEFAULT NULL,
+           TABLE_NAME VARCHAR(64) DEFAULT NULL,
+           PRIVILEGE VARCHAR (30),
+           TYPE CHAR(1),
            PRIMARY KEY (`ID`)
-         ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
+         ) ENGINE=MYISAM AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
 
-         drop table if exists sec_two_grantee_privileges_reconcile;
+         DROP TABLE IF EXISTS sec_two_grantee_privileges_reconcile;
 
-         create temporary table sec_two_grantee_privileges_reconcile
+         CREATE TEMPORARY TABLE sec_two_grantee_privileges_reconcile
          (
-           ID int(10) unsigned NOT NULL AUTO_INCREMENT,
-           SYSTEM varchar(20),
-           GRANTEE varchar(81),
-           TABLE_SCHEMA varchar (64) DEFAULT NULL,
-           TABLE_NAME varchar(64) DEFAULT NULL,
-           PRIVILEGE varchar (30),
-           TYPE char(1),
+           ID INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+           SYSTEM VARCHAR(20),
+           GRANTEE VARCHAR(81),
+           TABLE_SCHEMA VARCHAR (64) DEFAULT NULL,
+           TABLE_NAME VARCHAR(64) DEFAULT NULL,
+           PRIVILEGE VARCHAR (30),
+           TYPE CHAR(1),
            PRIMARY KEY (`ID`)
-         ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
+         ) ENGINE=MYISAM AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
 
-/* Build up a list of privileges securich ownes in order to be compared later (in the same stored proc) with privileges owned by mysql tables (user, db, tables_priv and procs_priv) */
 
-         insert into sec_two_grantee_privileges (GRANTEE,TABLE_SCHEMA,TABLE_NAME,PRIVILEGE,TYPE)
-            select CONCAT("'", us.USERNAME , "'@'" , ho.HOSTNAME , "'"), db.DATABASENAME, tb.TABLENAME, ushodbids.PRIVILEGE,'t'
-            from sec_users us, sec_hosts ho, sec_databases db, sec_tables tb join (
-               select US_ID,HO_ID,DB_ID,TB_ID,ushodbroids.PRIVILEGE
-               from sec_us_ho_db_tb ushodbtb join (
-                  select ushodbro.US_HO_DB_TB_ID, pr.PRIVILEGE
-                  from sec_us_ho_db_tb_ro ushodbro join sec_ro_pr ropr join  sec_privileges pr
-                  where ropr.PR_ID=pr.ID and
-                  ropr.RO_ID=ushodbro.RO_ID and
+
+         INSERT INTO sec_two_grantee_privileges (GRANTEE,TABLE_SCHEMA,TABLE_NAME,PRIVILEGE,TYPE)
+            SELECT CONCAT("'", us.USERNAME , "'@'" , ho.HOSTNAME , "'"), db.DATABASENAME, tb.TABLENAME, ushodbids.PRIVILEGE,'t'
+            FROM sec_users us, sec_hosts ho, sec_databases db, sec_tables tb JOIN (
+               SELECT US_ID,HO_ID,DB_ID,TB_ID,ushodbroids.PRIVILEGE
+               FROM sec_us_ho_db_tb ushodbtb JOIN (
+                  SELECT ushodbro.US_HO_DB_TB_ID, pr.PRIVILEGE
+                  FROM sec_us_ho_db_tb_ro ushodbro JOIN sec_ro_pr ropr JOIN  sec_privileges pr
+                  WHERE ropr.PR_ID=pr.ID AND
+                  ropr.RO_ID=ushodbro.RO_ID AND
                   ushodbro.STATE='A'
                   ) ushodbroids
-               where ushodbtb.ID=ushodbroids.US_HO_DB_TB_ID and
-               ushodbtb.STATE='A' /* do not take up any records which are revoked or blocked */
+               WHERE ushodbtb.ID=ushodbroids.US_HO_DB_TB_ID AND
+               ushodbtb.STATE='A' 
                ) ushodbids
-            where us.ID=ushodbids.US_ID and
-            ho.ID=ushodbids.HO_ID and
-            db.ID=ushodbids.DB_ID and
+            WHERE us.ID=ushodbids.US_ID AND
+            ho.ID=ushodbids.HO_ID AND
+            db.ID=ushodbids.DB_ID AND
             tb.ID=ushodbids.TB_ID
-            order by 1 asc;
+            ORDER BY 1 ASC;
 
-         insert into sec_two_grantee_privileges (GRANTEE,TABLE_SCHEMA,TABLE_NAME,PRIVILEGE,TYPE)
-            select CONCAT("'", us.USERNAME , "'@'" , ho.HOSTNAME , "'"), db.DATABASENAME, sp.STOREDPROCEDURENAME, ushodbids.PRIVILEGE,'s'
-            from sec_users us, sec_hosts ho, sec_databases db, sec_storedprocedures sp join (
-               select US_ID,HO_ID,DB_ID,SP_ID,ushodbroids.PRIVILEGE
-               from sec_us_ho_db_sp ushodbsp join (
-                  select ushodbro.US_HO_DB_SP_ID, pr.PRIVILEGE
-                  from sec_us_ho_db_sp_ro ushodbro join sec_ro_pr ropr join  sec_privileges pr
-                  where ropr.PR_ID=pr.ID and
-                  ropr.RO_ID=ushodbro.RO_ID and
+         INSERT INTO sec_two_grantee_privileges (GRANTEE,TABLE_SCHEMA,TABLE_NAME,PRIVILEGE,TYPE)
+            SELECT CONCAT("'", us.USERNAME , "'@'" , ho.HOSTNAME , "'"), db.DATABASENAME, sp.STOREDPROCEDURENAME, ushodbids.PRIVILEGE,'s'
+            FROM sec_users us, sec_hosts ho, sec_databases db, sec_storedprocedures sp JOIN (
+               SELECT US_ID,HO_ID,DB_ID,SP_ID,ushodbroids.PRIVILEGE
+               FROM sec_us_ho_db_sp ushodbsp JOIN (
+                  SELECT ushodbro.US_HO_DB_SP_ID, pr.PRIVILEGE
+                  FROM sec_us_ho_db_sp_ro ushodbro JOIN sec_ro_pr ropr JOIN  sec_privileges pr
+                  WHERE ropr.PR_ID=pr.ID AND
+                  ropr.RO_ID=ushodbro.RO_ID AND
                   ushodbro.STATE='A'
                   ) ushodbroids
-               where ushodbsp.ID=ushodbroids.US_HO_DB_SP_ID and
-               ushodbsp.STATE='A' /* do not take up any records which are revoked or blocked */
+               WHERE ushodbsp.ID=ushodbroids.US_HO_DB_SP_ID AND
+               ushodbsp.STATE='A' 
                ) ushodbids
-            where us.ID=ushodbids.US_ID and
-            ho.ID=ushodbids.HO_ID and
-            db.ID=ushodbids.DB_ID and
+            WHERE us.ID=ushodbids.US_ID AND
+            ho.ID=ushodbids.HO_ID AND
+            db.ID=ushodbids.DB_ID AND
             sp.ID=ushodbids.SP_ID
-            order by 1 asc;
+            ORDER BY 1 ASC;
 
-         update sec_two_grantee_privileges grpr join sec_privileges pr on grpr.PRIVILEGE=pr.PRIVILEGE
-         set TABLE_NAME=NULL
-         where pr.TYPE='2' OR TABLE_NAME='';
+         UPDATE sec_two_grantee_privileges grpr JOIN sec_privileges pr ON grpr.PRIVILEGE=pr.PRIVILEGE
+         SET TABLE_NAME=NULL
+         WHERE pr.TYPE='2' OR TABLE_NAME='';
 
-         update sec_two_grantee_privileges grpr join sec_privileges pr on grpr.PRIVILEGE=pr.PRIVILEGE
-         set TABLE_NAME=NULL
-         where (pr.TYPE='1' OR TABLE_NAME='') AND grpr.TYPE='t';
+         UPDATE sec_two_grantee_privileges grpr JOIN sec_privileges pr ON grpr.PRIVILEGE=pr.PRIVILEGE
+         SET TABLE_NAME=NULL
+         WHERE (pr.TYPE='1' OR TABLE_NAME='') AND grpr.TYPE='t';
 
-         update sec_two_grantee_privileges grpr join sec_privileges pr on grpr.PRIVILEGE=pr.PRIVILEGE
-         set TABLE_SCHEMA=NULL, TABLE_NAME=NULL
-         where pr.TYPE='3' OR TABLE_SCHEMA='*';
+         UPDATE sec_two_grantee_privileges grpr JOIN sec_privileges pr ON grpr.PRIVILEGE=pr.PRIVILEGE
+         SET TABLE_SCHEMA=NULL, TABLE_NAME=NULL
+         WHERE pr.TYPE='3' OR TABLE_SCHEMA='*';
 
-         insert into sec_two_grantee_privileges_reconcile (SYSTEM,GRANTEE,TABLE_SCHEMA,TABLE_NAME,PRIVILEGE,TYPE)
+         INSERT INTO sec_two_grantee_privileges_reconcile (SYSTEM,GRANTEE,TABLE_SCHEMA,TABLE_NAME,PRIVILEGE,TYPE)
          SELECT MIN(System), GRANTEE, TABLE_SCHEMA, TABLE_NAME, PRIVILEGE, TYPE
          FROM
          (
-           SELECT 'MySQL' as System, inf_grantee_privileges.GRANTEE, inf_grantee_privileges.TABLE_SCHEMA, inf_grantee_privileges.TABLE_NAME, inf_grantee_privileges.PRIVILEGE, inf_grantee_privileges.TYPE
+           SELECT 'MySQL' AS System, inf_grantee_privileges.GRANTEE, inf_grantee_privileges.TABLE_SCHEMA, inf_grantee_privileges.TABLE_NAME, inf_grantee_privileges.PRIVILEGE, inf_grantee_privileges.TYPE
            FROM inf_grantee_privileges
            UNION ALL
-           SELECT 'Securich' as System, sec_two_grantee_privileges.GRANTEE, sec_two_grantee_privileges.TABLE_SCHEMA, sec_two_grantee_privileges.TABLE_NAME, sec_two_grantee_privileges.PRIVILEGE, sec_two_grantee_privileges.TYPE
+           SELECT 'Securich' AS System, sec_two_grantee_privileges.GRANTEE, sec_two_grantee_privileges.TABLE_SCHEMA, sec_two_grantee_privileges.TABLE_NAME, sec_two_grantee_privileges.PRIVILEGE, sec_two_grantee_privileges.TYPE
            FROM sec_two_grantee_privileges
          ) tmp
          GROUP BY GRANTEE, TABLE_SCHEMA, TABLE_NAME, PRIVILEGE, TYPE
@@ -319,15 +377,15 @@ CREATE PROCEDURE `securich`.`mysql_reconciliation`(command_mysqlrecon varchar(50
                SET tablename = '';
             END IF;
 
-            SET roletype=(select type from sec_privileges where PRIVILEGE=role);
+            SET roletype=(SELECT TYPE FROM sec_privileges WHERE PRIVILEGE=role);
 
             IF tableschema IS NULL THEN
 
-            /* If roletype is global just grant the privilege on a single database */
+            
 
                IF roletype > 2 THEN
 
-                  SET dbnamein=(SELECT DATABASENAME FROM sec_databases WHERE DATABASENAME <> '' limit 1);
+                  SET dbnamein=(SELECT DATABASENAME FROM sec_databases WHERE DATABASENAME <> '' LIMIT 1);
 
                   IF SYSTEMPARAM = 'MySQL' THEN
 
@@ -409,7 +467,7 @@ CREATE PROCEDURE `securich`.`mysql_reconciliation`(command_mysqlrecon varchar(50
 
          CLOSE cur_user;
 
-         update sec_config set VALUE = '0' where PROPERTY = 'mysql_to_securich_reconciliation_in_progress';
+         UPDATE sec_config SET VALUE = '0' WHERE PROPERTY = 'mysql_to_securich_reconciliation_in_progress';
 
   END$$
 

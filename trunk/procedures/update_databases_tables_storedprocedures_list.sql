@@ -33,11 +33,22 @@ DELIMITER $$
 CREATE PROCEDURE `securich`.`update_databases_tables_storedprocedures_list`()
   BEGIN
 
+  
+     DROP TABLE IF EXISTS updtdbnames;  
+     CREATE TEMPORARY TABLE updtdbnames 
+     ( 
+      DB VARCHAR(50)
+     ) ENGINE=MYISAM; 
+
+     insert into updtdbnames select distinct(db) from mysql.db;
+     insert into updtdbnames select distinct(db) from mysql.tables_priv;
+     insert into updtdbnames select distinct(db) from mysql.procs_priv;
+     insert into updtdbnames select distinct(SCHEMA_NAME) from information_schema.SCHEMATA where SCHEMA_NAME != 'information_schema';                                  
+              
      insert into securich.sec_databases (DATABASENAME)
-        select SCHEMA_NAME
-        from information_schema.SCHEMATA
-        where SCHEMA_NAME <> 'information_schema' and
-        SCHEMA_NAME not in (
+        select distinct(db)
+        from updtdbnames
+        where db not in (
            select DATABASENAME
            from securich.sec_databases
            );
