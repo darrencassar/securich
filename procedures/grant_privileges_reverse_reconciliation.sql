@@ -140,7 +140,7 @@ CREATE  PROCEDURE `securich`.`grant_privileges_reverse_reconciliation`( username
 	          END IF;
 
 	          IF databaseexists = 0 /* AND tabletype = 'singletable' */ THEN
-               SELECT "Database does not exist";
+#               SELECT "Database $dbnamein does not exist";
                DELETE from sec_databases where DATABASENAME=dbnamein; /* If the database just created is not needed, then remove it from the list*/
             END IF;
 

@@ -279,7 +279,7 @@ CREATE PROCEDURE `securich`.`reverse_reconciliation`()
 
          SELECT distinct(commands) FROM temp_table_reconciliation INTO OUTFILE '/tmp/securich_reconciliation.sql';
          
-         call reconciliation('sync');
+#         call reconciliation('sync');
   END$$
 
 DELIMITER ;
