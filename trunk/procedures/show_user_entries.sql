@@ -181,16 +181,18 @@ CREATE PROCEDURE `securich`.`show_user_entries`( usernamein VARCHAR(16))
        );
        
        
-       INSERT INTO temp_tbl_4 SELECT b.USERNAME, b.HOSTNAME, b.DATABASENAME, b.TABLENAME, a.ROLE, b.TYPE, b.STATE
-       FROM temp_tbl_2 b, temp_tbl_1 a JOIN temp_tbl_3 c
+       INSERT INTO temp_tbl_4 SELECT b.USERNAME, b.HOSTNAME, b.DATABASENAME, b.TABLENAME, a.ROLE, b.TYPE, ushodbtbro.STATE
+       FROM temp_tbl_2 b, temp_tbl_1 a JOIN temp_tbl_3 c JOIN sec_us_ho_db_tb_ro ushodbtbro
        WHERE b.ID=c.US_HO_DB_TB_ID AND
-       a.ID=c.RO_ID
+       a.ID=c.RO_ID and 
+       b.ID=ushodbtbro.US_HO_DB_TB_ID
        GROUP BY USERNAME, HOSTNAME, DATABASENAME, TABLENAME, ROLE, STATE;
        
-       INSERT INTO temp_tbl_4 SELECT b.USERNAME, b.HOSTNAME, b.DATABASENAME, b.STOREDPROCEDURENAME, a.ROLE, b.TYPE, b.STATE
-       FROM temp_tbl_12 b, temp_tbl_11 a JOIN temp_tbl_13 c
-       WHERE b.ID=c.US_HO_DB_SP_ID AND
-       a.ID=c.RO_ID
+       INSERT INTO temp_tbl_4 SELECT b.USERNAME, b.HOSTNAME, b.DATABASENAME, b.STOREDPROCEDURENAME, a.ROLE, b.TYPE, ushodbspro.STATE
+       FROM temp_tbl_12 b, temp_tbl_11 a JOIN temp_tbl_13 c JOIN sec_us_ho_db_sp_ro ushodbspro
+       WHERE b.ID=c.US_HO_DB_SP_ID AND 
+       a.ID=c.RO_ID AND
+       b.ID=ushodbspro.US_HO_DB_SP_ID
        GROUP BY USERNAME, HOSTNAME, DATABASENAME, STOREDPROCEDURENAME, ROLE, STATE;
        
        SELECT * FROM temp_tbl_4 order by 1,2,3,4 asc;

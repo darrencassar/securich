@@ -109,7 +109,8 @@ CREATE PROCEDURE `securich`.`unblock_user`( usernamein varchar(16), hostnamein v
        where US_HO_DB_SP_ID=ushodbsp.ID and STATE='B';
 
 /*If the role revoked was the last role, thus user ended up without roles, then user is dropped*/
-       call reconciliation('sync');
+       call mysql_reconciliation('');
+       call reconciliation('securichsync');
 
     END IF;
 
