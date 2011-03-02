@@ -45,7 +45,6 @@ CREATE PROCEDURE `securich`.`block_user`( usernamein varchar(16), hostnamein var
     FLUSH PRIVILEGES;
     call update_databases_tables_storedprocedures_list();
 
-
     SET userexists = (
        select count(*)
        from sec_us_ho usho join (

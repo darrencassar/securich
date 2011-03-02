@@ -182,21 +182,22 @@ CREATE PROCEDURE `securich`.`show_full_user_entries`( usernamein VARCHAR(16))
 
 
        INSERT INTO temp_tbl_4
-       SELECT b.USERNAME, b.HOSTNAME, b.DATABASENAME, b.TABLENAME, a.ROLE, pr.PRIVILEGE, b.TYPE, b.STATE
-       FROM temp_tbl_2 b, temp_tbl_1 a JOIN temp_tbl_3 c join sec_privileges pr join sec_ro_pr ropr
+       SELECT b.USERNAME, b.HOSTNAME, b.DATABASENAME, b.TABLENAME, a.ROLE, pr.PRIVILEGE, b.TYPE, ushodbtbro.STATE
+       FROM temp_tbl_2 b, temp_tbl_1 a JOIN temp_tbl_3 c JOIN sec_privileges pr JOIN sec_ro_pr ropr JOIN sec_us_ho_db_tb_ro ushodbtbro
        WHERE b.ID=c.US_HO_DB_TB_ID AND
-       a.ID=c.RO_ID  and
-       c.RO_ID=ropr.RO_ID and
-       pr.ID=ropr.PR_ID;
+       a.ID=c.RO_ID  AND
+       c.RO_ID=ropr.RO_ID AND
+       pr.ID=ropr.PR_ID AND
+       b.ID=ushodbtbro.US_HO_DB_TB_ID ;
 
        INSERT INTO temp_tbl_4
-       SELECT b.USERNAME, b.HOSTNAME, b.DATABASENAME, b.STOREDPROCEDURENAME, a.ROLE, pr.PRIVILEGE, b.TYPE, b.STATE
-       FROM temp_tbl_12 b, temp_tbl_11 a JOIN temp_tbl_13 c join sec_privileges pr join sec_ro_pr ropr
+       SELECT b.USERNAME, b.HOSTNAME, b.DATABASENAME, b.STOREDPROCEDURENAME, a.ROLE, pr.PRIVILEGE, b.TYPE, ushodbspro.STATE
+       FROM temp_tbl_12 b, temp_tbl_11 a JOIN temp_tbl_13 c JOIN sec_privileges pr JOIN sec_ro_pr ropr JOIN sec_us_ho_db_sp_ro ushodbspro
        WHERE b.ID=c.US_HO_DB_SP_ID AND
-       a.ID=c.RO_ID  and
-       c.RO_ID=ropr.RO_ID and
-       pr.ID=ropr.PR_ID;
-
+       a.ID=c.RO_ID  AND
+       c.RO_ID=ropr.RO_ID AND
+       pr.ID=ropr.PR_ID AND
+       b.ID=ushodbspro.US_HO_DB_SP_ID;
 
        update temp_tbl_4 tbl4 join sec_privileges pr on tbl4.PRIVILEGE=pr.PRIVILEGE
           set OBJECT=''
