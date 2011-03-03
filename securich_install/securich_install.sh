@@ -30,15 +30,62 @@ terminate () {
 
 ## backup failed .... needs manual fixing
 
-         echo "***** MAJOR PROBLEM - Rollback not possible. Backup file is in backup folder, please import manually."
+         echo " ***** MAJOR PROBLEM - Rollback not possible. Backup file is in backup folder, please import manually."
          exit 1
        fi
      fi
 
-     echo "Installation terminated abruptly and installation reversed"
+     echo " Installation terminated abruptly and installation reversed"
      exit 0
 
 }
+
+#function hr_time_rem () {
+#  usage="$0 seconds 'variable'"
+#  if [ -z $1 ] || [ -z $2 ] ; then
+#    echo $usage
+#    exit 1
+#  fi
+#
+#  days_=$(echo "scale=0 ; $1 / 86400" | bc -l)
+#  remainder_=$(echo "scale=0 ; $1 % 86400" | bc -l)
+#  hours_=$(echo "scale=0 ; $remainder_ / 3600" | bc -l)
+#  remainder_=$(echo "scale=0 ; $remainder_ % 3600" | bc -l)
+#  minutes_=$(echo "scale=0 ; $remainder_ / 60" | bc -l)
+#  seconds_=$(echo "scale=0 ; $remainder_ % 60" | bc -l)
+#  export $2=" $minutes_ min $seconds_ sec"
+#}
+
+function hr_time () {
+  usage="$0 seconds 'variable'"
+  if [ -z $1 ] || [ -z $2 ] ; then
+    echo $usage
+    exit 1
+  fi
+
+  days=$(echo "scale=0 ; $1 / 86400" | bc -l)
+  remainder=$(echo "scale=0 ; $1 % 86400" | bc -l)
+  hours=$(echo "scale=0 ; $remainder / 3600" | bc -l)
+  remainder=$(echo "scale=0 ; $remainder % 3600" | bc -l)
+  minutes=$(echo "scale=0 ; $remainder / 60" | bc -l)
+  seconds=$(echo "scale=0 ; $remainder % 60" | bc -l)
+  export $2=" $minutes min $seconds sec"
+}
+
+ function check_percent () {
+
+   lasttime=`date +%s`
+   currentcount=`mysql --user=$SUPERUSER --password=$PASS $COMM_MEANS securich --execute="call reconciliation('list')" | wc -l` 
+   percentage=$(((originalcount-currentcount) *100 / originalcount))
+
+   #if [ $percentage -gt 2 ]
+   #then
+   #  timeremainingsec=$(((10000 * seconds) / (((originalcount-currentcount) *10000) / originalcount)))
+   #  hr_time_rem $timeremainingsec timeremaining
+   #else
+   #  timeremaining="Calculating time remaining"
+   #fi
+ }
 
 ARGUMENT=$1
 
@@ -62,11 +109,8 @@ then
   echo " brought to you by Darren Cassar "
   echo " http://www.mysqlpreacher.com "
   echo ""
-  echo " installer version 4.0"
-  echo " release date 15th January 2011"
-  echo ""
-  echo ""
-  echo "Anytime you need to cancel installation just press ( Ctrl + C )"
+  echo " installer version 5.0"
+  echo " release date 2nd March 2011"
   echo ""
   echo ""
 fi
@@ -76,8 +120,8 @@ fi
  MYSQLBIN=`which mysql 2> /dev/null`
  if [ "$MYSQLBIN" = "" -o ! -x "$MYSQLBIN" ]
  then
-   echo "It seems this installed can't find MYSQL binary."
-   echo "Please make sure it is in your system by running 'mysql --version'"
+   echo " It seems this installed can't find MYSQL binary."
+   echo " Please make sure it is in your system by running 'mysql --version'"
    exit 1
  fi
 
@@ -86,8 +130,8 @@ fi
  GUNZIPBIN=`which gunzip 2> /dev/null`
  if [ "$GUNZIPBIN" = "" -o ! -x "$GUNZIPBIN" ]
  then
-   echo "It seems this installed can't find GUNZIP binary."
-   echo "Please make sure it is in your system by running 'gunzip --version'"
+   echo " It seems this installed can't find GUNZIP binary."
+   echo " Please make sure it is in your system by running 'gunzip --version'"
    exit 1
  fi
 
@@ -96,8 +140,8 @@ fi
  TARBIN=`which tar 2> /dev/null`
  if [ "$TARBIN" = "" -o ! -x "$TARBIN" ]
  then
-   echo "It seems this installed can't find TAR binary."
-   echo "Please make sure it is in your system by running 'tar --version'"
+   echo " It seems this installed can't find TAR binary."
+   echo " Please make sure it is in your system by running 'tar --version'"
    exit 1
  fi
 
@@ -114,7 +158,7 @@ fi
  fi
 
  echo ""
- echo -n "Enter version number (default $LV i.e. latest version): "
+ echo -n " Enter version number (default $LV i.e. latest version): "
  read -e VN                                                            ## VN = Version Number
     if [ "$VN" == "" ]
     then
@@ -131,7 +175,7 @@ fi
   if [ $CVN == 0 ]
    then
     echo ""
-    echo -n "Wrong value, please re-enter version number (default $LV i.e. latest version): "
+    echo -n " Wrong value, please re-enter version number (default $LV i.e. latest version): "
      read -e VN
       if [ "$VN" == "" ]
        then
@@ -143,11 +187,16 @@ fi
 ## Choose if installation should get the file from the net or just install it from a  local file.
 
  echo ""
- echo "Which kind of installation would you like to do?"
- echo "1. Install from file on disk "
- echo "2. Download and install (recommended) "
- echo -n "Enter choice (default 2): "
+ echo " Which kind of installation would you like to do?"
+ echo " 1. Install from file on disk "
+ echo " 2. Download and install (recommended) "
+ echo -n " Enter choice (default 2): "
  read -e TOI                                                                  ## TOI = Type of Installation
+
+ if [ "$ARGUMENT" = "test" ]
+ then
+   TOI=1
+ fi
 
  if [ "$TOI" == "" ]
   then
@@ -156,7 +205,7 @@ fi
 
  while [ "$TOI" -lt "1" ] && [ "$TOI" -gt "2" ]
  do
-    echo -n "Wrong value, please re-enter choice (default 2 i.e. Download and install): "
+    echo -n " Wrong value, please re-enter choice (default 2 i.e. Download and install): "
      read -e TOI
       if [ "$TOI" == "" ]
        then
@@ -166,7 +215,7 @@ fi
 
  if [ "$TOI" == "2" ]
   then
-    echo "Installation starting"
+    echo " Installation starting"
 
 ## Depending on type of OS, use wget, fetch or curl to download the package
 
@@ -179,7 +228,7 @@ fi
        fetch http://securich.googlecode.com/files/securich.$VN.tar.gz
         if [ $? != 0 ]
          then
-          echo "Download problem, file does not exist or connection could not be established."
+          echo " Download problem, file does not exist or connection could not be established."
           exit 1
         fi
       fi
@@ -188,29 +237,29 @@ fi
      curl -o securich.$VN.tar.gz http://securich.googlecode.com/files/securich.$VN.tar.gz
       if [ $? != 0 ]
        then
-        echo "Download problem, file does not exist or connection could not be established."
+        echo " Download problem, file does not exist or connection could not be established."
         exit 1
       fi
     else
-     echo "OS not supported"
+     echo " OS not supported"
     fi
 
     if [ $? != 0 ]
      then
-      echo "Download problem, file does not exist or connection could not be established."
+      echo " Download problem, file does not exist or connection could not be established."
       exit 1
     fi
   elif [ "$TOI" == "1" ]
    then
     if [ -e securich.$VN.tar.gz ]
      then
-      echo "Installation starting"
+      echo " Installation starting"
      else
-      echo "securich.$VN.tar.gz was not found, please place it in the same folder as this install script"
+      echo " securich.$VN.tar.gz was not found, please place it in the same folder as this install script"
       exit 1
     fi
   else
-   echo "Wrong value"
+   echo " Wrong value"
    exit 1
  fi
 
@@ -224,7 +273,7 @@ fi
  cp -f securich.$VN.tar.gz securich
   if [ $? != 0 ]
    then
-    echo "Problem encountered ... exiting"
+    echo " Problem encountered ... exiting"
     exit 1
   fi
 
@@ -233,14 +282,14 @@ fi
  gunzip -f securich.$VN.tar.gz
    if [ $? != 0 ]
     then
-     echo "Problem encountered ... exiting"
+     echo " Problem encountered ... exiting"
      exit 1
    fi
 
  tar -xf securich.$VN.tar
   if [ $? != 0 ]
    then
-    echo "Problem encountered ... exiting"
+    echo " Problem encountered ... exiting"
     exit 1
   fi
 
@@ -249,10 +298,10 @@ fi
 ## Choose from fresh installation or upgrade
 
  echo ""
- echo "Do you wish to:"
- echo "1. Do a fresh install "
- echo "2. Upgrade from a previous version "
- echo -n "Enter choice (default 1): "
+ echo " Do you wish to:"
+ echo " 1. Do a fresh install "
+ echo " 2. Upgrade from a previous version "
+ echo -n " Enter choice (default 1): "
  read -e FOU                                                           ## FOU = Fresh install or Upgrade
 
   if [ "$FOU" == "" ]
@@ -262,7 +311,7 @@ fi
 
  while [ "$FOU" -lt "1" ] && [ "$FOU" -gt "2" ]
  do
-    echo -n "Wrong value, please re-enter choice (default 1 i.e. fresh installation): "
+    echo -n " Wrong value, please re-enter choice (default 1 i.e. fresh installation): "
      read -e FOU
       if [ "$FOU" == "" ]
        then
@@ -272,7 +321,7 @@ fi
 
 
  echo ""
- echo -n "Enter mysql installation user username (default 'root'): "
+ echo -n " Enter mysql installation user username (default 'root'): "
  read -e SUPERUSER
 
  if [ "$SUPERUSER" == "" ]
@@ -283,7 +332,7 @@ fi
 ## Enter password (masked for security)
 
  echo ""
- echo -n "Enter mysql $SUPERUSER Password (default ''): "
+ echo -n " Enter mysql $SUPERUSER Password (default ''): "
 
  stty_orig=`stty -g`
  trap "echo ''; echo 'Installation aborted during password entry'; stty $stty_orig ; exit" 1 2 15
@@ -292,13 +341,18 @@ fi
  stty $stty_orig
  trap "" 1 2 15
 
+ if [ "$ARGUMENT" = "test" ]
+ then
+   PASS=msandbox
+ fi
+
 ## Choose from TCP/IP or Socket file
 
  echo ""
- echo "Would you like to connect using:"
- echo "1. TCP/IP"
- echo "2. Socket file"
- echo -n "Enter choice (default 1): "
+ echo " Would you like to connect using:"
+ echo " 1. TCP/IP"
+ echo " 2. Socket file"
+ echo -n " Enter choice (default 1): "
  read -e CH                                                           ## CH = Connection Handler
 
  if [ "$CH" == "" ]
@@ -308,7 +362,7 @@ fi
 
  while [ "$CH" -lt "1" ] && [ "$CH" -gt "2" ]
  do
-    echo -n "Wrong value, please re-enter choice (default 1 i.e. TCP/IP): "
+    echo -n " Wrong value, please re-enter choice (default 1 i.e. TCP/IP): "
      read -e CH
       if [ "$CH" == "" ]
        then
@@ -318,14 +372,20 @@ fi
 
  if [ "$CH" == "" ] || [ "$CH" == "1"  ]
  then
-    echo -n "Enter mysql Hostname/IP (default '127.0.0.1'): "
+    echo -n " Enter mysql Hostname/IP (default '127.0.0.1'): "
     read -e HOST
     if [ "$HOST" == "" ]
     then
        HOST=127.0.0.1
     fi
-    echo -n "Enter mysql Port (default '3306'): "
+    echo -n " Enter mysql Port (default '3306'): "
     read -e PORT
+
+    if [ "$ARGUMENT" = "test" ]
+    then
+      PORT=5154
+    fi
+
     if [ "$PORT" == "" ]
     then
        PORT=3306
@@ -339,7 +399,7 @@ fi
     while [ ! -e $SOCK ]
     do
        echo ""
-       echo -n "Enter mysql socket (default '/tmp/mysql.sock'): "
+       echo -n " Enter mysql socket (default '/tmp/mysql.sock'): "
        read -e SOCK
        if [ "$SOCK" == "" ]
        then
@@ -359,6 +419,9 @@ fi
           mysql --user=$SUPERUSER --password=$PASS $COMM_MEANS --execute="drop database if exists securich"
           innodbyes=`mysql -u $SUPERUSER --password=$PASS -s -B $COMM_MEANS --execute="show engines" | cut -f 1,2 | grep InnoDB | cut -f 2`
 
+          echo ""
+          echo -n -e "\r Building Securich database"
+
           if [ "$innodbyes" = 'YES' ]; then
           {
              mysql --user=$SUPERUSER --password=$PASS $COMM_MEANS < db/securich.sql
@@ -371,49 +434,106 @@ fi
 
           if [ $? != 0 ]; then
            {
-             echo "Problem creating securich db"
+             echo " Problem creating securich db"
              exit 1
            }
           fi
+
+          echo -n -e "\r Building Securich database ... done"
 
 ## Import first stored procedure (used during installation)
 
           mysql --user=$SUPERUSER --password=$PASS $COMM_MEANS securich < procedures/update_databases_tables_storedprocedures_list.sql
           if [ $? != 0 ]; then
            {
-             echo "Problems importing procedure update_databses_tables_storedprocedures_list"
+             echo " Problems importing procedure update_databses_tables_storedprocedures_list"
              exit 1
            }
           fi
+
+          echo ""
+          echo -n -e "\r Loading Securich db with data"
 
 ## Create first sets of data in tables (2 simple roles, list of privileges etc)
 
           mysql --user=$SUPERUSER --password=$PASS $COMM_MEANS securich < db/data.sql
           if [ $? != 0 ]; then
            {
-             echo "Problems importing data into securich db"
+             echo " Problems importing data into securich db"
              exit 1
            }
           fi
 
+          echo -n -e "\r Loading Securich db with data ... done"
+
 ## Import all stored procedures into the database
+
+          echo ""
+          echo -n -e "\rLoading securich stored procedures"
 
           for proc in `ls procedures/`
            do
             mysql --user=$SUPERUSER --password=$PASS $COMM_MEANS securich < procedures/$proc
             if [ $? != 0 ]; then
              {
-               echo "Problem importing procedure $proc into securich db"
+               echo " Problem importing procedure $proc into securich db"
                exit 1
              }
             fi
           done
 
+          echo -n -e "\r Loading securich stored procedures ... done"
+
           mysql --user=$SUPERUSER --password=$PASS $COMM_MEANS --execute="insert into securich.sec_version (VERSION,UPDATED_TIMESTAMP) values ('$VN',now())"
 
 ## Run reconciliation to populate securich database
 
-          mysql --user=$SUPERUSER --password=$PASS $COMM_MEANS securich --execute="call mysql_reconciliation('')"
+          starttime=`date +%s`
+          originalcount=`mysql --user=$SUPERUSER --password=$PASS $COMM_MEANS securich --execute="call reconciliation('list')" | wc -l`
+
+          mysql --user=$SUPERUSER --password=$PASS $COMM_MEANS securich --execute="call mysql_reconciliation('')" &
+          
+          sleep 1
+
+          echo ""
+          echo " Reconciling privileges between MySQL db and Securich db started"
+          echo ""
+
+          currentcount=$originalcount
+          percentage=$(((originalcount-currentcount) *100 / originalcount))
+          lasttime=`date +%s`
+
+          while [ $currentcount -gt 1 ]
+          do
+          #   if [ $percentage -gt 2 ]
+          #   then
+          #     timeremainingsec=$((timeremainingsec - 1))
+          #     hr_time_rem $timeremainingsec timeremaining
+          #   fi
+
+             if [ $percentage -gt 94 ]
+             then
+               check_percent 
+             else
+               if [ `date +%s` -gt $((lasttime + 5)) ]
+               then 
+                 check_percent 
+               fi
+             fi
+
+             currenttime=`date +%s`
+
+             seconds=$((currenttime - starttime))
+
+             hr_time $seconds timevar
+             echo -n -e "\r                                                                     "
+             echo -n -e "\r Progress: $percentage% done in $timevar" #- Estimate: $timeremaining"
+             #echo "CurrentTime $currenttime CurrentCount $currentcount Percentage $percentage TimeRemaining $timeremaining TimeElapsed $timevar" >> /tmp/seclog
+             sleep 1
+          done
+
+          sleep 1
+          echo ""
 
 ## If upgrading, run upgrade scripts
 
@@ -443,7 +563,7 @@ fi
 
           if [ `sed -n "/$VN/,/$LV/p" $BASEDIR/version | grep -c $CURV` != 0 ]       ## New Or Old
           then
-            echo "Upgrading a recent version $CURV with the same or older version $VN is not possible"
+            echo " Upgrading a recent version $CURV with the same or older version $VN is not possible"
             exit 0
           fi
 
@@ -452,7 +572,7 @@ fi
           mysqldump -q --add-drop-table --single-transaction --no-autocommit --user=$SUPERUSER --password=$PASS $COMM_MEANS securich > backup/securich_`/bin/date +%Y%m%d`.sql
 
           echo ""
-          echo "MySQL Security database backup taken"
+          echo " MySQL Security database backup taken"
           echo ""
 
 ## Upgrade version of securich
@@ -465,7 +585,7 @@ fi
             mysql --user=$SUPERUSER --password=$PASS $COMM_MEANS securich < upgrades/$VERSION/upgrade.sql
             if [ $? != 0 ]; then
              {
-               echo "Problem updating securich db"
+               echo " Problem updating securich db"
                exit 1
              }
             fi
@@ -474,7 +594,7 @@ fi
           mysql --user=$SUPERUSER --password=$PASS $COMM_MEANS securich < procedures/update_databases_tables_storedprocedures_list.sql
           if [ $? != 0 ]; then
            {
-             echo "Problems importing procedure update_databses_tables_storedprocedures_list"
+             echo " Problems importing procedure update_databses_tables_storedprocedures_list"
              exit 1
            }
           fi
@@ -484,7 +604,7 @@ fi
             mysql --user=$SUPERUSER --password=$PASS $COMM_MEANS securich < procedures/$proc
             if [ $? != 0 ]; then
              {
-               echo "Problem importing procedure $proc into securich db"
+               echo " Problem importing procedure $proc into securich db"
                exit 1
              }
             fi
@@ -493,7 +613,7 @@ fi
           mysql --user=$SUPERUSER --password=$PASS $COMM_MEANS --execute="insert into securich.sec_version (VERSION,UPDATED_TIMESTAMP) values ('$VN',now())"
 
  else
-  echo "Wrong value for type of installation selected, please enter 1 or 2."
+  echo " Wrong value for type of installation selected, please enter 1 or 2."
  fi
 
- echo "Installation complete"
+ echo " Installation complete"
