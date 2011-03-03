@@ -20,3 +20,9 @@ Limitations:
 2. Doesn't cater for columns
 3. Can't be used to grant the grant option or limitations with the number of queries / connections per period of time.
 4. If a stored procedure is deleted / dropped, then the rights attached to it are lost as well so `call reconciliation('sync');` should be executed right after a stored procedure is recreated.
+
+
+
+Future changes in pipeline:
+1. Optimize grant_privileges_reverse_reconciliation
+2. Users with privileges on *.* should be expanded and flagged to update their grants whenever new databases are created
