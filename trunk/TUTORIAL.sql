@@ -50,3 +50,4 @@ show processlist;
 
 #typical output for grant privileges
 Password for user -- judas -- contactable at -- judas@domain.com -- is -- a56df6ed415d0 --
+
