@@ -5,8 +5,8 @@
 ##  Securich install script containing selection of kind of installation such   ##
 ##  as through download or from file, version control, upgrade facility,        ##
 ##  socket or tcp/ip connection etc                                             ##
-##  v 4.0                                                                       ##
-##  7 th January 2011                                                           ##
+##  v 5.0                                                                       ##
+##  2 nd March 2011                                                             ##
 ##                                                                              ##
 ##################################################################################
 
@@ -469,7 +469,7 @@ fi
 ## Import all stored procedures into the database
 
           echo ""
-          echo -n -e "\rLoading securich stored procedures"
+          echo -n -e "\r Loading securich stored procedures"
 
           for proc in `ls procedures/`
            do
