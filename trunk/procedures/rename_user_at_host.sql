@@ -49,6 +49,7 @@ CREATE PROCEDURE `securich`.`rename_user_at_host`( usernamein varchar(16), hostn
       DECLARE done INT DEFAULT 0;
 
       FLUSH PRIVILEGES;
+      call reconciliation('sync');
                       /* Security feature does not permit an empty user / root user being granted through this package! */
 
       SET usernameincount = (select count(*) from sec_reserved_usernames where USERNAME=usernamein);

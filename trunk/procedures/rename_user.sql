@@ -62,6 +62,7 @@ CREATE PROCEDURE `securich`.`rename_user`( usernamein varchar(16), newusernamein
       END; 
 */
       FLUSH PRIVILEGES;
+      call reconciliation('sync');
                       /* Security feature does not permit an empty user / root user being granted through this package! */
 
       SET usernameincount = (select count(*) from sec_reserved_usernames where USERNAME=usernamein);
