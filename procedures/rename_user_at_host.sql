@@ -138,7 +138,7 @@ CREATE PROCEDURE `securich`.`rename_user_at_host`( usernamein varchar(16), hostn
             update sec_us_ho_db_tb set HO_ID=newhostid , US_ID=newuserid where HO_ID=oldhostid and US_ID=olduserid;
             update sec_us_ho_db_sp set HO_ID=newhostid , US_ID=newuserid where HO_ID=oldhostid and US_ID=olduserid;
 
-            call reconciliation('sync');
+            call reconciliation('securichsync');
             
             SET @d = CONCAT('drop user "', usernamein , '"@"' , hostnamein , '"'); /* Drop since the user doesn't have any privileges at all! */
 

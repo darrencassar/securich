@@ -117,7 +117,7 @@ CREATE PROCEDURE `securich`.`rename_user`( usernamein varchar(16), newusernamein
                LEAVE cur_host_loop;
             END IF;
             
-            call reconciliation('sync');
+            call reconciliation('securichsync');
 
             call set_password(newusernamein,hostname,'xxx',randompassword);
 
