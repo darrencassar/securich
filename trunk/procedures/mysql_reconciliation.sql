@@ -332,7 +332,6 @@ BEGIN
             END IF;
  
             SET roletype=(SELECT TYPE FROM sec_privileges WHERE PRIVILEGE=role);
-
             IF SYSTEMPARAM = 'MySQL' THEN
                SET @i=CONCAT('call grant_privileges_reverse_reconciliation("' , TRIM(BOTH '\'' FROM SUBSTRING_INDEX(usernameinathostnamein, '@', 1)) , '","' , TRIM(BOTH '\'' FROM SUBSTRING_INDEX(usernameinathostnamein, '@', -1)) , '","' , tableschema , '","' , tablename , '","' , defobjecttype , '","' , role , '","");');
             ELSE
