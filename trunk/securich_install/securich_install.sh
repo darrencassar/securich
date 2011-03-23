@@ -422,7 +422,7 @@ fi
           echo ""
           echo -n -e "\r Building Securich database"
 
-          if [ "$innodbyes" = 'YES' ]; then
+          if [ "$innodbyes" = 'YES' ] || [ "$innodbyes" = 'DEFAULT' ]; then
           {
              mysql --user=$SUPERUSER --password=$PASS $COMM_MEANS < db/securich.sql
           }
