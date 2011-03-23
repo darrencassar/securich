@@ -340,8 +340,10 @@ BEGIN
                END IF;
             END IF;
  
-            PREPARE grantcomrecon FROM @i;
-            EXECUTE grantcomrecon;
+            IF @i IS NOT NULL THEN
+               PREPARE grantcomrecon FROM @i;
+               EXECUTE grantcomrecon;
+            END IF;
 
             END WHILE cur_user_loop;
 
