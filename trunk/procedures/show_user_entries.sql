@@ -144,7 +144,8 @@ CREATE PROCEDURE `securich`.`show_user_entries`( usernamein VARCHAR(16))
        DROP TABLE IF EXISTS temp_tbl_3;
        CREATE TEMPORARY TABLE temp_tbl_3
        (  `RO_ID` INT,
-          `US_HO_DB_TB_ID` INT
+          `US_HO_DB_TB_ID` INT,
+          `STATE` CHAR(1)
        );       
        
 # Stored Procedure section
@@ -152,16 +153,17 @@ CREATE PROCEDURE `securich`.`show_user_entries`( usernamein VARCHAR(16))
        DROP TABLE IF EXISTS temp_tbl_13;
        CREATE TEMPORARY TABLE temp_tbl_13
        (  `RO_ID` INT,
-          `US_HO_DB_SP_ID` INT
+          `US_HO_DB_SP_ID` INT,
+          `STATE` CHAR(1)
        );
 
        INSERT INTO temp_tbl_3
-       SELECT DISTINCT c.RO_ID AS roid, c.US_HO_DB_TB_ID AS ushodbid
+       SELECT DISTINCT c.RO_ID AS roid, c.US_HO_DB_TB_ID AS ushodbid, c.STATE as STATE
        FROM sec_us_ho_db_tb_ro c JOIN temp_tbl_2 d
        WHERE c.US_HO_DB_TB_ID=d.ID;
        
        INSERT INTO temp_tbl_13
-       SELECT DISTINCT c.RO_ID AS roid, c.US_HO_DB_SP_ID AS ushodbid
+       SELECT DISTINCT c.RO_ID AS roid, c.US_HO_DB_SP_ID AS ushodbid, c.STATE as STATE
        FROM sec_us_ho_db_sp_ro c JOIN temp_tbl_12 d
        WHERE c.US_HO_DB_SP_ID=d.ID;
 
@@ -181,18 +183,16 @@ CREATE PROCEDURE `securich`.`show_user_entries`( usernamein VARCHAR(16))
        );
        
        
-       INSERT INTO temp_tbl_4 SELECT b.USERNAME, b.HOSTNAME, b.DATABASENAME, b.TABLENAME, a.ROLE, b.TYPE, ushodbtbro.STATE
+       INSERT INTO temp_tbl_4 SELECT b.USERNAME, b.HOSTNAME, b.DATABASENAME, b.TABLENAME, a.ROLE, b.TYPE, c.STATE
        FROM temp_tbl_2 b, temp_tbl_1 a JOIN temp_tbl_3 c JOIN sec_us_ho_db_tb_ro ushodbtbro
        WHERE b.ID=c.US_HO_DB_TB_ID AND
-       a.ID=c.RO_ID and 
-       b.ID=ushodbtbro.US_HO_DB_TB_ID
+       a.ID=c.RO_ID
        GROUP BY USERNAME, HOSTNAME, DATABASENAME, TABLENAME, ROLE, STATE;
        
-       INSERT INTO temp_tbl_4 SELECT b.USERNAME, b.HOSTNAME, b.DATABASENAME, b.STOREDPROCEDURENAME, a.ROLE, b.TYPE, ushodbspro.STATE
+       INSERT INTO temp_tbl_4 SELECT b.USERNAME, b.HOSTNAME, b.DATABASENAME, b.STOREDPROCEDURENAME, a.ROLE, b.TYPE, c.STATE
        FROM temp_tbl_12 b, temp_tbl_11 a JOIN temp_tbl_13 c JOIN sec_us_ho_db_sp_ro ushodbspro
        WHERE b.ID=c.US_HO_DB_SP_ID AND 
-       a.ID=c.RO_ID AND
-       b.ID=ushodbspro.US_HO_DB_SP_ID
+       a.ID=c.RO_ID 
        GROUP BY USERNAME, HOSTNAME, DATABASENAME, STOREDPROCEDURENAME, ROLE, STATE;
        
        SELECT * FROM temp_tbl_4 order by 1,2,3,4 asc;
