@@ -40,8 +40,19 @@ CREATE PROCEDURE `securich`.`password_check`()
       /* list of privileges a particular user entity (username@hostname) will be granted on a particular combination of database and tables */
 
       DECLARE cur_pass CURSOR FOR
-	     SELECT mu.USER AS USERNAME,mu.HOST AS HOSTNAME,mu.PASSWORD AS "MySQL PW" ,sec.PW0 AS "SECURICH PW"
-         FROM mysql.user mu JOIN (
+      SELECT * FROM mysql_securich_users;
+ 
+      DECLARE EXIT HANDLER FOR SQLEXCEPTION
+      BEGIN
+         ROLLBACK;
+         SELECT 'Error occurred - terminating - Securich to MySQL password reconciliation failed';
+      END;
+      DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
+
+      DROP TEMPORARY TABLE IF EXISTS mysql_securich_users;
+      CREATE TEMPORARY TABLE mysql_securich_users AS
+      SELECT mu.USER AS USERNAME,mu.HOST AS HOSTNAME,mu.PASSWORD AS "MySQL PW" ,sec.PW0 AS "SECURICH PW"
+      FROM mysql.`user` mu JOIN (
            SELECT uhid.USERNAME, uhid.HOSTNAME, pr.PW0 
            FROM sec_us_ho_profile pr JOIN (
               SELECT uh.ID, us.USERNAME, ho.HOSTNAME 
@@ -58,34 +69,24 @@ CREATE PROCEDURE `securich`.`password_check`()
             SELECT USERNAME 
             FROM sec_reserved_usernames)
          GROUP BY mu.USER;
-
-      DECLARE EXIT HANDLER FOR SQLEXCEPTION
-      BEGIN
-         ROLLBACK;
-         SELECT 'Error occurred - terminating - Securich to MySQL password reconciliation failed';
-      END;
-      
+       
+      IF (SELECT COUNT(*) FROM  mysql_securich_users) > 0 THEN
       OPEN cur_pass;
-
       cur_pass_loop:WHILE(done=0) DO
-
       FETCH cur_pass INTO un, hn, pwm, pws;
       
-          /* once done, just leave the loop */
-
+          
       IF done=1 THEN
          LEAVE cur_pass_loop;
-
       END IF;
-
-         update mysql.user set Password=pws where User=un and Host=hn;
-         insert into aud_password (USERNAME,HOSTNAME,MPASS,SPASS,TIMESTAMP) values (un,hn,pwm,pws,now());
+         UPDATE mysql.USER SET PASSWORD=pws WHERE USER=un AND HOST=hn;
+         INSERT INTO aud_password (USERNAME,HOSTNAME,MPASS,SPASS,TIMESTAMP) VALUES (un,hn,pwm,pws,NOW());
          
       END WHILE cur_pass_loop;
       CLOSE cur_pass;
-
       FLUSH PRIVILEGES;
-                     
+      END IF;
+                                     
 END$$
 
 DELIMITER ;
