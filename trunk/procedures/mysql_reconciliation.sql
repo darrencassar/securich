@@ -284,70 +284,74 @@ BEGIN
          GROUP BY GRANTEE, TABLE_SCHEMA, TABLE_NAME, PRIVILEGE, TYPE
          HAVING COUNT(*) = 1
          ORDER BY GRANTEE;
- 
-         OPEN cur_role;
-            cur_role_loop:WHILE(done=0) DO
-            FETCH cur_role INTO privilegerole;
- 
-            IF done=1 THEN
-               SET done=0;
-               LEAVE cur_role_loop;
-            END IF;
- 
-            SET @a= CONCAT('set @b=(SELECT COUNT(*) FROM sec_roles WHERE ROLE="' , privilegerole , '")');
- 
-            PREPARE temporarycom FROM @a;
-            EXECUTE temporarycom;
- 
-            IF @b < 1 THEN
-               SET @c = CONCAT('call create_update_role ("add","' , LOWER(privilegerole) , '","' , LOWER(privilegerole) , '")');
-               PREPARE rolecreatecom FROM @c;
-               EXECUTE rolecreatecom;
-            END IF;
- 
-            END WHILE cur_role_loop;
- 
-         CLOSE cur_role;
- 
-         OPEN cur_user;
- 
-            cur_user_loop:WHILE(done=0) DO
-            FETCH cur_user INTO SYSTEMPARAM, usernameinathostnamein, tableschema, tablename, role, objecttype;
- 
-            IF done=1 THEN
-               SET done=0;
-               LEAVE cur_user_loop;
-            END IF;
- 
-            IF objecttype = 't' AND tablename IS NULL THEN
-               SET defobjecttype = 'all' ;
-            ELSEIF objecttype = 't' AND tablename IS NOT NULL THEN
-               SET defobjecttype = 'singletable' ;
-            ELSEIF objecttype = 's' THEN
-               SET defobjecttype = 'storedprocedure';
-            END IF;
- 
-            IF tablename IS NULL THEN
-               SET tablename = '';
-            END IF;
- 
-            SET roletype=(SELECT TYPE FROM sec_privileges WHERE PRIVILEGE=role);
-            IF SYSTEMPARAM = 'MySQL' THEN
-               SET @i=CONCAT('call grant_privileges_reverse_reconciliation("' , TRIM(BOTH '\'' FROM SUBSTRING_INDEX(usernameinathostnamein, '@', 1)) , '","' , TRIM(BOTH '\'' FROM SUBSTRING_INDEX(usernameinathostnamein, '@', -1)) , '","' , tableschema , '","' , tablename , '","' , defobjecttype , '","' , role , '","");');
-            ELSE
-               IF command_mysqlrecon= 'mysqlsync' THEN
-                  SET @i=CONCAT('call revoke_privileges("' , TRIM(BOTH '\'' FROM SUBSTRING_INDEX(usernameinathostnamein, '@', 1)) , '","' , TRIM(BOTH '\'' FROM SUBSTRING_INDEX(usernameinathostnamein, '@', -1)) , '","' , tableschema , '","' , tablename , '","' , defobjecttype , '","' , role , '","");');
-               END IF;
-            END IF;
- 
-            IF @i IS NOT NULL THEN
-               PREPARE grantcomrecon FROM @i;
-               EXECUTE grantcomrecon;
-            END IF;
 
-            END WHILE cur_user_loop;
+         IF (SELECT COUNT(*) FROM sec_two_grantee_privileges_reconcile WHERE SYSTEMPARAM = 'MySQL') > 0 THEN
+ 
+           OPEN cur_role;
+              cur_role_loop:WHILE(done=0) DO
+              FETCH cur_role INTO privilegerole;
+   
+              IF done=1 THEN
+                 SET done=0;
+                 LEAVE cur_role_loop;
+              END IF;
+   
+              SET @a= CONCAT('set @b=(SELECT COUNT(*) FROM sec_roles WHERE ROLE="' , privilegerole , '")');
+   
+              PREPARE temporarycom FROM @a;
+              EXECUTE temporarycom;
+   
+              IF @b < 1 THEN
+                 SET @c = CONCAT('call create_update_role ("add","' , LOWER(privilegerole) , '","' , LOWER(privilegerole) , '")');
+                 PREPARE rolecreatecom FROM @c;
+                 EXECUTE rolecreatecom;
+              END IF;
+   
+              END WHILE cur_role_loop;
+   
+           CLOSE cur_role;
+   
+           OPEN cur_user;
+   
+              cur_user_loop:WHILE(done=0) DO
+              FETCH cur_user INTO SYSTEMPARAM, usernameinathostnamein, tableschema, tablename, role, objecttype;
+   
+              IF done=1 THEN
+                 SET done=0;
+                 LEAVE cur_user_loop;
+              END IF;
+   
+              IF objecttype = 't' AND tablename IS NULL THEN
+                 SET defobjecttype = 'all' ;
+              ELSEIF objecttype = 't' AND tablename IS NOT NULL THEN
+                 SET defobjecttype = 'singletable' ;
+              ELSEIF objecttype = 's' THEN
+                 SET defobjecttype = 'storedprocedure';
+              END IF;
+   
+              IF tablename IS NULL THEN
+                 SET tablename = '';
+              END IF;
+   
+              SET roletype=(SELECT TYPE FROM sec_privileges WHERE PRIVILEGE=role);
+              IF SYSTEMPARAM = 'MySQL' THEN
+                 SET @i=CONCAT('call grant_privileges_reverse_reconciliation("' , TRIM(BOTH '\'' FROM SUBSTRING_INDEX(usernameinathostnamein, '@', 1)) , '","' , TRIM(BOTH '\'' FROM SUBSTRING_INDEX(usernameinathostnamein, '@', -1)) , '","' , tableschema , '","' , tablename , '","' , defobjecttype , '","' , role , '","");');
+              ELSE
+                 IF command_mysqlrecon= 'mysqlsync' THEN
+                    SET @i=CONCAT('call revoke_privileges("' , TRIM(BOTH '\'' FROM SUBSTRING_INDEX(usernameinathostnamein, '@', 1)) , '","' , TRIM(BOTH '\'' FROM SUBSTRING_INDEX(usernameinathostnamein, '@', -1)) , '","' , tableschema , '","' , tablename , '","' , defobjecttype , '","' , role , '","");');
+                 END IF;
+              END IF;
+   
+              IF @i IS NOT NULL THEN
+                 PREPARE grantcomrecon FROM @i;
+                 EXECUTE grantcomrecon;
+              END IF;
 
-         CLOSE cur_user;
+              END WHILE cur_user_loop;
+
+           CLOSE cur_user;
+
+         END IF;
  
          UPDATE sec_config SET VALUE = '0' WHERE PROPERTY = 'mysql_to_securich_reconciliation_in_progress';
  
