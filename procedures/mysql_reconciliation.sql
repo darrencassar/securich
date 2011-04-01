@@ -285,7 +285,7 @@ BEGIN
          HAVING COUNT(*) = 1
          ORDER BY GRANTEE;
 
-         IF (SELECT COUNT(*) FROM sec_two_grantee_privileges_reconcile WHERE SYSTEMPARAM = 'MySQL') > 0 THEN
+         IF (SELECT COUNT(*) FROM sec_two_grantee_privileges_reconcile WHERE SYSTEM = 'MySQL') > 0 THEN
  
            OPEN cur_role;
               cur_role_loop:WHILE(done=0) DO
