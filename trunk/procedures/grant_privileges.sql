@@ -79,6 +79,7 @@ CREATE  PROCEDURE `securich`.`grant_privileges`( usernamein VARCHAR(16), hostnam
       DECLARE spname VARCHAR(64);
       DECLARE reservedusername INT;
       DECLARE modeofoperation VARCHAR(40);
+      DECLARE usercreated INT;
 
       DECLARE RL VARCHAR(20);
       DECLARE PRIV_OBO_GRANT VARCHAR(50);
@@ -362,18 +363,23 @@ CREATE  PROCEDURE `securich`.`grant_privileges`( usernamein VARCHAR(16), hostnam
 
                   IF userexistsonmysql = 1 THEN
 
-                     SET @d = CONCAT('drop user "' , usernamein , '"@"' , hostnamein , '"');
+                     IF (select count(*) from  information_schema.SCHEMA_PRIVILEGES where grantee=concat("'",usernamein,"'@'",hostnamein,"'")) = 0 THEN
 
-                     PREPARE dropcom FROM @d;
-                     EXECUTE dropcom;
+                        SET @d = CONCAT('drop user "' , usernamein , '"@"' , hostnamein , '"');
+
+                        PREPARE dropcom FROM @d;
+                        EXECUTE dropcom;
+
+                        SET @c = CONCAT('create user "' , usernamein , '"@"' , hostnamein , '" identified by "' , randompassword , '"');
+
+                        PREPARE createcom FROM @c;
+                        EXECUTE createcom;
+
+                        SET usercreated = 1;
+
+                     END IF;
 
                   END IF;
-
-
-                  SET @c = CONCAT('create user "' , usernamein , '"@"' , hostnamein , '" identified by "' , randompassword , '"');
-
-                  PREPARE createcom FROM @c;
-                  EXECUTE createcom;
 
                       /* insert a record of the user entity (username@host) in sec_us_ho */
 
@@ -929,10 +935,15 @@ CREATE  PROCEDURE `securich`.`grant_privileges`( usernamein VARCHAR(16), hostnam
 
                IF ushoidcount < 1 THEN
 
-                  SET @randomp = CONCAT('select "Password for user -- ' , usernamein , ' -- contactable at -- ' , emailaddressin , ' -- is -- ' , randompassword , ' --" as USER_PASSWORD');
+                  IF usercreated = 1 THEN
 
-                  PREPARE randompasswordcom FROM @randomp;
-                  EXECUTE randompasswordcom;
+                     SET @randomp = CONCAT('select "Password for user -- ' , usernamein , ' -- contactable at -- ' , emailaddressin , ' -- is -- ' , randompassword , ' --" as USER_PASSWORD');
+
+                     PREPARE randompasswordcom FROM @randomp;
+                     EXECUTE randompasswordcom;
+
+                  END IF;
+
 
                   SET spname = 'set_my_password';
 
