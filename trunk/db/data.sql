@@ -56,7 +56,8 @@ INSERT  INTO `sec_privileges`(`ID`,`PRIVILEGE`,`TYPE`) VALUES
 (24,'SHOW DATABASES',3),
 (25,'SHUTDOWN',3),
 (26,'SUPER',3),
-(27,'FILE',3);
+(27,'FILE',3),
+(28,'CREATE TABLESPACE','3');
 
 
 INSERT INTO `sec_roles` VALUES
