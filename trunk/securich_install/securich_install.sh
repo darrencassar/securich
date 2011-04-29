@@ -75,7 +75,7 @@ function hr_time () {
  function check_percent () {
 
    lasttime=`date +%s`
-   currentcount=`mysql --user=$SUPERUSER --password=$PASS $COMM_MEANS securich --execute="call reconciliation('list')" | wc -l` 
+#   currentcount=`mysql --user=$SUPERUSER --password=$PASS $COMM_MEANS securich --execute="call reconciliation('list')" | wc -l` 
    percentage=$(((originalcount-currentcount) *100 / originalcount))
 
    #if [ $percentage -gt 2 ]
@@ -483,6 +483,8 @@ fi
           done
 
           echo -n -e "\r Loading securich stored procedures ... done"
+          echo ""
+          echo -n -e "\r Computing work to be done"
 
           mysql --user=$SUPERUSER --password=$PASS $COMM_MEANS --execute="insert into securich.sec_version (VERSION,UPDATED_TIMESTAMP) values ('$VN',now())"
 
@@ -490,6 +492,8 @@ fi
 
           starttime=`date +%s`
           originalcount=`mysql --user=$SUPERUSER --password=$PASS $COMM_MEANS securich --execute="call reconciliation('list')" | wc -l`
+	  int_sec=$(((originalcount*5/500)+2))
+          echo -n -e "\r Computing work to be done ... done"
 
           mysql --user=$SUPERUSER --password=$PASS $COMM_MEANS securich --execute="call mysql_reconciliation('')" &
           
@@ -499,38 +503,47 @@ fi
           echo " Reconciling privileges between MySQL db and Securich db started"
           echo ""
 
-          currentcount=$originalcount
-          percentage=$(((originalcount-currentcount) *100 / originalcount))
-          lasttime=`date +%s`
+          mysql --user=$SUPERUSER --password=$PASS $COMM_MEANS securich --execute="call listcount()" > /dev/null 2>&1 &
+
+#          sleep 3
+
+#          currentcount=`cat /tmp/sec_outfile`
+#	   rm /tmp/sec_outfile
+#          percentage=$(((originalcount-currentcount) *100 / originalcount))
+
+          if [ -e "/tmp/sec_outfile" ]
+	  then
+	    currentcount=`cat /tmp/sec_outfile`
+	  else
+            currentcount=$originalcount
+	  fi
+          rm -f /tmp/sec_outfile
 
           while [ $currentcount -gt 1 ]
           do
-          #   if [ $percentage -gt 2 ]
-          #   then
-          #     timeremainingsec=$((timeremainingsec - 1))
-          #     hr_time_rem $timeremainingsec timeremaining
-          #   fi
 
-             if [ $percentage -gt 94 ]
-             then
-               check_percent 
-             else
-               if [ `date +%s` -gt $((lasttime + 5)) ]
-               then 
-                 check_percent 
-               fi
-             fi
+             if [ -e "/tmp/sec_outfile" ]
+	     then
+	       currentcount=`cat /tmp/sec_outfile`
+	       rm -f /tmp/sec_outfile
+	     fi
 
              currenttime=`date +%s`
 
              seconds=$((currenttime - starttime))
 
              hr_time $seconds timevar
+	     check_percent
              echo -n -e "\r                                                                     "
              echo -n -e "\r Progress: $percentage% done in $timevar" #- Estimate: $timeremaining"
              #echo "CurrentTime $currenttime CurrentCount $currentcount Percentage $percentage TimeRemaining $timeremaining TimeElapsed $timevar" >> /tmp/seclog
              sleep 1
           done
+
+          if [ -e "/tmp/sec_outfile" ]
+	  then
+	    rm -f /tmp/sec_outfile
+	  fi
 
           sleep 1
           echo ""
