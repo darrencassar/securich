@@ -56,9 +56,9 @@ BEGIN
       DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
       
       SET @@session.max_sp_recursion_depth=30;
- 
+
       CALL update_databases_tables_storedprocedures_list();
- 
+
       IF command <> 'list' AND command <> 'sync' AND command <> 'securichsync' AND command <> 'mysqlsync' THEN
          SELECT "WRONG PARAMETER PASSED THROUGH RECONCILIATION" AS ERROR;
  
