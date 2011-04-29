@@ -56,8 +56,13 @@ BEGIN
       DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
       
       SET @@session.max_sp_recursion_depth=30;
+      
+      IF (SELECT TIME_TO_SEC(TIMEDIFF(now(),@time_update_list)) > 300) OR (select @time_update_list is NULL ) THEN
 
-      CALL update_databases_tables_storedprocedures_list();
+         CALL update_databases_tables_storedprocedures_list();       
+         set @time_update_list=now();
+        
+      END IF;  
 
       IF command <> 'list' AND command <> 'sync' AND command <> 'securichsync' AND command <> 'mysqlsync' THEN
          SELECT "WRONG PARAMETER PASSED THROUGH RECONCILIATION" AS ERROR;
