@@ -24,8 +24,8 @@
 ##                                                                                   ##
 #######################################################################################
 
-USE securich;
-
+USE securich;   
+                 
 DROP PROCEDURE IF EXISTS reconciliation;
 
 DELIMITER $$
