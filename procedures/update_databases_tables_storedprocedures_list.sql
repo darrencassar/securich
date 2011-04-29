@@ -74,7 +74,7 @@ CREATE PROCEDURE `securich`.`update_databases_tables_storedprocedures_list`()
         
         set @time_temptbl_created=now();
         
-     END IF;
+     END IF;  
      
           
      insert into securich.sec_databases (DATABASENAME)
