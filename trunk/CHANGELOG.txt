@@ -120,4 +120,18 @@ SecuRich Changelog:
    * Patch in auditing of privileges
    * Patch show_user_entries and show_full_user_entries to show blocked privileges
 
+2011-05-02: version 0.6.2
+  
+   * Patch fix for drop_user reconciliation 
+   * Patch fix for rename_user reconciliation 
+   * Patch fix for rename_user
+   * Patch fix for 5.5 having innodb engine by default
+   * Patch fix for show_user_entries
+   * Patch fix for new user creation random password generation
+   * Added new privilege for 5.5 "create tablespace"
+   * Addred listcount procedure
+   * Optimized update_databases_tables_storedprocedures_list by a ratio of 1:5400
+   * Optimized reconciliation(''); by 1:30
+   * Optimized the install script to not be intrusive when checking the progress of reconciliation
+
 

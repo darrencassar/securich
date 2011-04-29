@@ -40,22 +40,6 @@ terminate () {
 
 }
 
-#function hr_time_rem () {
-#  usage="$0 seconds 'variable'"
-#  if [ -z $1 ] || [ -z $2 ] ; then
-#    echo $usage
-#    exit 1
-#  fi
-#
-#  days_=$(echo "scale=0 ; $1 / 86400" | bc -l)
-#  remainder_=$(echo "scale=0 ; $1 % 86400" | bc -l)
-#  hours_=$(echo "scale=0 ; $remainder_ / 3600" | bc -l)
-#  remainder_=$(echo "scale=0 ; $remainder_ % 3600" | bc -l)
-#  minutes_=$(echo "scale=0 ; $remainder_ / 60" | bc -l)
-#  seconds_=$(echo "scale=0 ; $remainder_ % 60" | bc -l)
-#  export $2=" $minutes_ min $seconds_ sec"
-#}
-
 function hr_time () {
   usage="$0 seconds 'variable'"
   if [ -z $1 ] || [ -z $2 ] ; then
@@ -72,20 +56,12 @@ function hr_time () {
   export $2=" $minutes min $seconds sec"
 }
 
- function check_percent () {
+function check_percent () {
 
-   lasttime=`date +%s`
-#   currentcount=`mysql --user=$SUPERUSER --password=$PASS $COMM_MEANS securich --execute="call reconciliation('list')" | wc -l` 
-   percentage=$(((originalcount-currentcount) *100 / originalcount))
-
-   #if [ $percentage -gt 2 ]
-   #then
-   #  timeremainingsec=$(((10000 * seconds) / (((originalcount-currentcount) *10000) / originalcount)))
-   #  hr_time_rem $timeremainingsec timeremaining
-   #else
-   #  timeremaining="Calculating time remaining"
-   #fi
- }
+  lasttime=`date +%s`
+# currentcount=`mysql --user=$SUPERUSER --password=$PASS $COMM_MEANS securich --execute="call reconciliation('list')" | wc -l` 
+  percentage=$(((originalcount-currentcount) *100 / originalcount))
+}
 
 ARGUMENT=$1
 
@@ -109,8 +85,8 @@ then
   echo " brought to you by Darren Cassar "
   echo " http://www.mysqlpreacher.com "
   echo ""
-  echo " installer version 5.0"
-  echo " release date 2nd March 2011"
+  echo " installer version 6.0"
+  echo " release date 1st May 2011"
   echo ""
   echo ""
 fi
