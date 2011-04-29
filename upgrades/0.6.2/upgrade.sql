@@ -1,0 +1,1 @@
+INSERT  INTO `sec_privileges`(`ID`,`PRIVILEGE`,`TYPE`) VALUES (28,'CREATE TABLESPACE','3');
