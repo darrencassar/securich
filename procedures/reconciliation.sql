@@ -64,7 +64,7 @@ BEGIN
         
       END IF;  
 
-      IF command <> 'list' AND command <> 'sync' AND command <> 'securichsync' AND command <> 'mysqlsync' THEN
+      IF command <> 'list' AND command <> 'listcount' AND command <> 'sync' AND command <> 'securichsync' AND command <> 'mysqlsync' THEN
          SELECT "WRONG PARAMETER PASSED THROUGH RECONCILIATION" AS ERROR;
  
       ELSEIF command = 'mysqlsync' THEN
@@ -286,6 +286,25 @@ BEGIN
             GROUP BY GRANTEE, TABLE_SCHEMA, TABLE_NAME, PRIVILEGE, TYPE
             HAVING COUNT(*) = 1
             ORDER BY GRANTEE;
+            
+        ELSEIF command = 'listcount' THEN
+ 
+            set @reconlistcount=(
+               SELECT count(*) from (
+                  SELECT MIN(System) AS System, GRANTEE, TABLE_SCHEMA, TABLE_NAME, PRIVILEGE, TYPE
+                  FROM
+                  (
+                    SELECT 'MySQL' AS System, inf_grantee_privileges.GRANTEE, inf_grantee_privileges.TABLE_SCHEMA, inf_grantee_privileges.TABLE_NAME, inf_grantee_privileges.PRIVILEGE, inf_grantee_privileges.TYPE
+                    FROM inf_grantee_privileges
+                    UNION ALL
+                    SELECT 'Securich' AS System, sec_grantee_privileges.GRANTEE, sec_grantee_privileges.TABLE_SCHEMA, sec_grantee_privileges.TABLE_NAME, sec_grantee_privileges.PRIVILEGE, sec_grantee_privileges.TYPE
+                    FROM sec_grantee_privileges
+                  ) tmp
+                  GROUP BY GRANTEE, TABLE_SCHEMA, TABLE_NAME, PRIVILEGE, TYPE
+                  HAVING COUNT(*) = 1
+                  ORDER BY GRANTEE
+                  ) tblalias
+               );
  
          ELSEIF command = 'sync' OR command = 'securichsync' THEN
  
