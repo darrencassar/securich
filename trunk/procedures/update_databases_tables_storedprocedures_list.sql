@@ -45,29 +45,37 @@ CREATE PROCEDURE `securich`.`update_databases_tables_storedprocedures_list`()
      insert into updtdbnames select distinct(db) from mysql.procs_priv;
      insert into updtdbnames select distinct(SCHEMA_NAME) from information_schema.SCHEMATA where SCHEMA_NAME != 'information_schema';                                  
 
-     drop temporary table if exists temptbl1;
+           
+     IF (SELECT TIME_TO_SEC(TIMEDIFF(now(),@time_temptbl_created)) > 300) OR (select @time_temptbl_created is NULL ) THEN
+
+        drop temporary table if exists temptbl1;
      
-     CREATE TEMPORARY TABLE `temptbl1` (
-     `TABLE_SCHEMA` varchar(64) NOT NULL DEFAULT '',
-     `TABLE_NAME` varchar(64) NOT NULL DEFAULT '',
-     KEY `tt_idx` (`TABLE_SCHEMA`,`TABLE_NAME`)
-     ) ENGINE=InnoDB DEFAULT CHARSET=latin1 ;
-                                
-     insert into temptbl1 select TABLE_SCHEMA, TABLE_NAME
-        from information_schema.tables
-        where table_schema <> 'information_schema';
-          
-     drop temporary table if exists temptbl2;
-                   
-     CREATE TEMPORARY TABLE `temptbl2` (
-     `ROUTINE_SCHEMA` varchar(64) NOT NULL DEFAULT '',
-     `ROUTINE_NAME` varchar(64) NOT NULL DEFAULT '',
-     KEY `tt_idx` (`ROUTINE_SCHEMA`,`ROUTINE_NAME`)
-     ) ENGINE=InnoDB DEFAULT CHARSET=latin1 ;
+        CREATE TEMPORARY TABLE `temptbl1` (
+        `TABLE_SCHEMA` varchar(64) NOT NULL DEFAULT '',
+        `TABLE_NAME` varchar(64) NOT NULL DEFAULT '',
+        KEY `tt_idx` (`TABLE_SCHEMA`,`TABLE_NAME`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=latin1 ;
+        
+        insert into temptbl1 select TABLE_SCHEMA, TABLE_NAME
+           from information_schema.tables
+           where table_schema <> 'information_schema';
+             
+        drop temporary table if exists temptbl2;
+                      
+        CREATE TEMPORARY TABLE `temptbl2` (
+        `ROUTINE_SCHEMA` varchar(64) NOT NULL DEFAULT '',
+        `ROUTINE_NAME` varchar(64) NOT NULL DEFAULT '',
+        KEY `tt_idx` (`ROUTINE_SCHEMA`,`ROUTINE_NAME`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=latin1 ;
+        
+        insert into temptbl2 select ROUTINE_SCHEMA, ROUTINE_NAME
+           from information_schema.routines
+           where ROUTINE_SCHEMA <> 'information_schema';     
+        
+        set @time_temptbl_created=now();
+        
+     END IF;
      
-     insert into temptbl2 select ROUTINE_SCHEMA, ROUTINE_NAME
-        from information_schema.routines
-        where ROUTINE_SCHEMA <> 'information_schema';
           
      insert into securich.sec_databases (DATABASENAME)
         select distinct(db)
