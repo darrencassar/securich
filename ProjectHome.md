@@ -1,0 +1,7 @@
+Securich is an incredibly handy and versatile tool for managing user privileges on MySQL through the use of roles. It basically makes granting and revoking rights a piece of cake, not to mention added security it provides through password expiry, history and complexity, the customization level it permits, the fact that it runs on any MySQL 5.1.12 or later and it's easily deployable on any official MySQL binary, platform independent.
+
+[There is a presentation format PDF document here](http://securich.googlecode.com/files/MYSQLConference.pdf).
+
+The package basically consists of a database named securich containing a bunch of tables used by a group of stored procedures to do the job of handling roles for you. Despite the fact that roles have been implemented in other database technologies like Oracle, SQL server and Sybase for a long time, MySQL hasn't caught up with them yet on that respect, which inspired the start of SecuRich to fill in the void in the area.
+
+Adding to it's beauty is the fact that SecuRich is an OpenSource project licensed under GPLv2 meaning you can use it free of charge, you can modify it at will and maybe even supply some cool stored procedures back to the project for others to use. Having said that, there is no one working full time on it meaning I might not be able to develop custom requested features or provide support.
